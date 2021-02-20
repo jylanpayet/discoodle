@@ -1,0 +1,32 @@
+discoodle.iml
+frontend/frontend.iml
+frontend/node
+frontend/node_modules/.cache
+.mvn
+.idea
+api/api.iml
+frontend/package-lock.json
+
+.DS_Store
+node_modules
+/dist
+
+
+# local env files
+.env.local
+.env.*.local
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor directories and files
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+/api/target/

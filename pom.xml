@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.discoodle</groupId>
+    <artifactId>discoodle</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <!-- Name of the main module -->
+    <name>discoodle</name>
+    <description>Vue.JS and SpringBoot application. Student project to make learning easier !</description>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.4.2</version>
+        <relativePath/>
+    </parent>
+
+    <!-- Porject main properties -->
+    <properties>
+        <main.basedir>${project.basedir}</main.basedir>
+    </properties>
+
+    <modules>
+        <!-- Backend module -->
+        <module>api</module>
+        <!-- Frontend module -->
+        <module>frontend</module>
+    </modules>
+
+
+    <!-- Devteam with emails -->
+    <developers>
+        <developer>
+            <name>Moïse CLIPAL</name>
+            <email>elymo.mc@gmail.com</email>
+        </developer>
+        <developer>
+            <name>Jylan PAYET</name>
+            <email>jylanpayet@gmail.com</email>
+        </developer>
+        <developer>
+            <name>Dylan ALEXANDRE</name>
+            <email>dylan_alexandre@outlook.fr</email>
+        </developer>
+        <developer>
+            <name>Bastian SOMON</name>
+            <email>bastian.somon@gmail.com</email>
+        </developer>
+    </developers>
+
+
+</project>
