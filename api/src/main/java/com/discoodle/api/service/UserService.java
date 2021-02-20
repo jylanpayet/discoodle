@@ -22,7 +22,7 @@ public class UserService {
     }
 
     public void addNewUser(User user) {
-        Optional<User> TestPseudo = userRepository.findUserByPseudo(user.getUsername());
+        Optional<User> TestPseudo = userRepository.findUserByPseudo(user.getPseudo());
         Optional<User> TestMail = userRepository.findUserByPseudo(user.getMail());
 
         if(TestPseudo.isPresent() || TestMail.isPresent()) {
