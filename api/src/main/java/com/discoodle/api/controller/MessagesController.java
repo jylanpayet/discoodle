@@ -19,16 +19,20 @@ import java.util.Scanner;
 public class MessagesController {
 
    @GetMapping("api/messages")
-   public ConversationMessages getMessages(@RequestParam(value = "uuid", defaultValue = "messages") String date) {
+   public ConversationMessages getMessages(@RequestParam(value = "uuid", defaultValue = "messages") String uuid) {
       Gson gson = new Gson();
 
       ConversationMessages conversationMessages = new ConversationMessages();
       StringBuilder jsonContent = new StringBuilder();
 
       try {
-         File myObj = new File("static/common/json/"+date+".json");
+         File myObj = new File("static/common/json/"+uuid+".json");
          if (!myObj.exists()) {
-            return new ConversationMessages();
+            myObj.createNewFile();
+            PrintWriter writer = new PrintWriter(myObj);
+            writer.write("[\n\n]");
+            writer.close();
+            return conversationMessages;
          }
          Scanner myReader = new Scanner(myObj);
          while (myReader.hasNextLine()) {

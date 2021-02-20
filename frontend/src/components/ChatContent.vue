@@ -46,7 +46,6 @@ export default {
    },
    mounted() {
       this.getMessagesFromJSON();
-      console.log(this.messages);
       this.connect();
    },
    beforeRouteUpdate() {
@@ -67,7 +66,7 @@ export default {
          let ws = new SockJS("http://localhost:8080/ws");
          stompClient = Stomp.over(ws);
          // Comment the next line if you want to show websocket's logs
-         stompClient.debug = null
+         // stompClient.debug = null
 
          stompClient.connect({}, () => {
             stompClient.subscribe(`/conversations/rooms/${this.getCurrentConv}`, (sdkEvent) => {
