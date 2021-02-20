@@ -3,13 +3,14 @@ package com.discoodle.api.model;
 import java.util.LinkedList;
 
 public class ConversationMessages {
-   private LinkedList<ChatMessage> chatMessages = new LinkedList<>();
+   private LinkedList<ChatMessage> chatMessages;
 
    public ConversationMessages(LinkedList<ChatMessage> chatMessages) {
       this.chatMessages = chatMessages;
    }
 
    public ConversationMessages() {
+      this(new LinkedList<>());
    }
 
    public LinkedList<ChatMessage> getChatMessages() {

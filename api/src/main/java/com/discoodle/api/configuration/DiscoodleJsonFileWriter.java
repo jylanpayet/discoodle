@@ -16,15 +16,13 @@ public class DiscoodleJsonFileWriter {
 
 
     public static void runWriter(ChatMessage msg, String roomUUID) {
-
-        System.out.println("------" + roomUUID);
-
-        LinkedList<ChatMessage> chatMessage = new LinkedList<>();
+        LinkedList<ChatMessage> chatMessage;
         StringBuilder jsonContent = new StringBuilder();
 
         try {
             File myObj = new File(String.format("static/common/json/%s.json", roomUUID));
-            if (myObj.createNewFile()) {
+            if (!myObj.exists()) {
+                myObj.createNewFile();
                 PrintWriter writer = new PrintWriter(myObj);
                 writer.write("[\n\n]");
                 writer.close();
