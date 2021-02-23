@@ -1,5 +1,14 @@
 package com.discoodle.api.model;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.util.UUID;
+
+@Getter
+@Setter
+@ToString
 
 public class ChatRoom {
     private String roomID;
@@ -11,21 +20,4 @@ public class ChatRoom {
         chatRoom.name = name;
         return chatRoom;
     }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getRoomID() {
-        return roomID;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setRoomID(String roomID) {
-        this.roomID = roomID;
-    }
-
 }
