@@ -3,9 +3,7 @@ package com.discoodle.api.model;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
+import java.util.*;
 
 @Getter
 @Setter
@@ -37,7 +35,7 @@ public class User {
             strategy = GenerationType.SEQUENCE,
             generator = "user_sequence"
     )
-    @Column(name = "id", unique = true, nullable = false)
+    @Column(name = "user_id", unique = true, nullable = false)
     private Integer id;
 
     @Column(name="mail")
@@ -70,4 +68,11 @@ public class User {
 
     @Column(name="enabled")
     private Boolean enabled = false;
+
+    @ManyToMany
+    @JoinTable( name = "link_user_subject",
+            joinColumns= @JoinColumn( name = "user_id" ),
+            inverseJoinColumns = @JoinColumn( name = "subject_id" )
+    )
+    private List<User> users = new ArrayList<>();
 }

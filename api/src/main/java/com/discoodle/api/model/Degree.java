@@ -3,6 +3,8 @@ package com.discoodle.api.model;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Getter
@@ -29,12 +31,19 @@ public class Degree {
             strategy = GenerationType.SEQUENCE,
             generator = "degree_sequence"
     )
-    @Column(name = "id", unique = true, nullable = false)
-    private long id;
+    @Column(name = "degree_id", unique = true, nullable = false)
+    private long degreeId;
 
     @Column(name = "name")
     private String name;
 
     @Column(name = "year")
     private Integer year;
+
+    @ManyToMany
+    @JoinTable( name = "link_degree_subject",
+            joinColumns = @JoinColumn( name = "degree_id" ),
+            inverseJoinColumns = @JoinColumn( name = "subject_id" ) )
+    private List<Subject> subjects = new ArrayList<>();
+
 }
