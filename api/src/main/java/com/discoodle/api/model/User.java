@@ -13,7 +13,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Entity
 @ToString
-@Table(name = "User")
+@Table(name = "user")
 public class User {
 
     public User(String mail, String pseudo, String password, String name, String last_name, Date date, String link_to_avatar, UserRole role) {

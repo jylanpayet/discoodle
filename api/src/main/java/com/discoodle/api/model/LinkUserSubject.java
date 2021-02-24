@@ -12,7 +12,7 @@ import java.io.Serializable;
 @ToString
 @Entity
 @IdClass(value=LinkUserSubject.KeyUS.class)
-@Table(name = "Link_user_subject")
+@Table(name = "link_user_subject")
 public class LinkUserSubject implements Serializable {
 
     @Id

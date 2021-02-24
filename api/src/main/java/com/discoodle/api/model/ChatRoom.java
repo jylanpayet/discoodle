@@ -11,7 +11,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @ToString
-@Table(name = "ChatRoom")
+@Table(name = "chat_room")
 public class ChatRoom {
 
     public ChatRoom(String name) {
@@ -19,8 +19,8 @@ public class ChatRoom {
     }
 
     @Id
-    @GeneratedValue(generator = "room_id")
-    @GenericGenerator(name = "room_id", strategy = "org.hibernate.id.UUIDGenerator")
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "room_id",unique = true, nullable = false)
     private String roomID;
     @Column(name = "name")

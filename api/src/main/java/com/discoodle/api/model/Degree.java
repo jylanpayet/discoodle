@@ -11,7 +11,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 @ToString
-@Table(name = "Degree")
+@Table(name = "degree")
 
 public class Degree {
 

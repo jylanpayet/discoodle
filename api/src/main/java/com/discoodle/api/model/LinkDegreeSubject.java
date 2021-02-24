@@ -12,7 +12,7 @@ import java.io.Serializable;
 @ToString
 @Entity
 @IdClass(value=LinkDegreeSubject.KeyDS.class)
-@Table(name = "Link_degree_subject")
+@Table(name = "link_degree_subject")
 public class LinkDegreeSubject implements Serializable {
 
     public LinkDegreeSubject(Integer degreeId, Integer subjectId) {
