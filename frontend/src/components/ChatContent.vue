@@ -12,8 +12,15 @@
                   :belong-to-myself="message.sender === user" :message-date="message.messageDate"/>
 
       </div>
+      <div class="writing-content" v-if="writers.length > 0" >
+         <span :key="items" v-for="items in writers">
+            {{items}},
+         </span>
+         {{writers.length>1 ? "sont" : "est"}} en train d'écrire...
+      </div>
       <div class="input-content">
-         <input type="text" :placeholder="`Envoyer un message à ${ $route.query.name }`" @keypress="isEnter">
+         <input type="text" :placeholder="`Envoyer un message à ${ $route.query.name }`"
+                @keypress="actionInput">
          <div class="right-side-input">
             ☺
             <button @click="user = 'Dylan'">
@@ -42,6 +49,7 @@ export default {
       return {
          messages: [],
          user: "Bob",
+         writers: []
       }
    },
    mounted() {
@@ -55,11 +63,22 @@ export default {
    },
    unmounted() {
       this.disconnect();
+      if (event.keyCode === 13 && document.querySelector(".input-content > input").value !== "") {
+         this.send();
+      }
    },
    methods: {
-      isEnter(event) {
+      actionInput(event) {
          if (event.keyCode === 13 && document.querySelector(".input-content > input").value !== "") {
             this.send();
+            this.writers.pop(this.user);
+         }else if(event.keyCode !== 13){
+            this.writing();
+         }
+      },
+      writing(){
+         if(!this.writers.includes(this.user)){
+            this.writers.push(this.user);
          }
       },
       connect() {
@@ -102,7 +121,7 @@ export default {
 
          if (messageContent && stompClient) {
             let date = new Date();
-            date = date.toLocaleString('fr-FR', { timeZone: 'UTC'}).substr(0, 17).replace(",", " -");
+            date = date.toLocaleString('fr-FR', {timeZone: 'UTC'}).substr(0, 17).replace(",", " -");
             date = date.substr(0, 13) + ((Number(date.substr(13, 2)) + 1) % 24) + date.substr(15, 3);
 
             let chatMessage = {
@@ -193,7 +212,7 @@ export default {
 
    width: calc(100% + 4px);
 
-   height: 80%;
+   height: 77%;
 
    overflow-y: auto;
 }
