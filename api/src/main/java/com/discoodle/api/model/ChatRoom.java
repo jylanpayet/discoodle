@@ -1,31 +1,29 @@
 package com.discoodle.api.model;
+import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
+
+import javax.persistence.*;
 import java.util.UUID;
 
+@Getter
+@Setter
+@EqualsAndHashCode
+@NoArgsConstructor
+@Entity
+@ToString
+@Table(name = "chat_room")
 public class ChatRoom {
-    private String roomID;
-    private String name;
 
-    public static ChatRoom create(String name){
-        ChatRoom chatRoom = new ChatRoom();
-        chatRoom.roomID = UUID.randomUUID().toString();
-        chatRoom.name = name;
-        return chatRoom;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getRoomID() {
-        return roomID;
-    }
-
-    public void setName(String name) {
+    public ChatRoom(String name) {
         this.name = name;
     }
 
-    public void setRoomID(String roomID) {
-        this.roomID = roomID;
-    }
+    @Id
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "room_id",unique = true, nullable = false)
+    private UUID id;
+    @Column(name = "name")
+    private String name;
 
 }
