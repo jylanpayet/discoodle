@@ -16,6 +16,11 @@ const routes = [
         component: () => import(/* webpackChunkName: "home" */ '../views/Home')
     },
     {
+        path: '/authentification',
+        name: 'Authentication',
+        component: () => import(/* webpackChunkName: "home" */ '../views/Authentication')
+    },
+    {
         path: '/cours',
         name: 'Cours',
         component: () => import(/* webpackChunkName: "courses" */ '../views/Courses')

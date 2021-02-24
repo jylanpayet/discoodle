@@ -14,14 +14,12 @@ import java.util.*;
 @Table(name = "user")
 public class User {
 
-    public User(String mail, String pseudo, String password, String name, String last_name, Date date, String link_to_avatar, UserRole role) {
+    public User(String mail, String username, String password, String name, String lastName, UserRole role) {
         this.mail = mail;
-        this.pseudo = pseudo;
+        this.username = username;
         this.password = password;
         this.name = name;
-        this.last_name = last_name;
-        this.birth_day = date;
-        this.link_to_avatar = link_to_avatar;
+        this.lastName = lastName;
         this.role = role;
     }
 
@@ -35,38 +33,35 @@ public class User {
             strategy = GenerationType.SEQUENCE,
             generator = "user_sequence"
     )
-    @Column(name = "user_id", unique = true, nullable = false)
+    @Column(name = "id", unique = true, nullable = false)
     private Integer id;
 
-    @Column(name="mail")
+    @Column(name = "mail")
     private String mail;
 
-    @Column(name="pseudo")
-    private String pseudo;
+    @Column(name = "username")
+    private String username;
 
-    @Column(name="password")
+    @Column(name = "password")
     private String password;
 
-    @Column(name="name")
+    @Column(name = "name")
     private String name;
 
-    @Column(name="last_name")
-    private String last_name;
+    @Column(name = "last_name")
+    private String lastName;
 
-    @Column(name="birth_day")
-    private Date birth_day;
+    @Column(name = "link_to_avatar")
+    private String linkToAvatar;
 
-    @Column(name="link_to_avatar")
-    private String link_to_avatar;
-
-    @Column(name="role")
     @Enumerated(EnumType.STRING)
+    @Column(name = "role")
     private UserRole role;
 
-    @Column(name="locked")
+    @Column(name = "locked")
     private Boolean locked = false;
 
-    @Column(name="enabled")
+    @Column(name = "enabled")
     private Boolean enabled = false;
 
     @ManyToMany
