@@ -15,7 +15,7 @@
           </div>
         </div>
       </div>
-      <form class="sign-up" @click="userRegistration">
+      <div class="sign-up">
         <h2>Créez votre compte</h2>
         <div>Le mail servira d'identifiant.</div>
         <input type="text" placeholder="Pseudonyme" name="username" />
@@ -24,8 +24,8 @@
         <input type="email" placeholder="Mail" name="mail" />
         <input type="password" placeholder="Mot de passe" name="password" />
         <input type="date" name="birthday"/>
-        <button>Inscription</button>
-      </form>
+        <button @click="userRegistration">Inscription</button>
+      </div>
 
       <form class="sign-in">
         <h2>Se connecter</h2>
@@ -49,10 +49,18 @@ export default {
     }
   },
   methods: {
-    userRegistration() {
-      axios.post(`http://localhost:8080/api/registration`, {mail: document.querySelector("input[name=mail]").value, password: document.querySelector("input[name=password]").value, lastName: document.querySelector("input[name=lastname]").value, name: document.querySelector("input[name=name]").value, username: document.querySelector("input[name=username]").value, locked: false, enabled: false}).then(response => {
+    userRegistration(event) {
+      console.log(event);
+      axios.post(`http://localhost:8080/api/registration`, {
+          mail: document.querySelector("input[name=mail]").value,
+          password: document.querySelector("input[name=password]").value,
+          lastName: document.querySelector("input[name=lastname]").value,
+          name: document.querySelector("input[name=name]").value,
+          username: document.querySelector("input[name=username]").value,
+          locked: false,
+          enabled: false
+      }).then(response => {
         console.log(response);
-        return "Enregistrement avec succès !";
       })
     }
   }
@@ -70,7 +78,7 @@ export default {
   overflow: hidden;
   box-shadow: 0 15px 30px rgba(0, 0, 0, .2),
   0 10px 10px rgba(0, 0, 0, .2);
-  background: linear-gradient(to bottom, #efefef, #ccc);
+  background: linear-gradient(to bottom, #ffffff, #f4f4f4);
 
   .overlay-container {
     position: absolute;
@@ -87,7 +95,7 @@ export default {
     left: -100%;
     height: 100%;
     width: 200%;
-    background: linear-gradient(to bottom right, #e85c5c, #f3ca20);
+    background: linear-gradient(to bottom right, #e85c5c, #e86c5c);
     color: #fff;
     transform: translateX(0);
     transition: transform .5s ease-in-out;
@@ -128,8 +136,8 @@ a {
 }
 button {
   border-radius: 20px;
-  border: 1px solid #dba917;
-  background-color: #dba917;
+  border: 1px solid #e85c5c;
+  background-color: #e85c5c;
   color: #fff;
   font-size: 1rem;
   font-weight: bold;
@@ -149,7 +157,7 @@ button.invert {
   background-color: transparent;
   border-color: #fff;
 }
-form {
+.sign-up, .sign-in {
   position: absolute;
   top: 0;
   display: flex;
@@ -160,7 +168,7 @@ form {
   width: calc(50% - 120px);
   height: calc(100% - 180px);
   text-align: center;
-  background: linear-gradient(to bottom, #efefef, #ccc);
+  background: linear-gradient(to bottom, #ffffff, #f4f4f4);
   transition: all .5s ease-in-out;
   div {
     font-size: 1rem;
@@ -172,8 +180,7 @@ form {
     margin: 6px 0;
     width: calc(100% - 30px);
     border-radius: 15px;
-    border-bottom: 1px solid #ddd;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, .4),
+    border-bottom: 1px solid #ddd,
     0 -1px 1px #fff,
     0 1px 0 #fff;
     overflow: hidden;
