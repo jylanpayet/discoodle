@@ -24,8 +24,6 @@
                   {{ item.name }}
                </div>
             </router-link>
-
-
          </div>
          <router-view/>
       </div>

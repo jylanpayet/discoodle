@@ -12,11 +12,11 @@
                   :belong-to-myself="message.sender === user" :message-date="message.messageDate"/>
 
       </div>
-      <div class="writing-content" v-if="writers.length > 0" >
+      <div class="writing-content" v-if="writers.length > 0">
          <span :key="items" v-for="items in writers">
-            {{items}},
+            {{ items }},
          </span>
-         {{writers.length>1 ? "sont" : "est"}} en train d'écrire...
+         {{ writers.length > 1 ? "sont" : "est" }} en train d'écrire...
       </div>
       <div class="input-content">
          <input type="text" :placeholder="`Envoyer un message à ${ $route.query.name }`"
@@ -72,13 +72,23 @@ export default {
          if (event.keyCode === 13 && document.querySelector(".input-content > input").value !== "") {
             this.send();
             this.writers.pop(this.user);
-         }else if(event.keyCode !== 13){
+         } else if (event.keyCode !== 13) {
             this.writing();
          }
       },
-      writing(){
-         if(!this.writers.includes(this.user)){
+      writing() {
+         if (!this.writers.includes(this.user)) {
             this.writers.push(this.user);
+            let writingT = {
+               content: "",
+               sender: this.user,
+               messageDate: new Date().toLocaleDateString(),
+               pinned: false,
+               convUUID: this.getCurrentConv,
+               type: "WRITING"
+            }
+            console.log(writingT);
+            stompClient.send(`/conversationListener/${this.getCurrentConv}/room.writing`, {},writingT );
          }
       },
       connect() {
@@ -107,14 +117,25 @@ export default {
          let message = JSON.parse(payload.body);
 
          if (message.sender !== this.user) {
-            this.messages.unshift({
-               content: message.content,
-               sender: message.sender,
-               messageDate: message.messageDate,
-               pinned: message.pinned,
-               // messageReactions: message.messageReactions
-            })
+            if (message.type === "SEND") {
+               this.messages.unshift({
+                  content: message.content,
+                  sender: message.sender,
+                  messageDate: message.messageDate,
+                  pinned: message.pinned,
+                  // messageReactions: message.messageReactions
+               })
+            } else if (message.type === "WRITING") {
+               if (!this.writers.includes(this.user))
+                  this.writers.push(message.sender)
+               setTimeout(()=>{
+                  this.writers = this.writers.filter((elt) => (
+                     elt !== message.sender
+                  ))
+               }, 5000)
+            }
          }
+
       },
       send() {
          let messageContent = document.querySelector(".input-content > input");
@@ -130,6 +151,7 @@ export default {
                messageDate: date,
                pinned: false,
                convUUID: this.getCurrentConv,
+               type: "SEND",
                // messageReactions: []
             };
 
