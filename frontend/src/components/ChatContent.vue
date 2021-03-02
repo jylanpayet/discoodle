@@ -3,8 +3,23 @@
         :key="$route.fullPath">
       <div class="user-info-content"
            :style="getTheme ? { backgroundColor: '#454150' } : { backgroundColor: '#909090' }">
-         {{ $route.query.name }}
+         <span>{{ $route.query.name }}</span>
+         <div class="room-icons">
+            <button id="pin" @click="switchPinDisplay"><img src="../assets/pin.png" alt="pin"></button>
+         </div>
       </div>
+
+      <div class="pinned-message" v-if="showPinned">
+         <div>
+            {{ pinned.length === 0 ? "Aucun message épinglé" : "" }}
+            <div class="pinned-message-content" :key="messages" v-for="messages in pinned">
+               {{ messages.sender }} : <br>
+               {{ messages.content }} <br>
+               {{ messages.messageDate }}
+            </div>
+         </div>
+      </div>
+
       <div class="conversation-content">
 
          <Message v-for="message in messages" :key="message" :content="message.content"
@@ -12,11 +27,14 @@
                   :belong-to-myself="message.sender === user" :message-date="message.messageDate"/>
 
       </div>
-      <div class="writing-content" v-if="writers.length > 0">
+      <div class="writing-content" v-if="writers.length > 0 && writers.length < 4">
          <span :key="items" v-for="items in writers">
             {{ items }},
          </span>
-         {{ writers.length > 1 ? "sont" : "est" }} en train d'écrire...
+         {{ (writers.length > 1 ? "sont" : "est") + " en train d'écrire..." }}
+      </div>
+      <div class="writing-content" v-else-if="writers.length >= 4">
+         Plusieurs personnes sont en train d'écrire.
       </div>
       <div class="input-content">
          <input type="text" :placeholder="`Envoyer un message à ${ $route.query.name }`"
@@ -48,8 +66,10 @@ export default {
    data() {
       return {
          messages: [],
+         pinned: [],
          user: "Bob",
-         writers: []
+         writers: [],
+         showPinned: false
       }
    },
    mounted() {
@@ -79,16 +99,6 @@ export default {
       writing() {
          if (!this.writers.includes(this.user)) {
             this.writers.push(this.user);
-            let writingT = {
-               content: "",
-               sender: this.user,
-               messageDate: new Date().toLocaleDateString(),
-               pinned: false,
-               convUUID: this.getCurrentConv,
-               type: "WRITING"
-            }
-            console.log(writingT);
-            stompClient.send(`/conversationListener/${this.getCurrentConv}/room.writing`, {},writingT );
          }
       },
       connect() {
@@ -117,25 +127,14 @@ export default {
          let message = JSON.parse(payload.body);
 
          if (message.sender !== this.user) {
-            if (message.type === "SEND") {
-               this.messages.unshift({
-                  content: message.content,
-                  sender: message.sender,
-                  messageDate: message.messageDate,
-                  pinned: message.pinned,
-                  // messageReactions: message.messageReactions
-               })
-            } else if (message.type === "WRITING") {
-               if (!this.writers.includes(this.user))
-                  this.writers.push(message.sender)
-               setTimeout(()=>{
-                  this.writers = this.writers.filter((elt) => (
-                     elt !== message.sender
-                  ))
-               }, 5000)
-            }
+            this.messages.unshift({
+               content: message.content,
+               sender: message.sender,
+               messageDate: message.messageDate,
+               pinned: message.pinned,
+               // messageReactions: message.messageReactions
+            })
          }
-
       },
       send() {
          let messageContent = document.querySelector(".input-content > input");
@@ -151,7 +150,6 @@ export default {
                messageDate: date,
                pinned: false,
                convUUID: this.getCurrentConv,
-               type: "SEND",
                // messageReactions: []
             };
 
@@ -164,7 +162,11 @@ export default {
          axios.get(`http://localhost:8080/api/messages?uuid=${this.getCurrentConv}`).then(response => {
             console.log(response);
             this.messages = response.data.chatMessages;
+            this.pinned = this.messages.filter(elt => (elt.pinned === true));
          });
+      },
+      switchPinDisplay() {
+         this.showPinned = !this.showPinned;
       },
    },
    computed: {
@@ -195,6 +197,7 @@ export default {
    width: 100%;
 
    display: flex;
+   justify-content: space-between;
    align-items: center;
 
    color: #F4F4F4;
@@ -231,6 +234,8 @@ export default {
    position: relative;
    display: flex;
    flex-direction: column-reverse;
+
+   padding-right: 6px;
 
    width: calc(100% + 4px);
 
@@ -284,13 +289,80 @@ export default {
 }
 
 .conversation-content::-webkit-scrollbar {
-   width: 4px;
+   width: 3px;
 }
 
 
 .conversation-content::-webkit-scrollbar-thumb {
    background: #909090;
    border-radius: 15px;
+}
+
+#pin > img {
+   width: 20px;
+   height: 20px;
+}
+
+#pin {
+   outline: none;
+   background: none;
+   border: none;
+
+   cursor: pointer;
+}
+
+#pin:hover {
+   transform: scale(1.1) rotate(-10deg);
+}
+
+.pinned-message {
+   animation: appear-opacity ease-in-out 0.5s;
+
+   position: absolute;
+
+   border-radius: 12px;
+   right: 50px;
+   max-width: 350px;
+   min-width: 350px;
+   transform: translateY(35px);
+
+   min-height: 50px;
+   background-color: #909090;
+}
+
+.pinned-message > div {
+   position: relative;
+   width: calc(100% - 20px);
+
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: flex-start;
+
+   margin: 10px 10px 0 10px;
+
+}
+
+.pinned-message > div::before {
+   content: "";
+   position: absolute;
+   right: 0;
+   top: 0;
+   width: 13px;
+   height: 13px;
+   background-color: #909090;
+   transform: rotate(45deg) translateY(-9px) translateX(-15px);
+}
+
+.pinned-message-content {
+   padding: 10px;
+   margin-bottom: 10px;
+   width: calc(100% - 20px);
+   background-color: #C4C4C4;
+   color: #454150;
+   border-radius: 12px;
+
+   cursor: pointer;
 }
 
 @keyframes appear-opacity {

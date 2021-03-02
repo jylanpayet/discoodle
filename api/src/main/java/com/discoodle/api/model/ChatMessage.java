@@ -63,6 +63,10 @@ public class ChatMessage {
 		this.pinned = pinned;
 	}
 
+	public boolean isPinned() {
+		return pinned;
+	}
+
 	public UUID getConvUUID() {
 		return convUUID;
 	}
