@@ -35,7 +35,7 @@ public class UserService implements UserDetailsService {
         Optional<User> TestPseudo = userRepository.findUserByPseudo(user.getUsername());
         Optional<User> TestMail = userRepository.findUserByPseudo(user.getMail());
 
-        if(TestPseudo.isPresent() || TestMail.isPresent()) {
+        if (TestPseudo.isPresent() || TestMail.isPresent()) {
             throw new IllegalStateException("pseudo déjà pris");
         }
         userRepository.save(user);
@@ -43,7 +43,7 @@ public class UserService implements UserDetailsService {
 
     public void deleteUser(Integer userId) {
         boolean exists = userRepository.existsById(userId);
-        if(!exists) {
+        if (!exists) {
             throw new IllegalStateException("L'étudiant avec l'id : " + userId + "n'existe pas.");
         }
         userRepository.deleteById(userId);
@@ -58,7 +58,7 @@ public class UserService implements UserDetailsService {
     public String signUpUser(User user) {
         boolean userExist = userRepository.findUserByMail(user.getMail()).isPresent();
 
-        if(userExist) {
+        if (userExist) {
             throw new IllegalStateException("L'email est déjà utilisé.");
         }
 
@@ -77,6 +77,13 @@ public class UserService implements UserDetailsService {
 
         confirmationTokenService.saveConfirmationToken(confirmationToken);
         return token;
+    }
+
+    public Boolean login(String mail, String password) {
+        if(userRepository.findUserByMail(mail).isPresent()) {
+            return bCryptPasswordEncoder.matches(password, userRepository.findUserByMail(mail).get().getPassword());
+        }
+        return false;
     }
 
     public int enableUser(String email) {

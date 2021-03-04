@@ -30,7 +30,7 @@ public class MailService implements MailSender {
             helper.setText(mail, true);
             helper.setTo(to);
             helper.setSubject("Confirmez votre adresse mail.");
-            helper.setFrom("hello@amigoscode.com");
+            helper.setFrom("salut@discoodle.fr");
             mailSender.send(mimeMessage);
         } catch (MessagingException e) {
             LOGGER.error("L'envoie du mail de confirmation n'a pas pu se faire.", e);

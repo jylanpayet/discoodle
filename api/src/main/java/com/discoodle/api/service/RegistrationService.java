@@ -2,7 +2,6 @@ package com.discoodle.api.service;
 
 import com.discoodle.api.model.RegistrationRequest;
 import com.discoodle.api.model.UserRole;
-import com.discoodle.api.security.EmailValidator;
 import com.discoodle.api.model.User;
 
 import com.discoodle.api.security.mailConfirmation.MailSender;
@@ -18,54 +17,42 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class RegistrationService {
     private final UserService userService;
-    private final EmailValidator emailValidator;
     private final ConfirmationTokenService confirmationTokenService;
     private final MailSender mailSender;
 
     public String register(RegistrationRequest request) {
-        boolean isValidEmail = emailValidator.test(request.getMail());
-
-        if (!isValidEmail) {
-            throw new IllegalStateException("Le mail n'est pas valide.");
+        if (request.getPassword().matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}")) {
+            if (request.getMail().matches("^(.+)@(.+)$")) {
+                String token = userService.signUpUser(
+                        new User(
+                                request.getMail(),
+                                request.getUsername(),
+                                request.getPassword(),
+                                request.getName(),
+                                request.getLastName(),
+                                UserRole.STUDENT
+                        )
+                );
+            /*String link = "http://localhost:8080/api/v1/registration/confirm?token=" + token;
+            mailSender.send(request.getMail(),
+                    buildMail(request.getName(), link));*/
+                return token;
+            }
+            return "Votre mail n'est pas valide.\n";
         }
-        String token = userService.signUpUser(
-                new User(
-                        request.getMail(),
-                        request.getUsername(),
-                        request.getPassword(),
-                        request.getName(),
-                        request.getLastName(),
-                        UserRole.STUDENT
-                )
-        );
-        String link = "http://localhost:8080/api/v1/registration/confirm?token=" + token;
-        mailSender.send(request.getMail(),
-                buildMail(request.getName(), link));
-        return token;
+        return "Votre mot de passe doit contenir :\n" +
+                "- au moins 8 caractères\n" +
+                "- un chiffre\n" +
+                "- une minuscule\n" +
+                "- une majuscule\n" +
+                "- un caractère spécial\n" +
+                "- pas d'espace, retour à la ligne...\n";
     }
 
-    public String login(RegistrationRequest request) {
-        boolean isValidEmail = emailValidator.test(request.getMail());
-
-        if (!isValidEmail) {
-            throw new IllegalStateException("Le mail n'est pas valide");
-        }
-        String token = userService.signUpUser(
-                new User(
-                        request.getMail(),
-                        request.getUsername(),
-                        request.getPassword(),
-                        request.getName(),
-                        request.getLastName(),
-                        UserRole.STUDENT
-                )
-        );
-        String link = "http://localhost:8080/api/v1/registration/confirm?token=" + token;
-        mailSender.send(request.getMail(),
-                buildMail(request.getName(), link));
-        return token;
+    public Boolean login(RegistrationRequest request) {
+        return (userService.login(request.getMail(), request.getPassword()));
     }
-    
+
     @Transactional
     public String confirmToken(String token) {
         ConfirmationToken confirmationToken = confirmationTokenService

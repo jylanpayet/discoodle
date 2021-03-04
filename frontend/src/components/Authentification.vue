@@ -18,23 +18,22 @@
       <div class="sign-up">
         <h2>Créez votre compte</h2>
         <div>Le mail servira d'identifiant.</div>
-        <input type="text" placeholder="Pseudonyme" name="username" />
-        <input type="text" placeholder="Prénom" name="name" />
-        <input type="text" placeholder="Nom" name="lastname" />
-        <input type="email" placeholder="Mail" name="mail" />
-        <input type="password" placeholder="Mot de passe" name="password" />
-        <input type="date" name="birthday"/>
+        <input type="text" placeholder="Pseudonyme" name="username" required/>
+        <input type="text" placeholder="Prénom" name="name" required/>
+        <input type="text" placeholder="Nom" name="lastname" required/>
+        <input type="email" placeholder="Mail" name="mailReg" required/>
+        <input type="password" placeholder="Mot de passe" name="passwordReg" required/>
         <button @click="userRegistration">Inscription</button>
       </div>
 
-      <form class="sign-in">
+      <div class="sign-in">
         <h2>Se connecter</h2>
         <div>Uttilisez vos informations renseignées lors de l'inscription</div>
-        <input type="email" placeholder="Mail" id="mail" />
-        <input type="password" placeholder="Mot de passe" />
+        <input type="email" placeholder="Mail" name="maillog" required/>
+        <input type="password" placeholder="Mot de passe" name="passwordlog" required/>
         <a>Vous avez oublié votre mot de passe?</a>
-        <button>Connexion</button>
-      </form>
+        <button @click="login">Connexion</button>
+      </div>
     </div>
   </article>
 </template>
@@ -49,19 +48,33 @@ export default {
     }
   },
   methods: {
-    userRegistration(event) {
-      console.log(event);
+    userRegistration() {
       axios.post(`http://localhost:8080/api/registration`, {
-          mail: document.querySelector("input[name=mail]").value,
-          password: document.querySelector("input[name=password]").value,
-          lastName: document.querySelector("input[name=lastname]").value,
-          name: document.querySelector("input[name=name]").value,
-          username: document.querySelector("input[name=username]").value,
-          locked: false,
-          enabled: false
+        mail: document.querySelector("input[name=mailReg]").value,
+        password: document.querySelector("input[name=passwordReg]").value,
+        lastName: document.querySelector("input[name=lastname]").value,
+        name: document.querySelector("input[name=name]").value,
+        username: document.querySelector("input[name=username]").value,
       }).then(response => {
         console.log(response);
-      })
+      }).catch(error => {
+        console.log(error.response);
+      });
+    },
+    login() {
+      axios.post(`http://localhost:8080/api/registration/login`, {
+        mail: document.querySelector("input[name=maillog]").value,
+        password: document.querySelector("input[name=passwordlog]").value,
+      }).then(response => {
+        if (response.data === true) {
+          console.log("Vous vous êtes connecté avec succès !");
+        } else {
+          console.log("Echec lors de l'authentification...");
+        }
+        console.log(response);
+      }).catch(error => {
+        console.log(error.response);
+      });
     }
   }
 }
