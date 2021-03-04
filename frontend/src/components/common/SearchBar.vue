@@ -12,11 +12,11 @@
                <img src="../../assets/bell.png" alt="Bell" v-if="getTheme">
                <img src="../../assets/bell-daymode.png" alt="Bell" v-else>
             </button>
-            <div class="red-alert" v-if="1 > 0" :style="{ borderColor: getColors.color1, borderWidth: '2px', borderStyle: 'solid'}"></div>
+            <div class="red-alert" v-if="1 > 0"></div>
          </div>
       </div>
 
-      <NotificationBox v-if="showNotification" />
+      <NotificationBox v-if="showNotification" @switchNotification="showNotification = !showNotification" />
    </div>
 </template>
 
@@ -48,6 +48,8 @@ export default {
    display: flex;
    align-items: center;
    justify-content: center;
+
+   z-index: 1;
 }
 
 .SearchBar > .content {
@@ -117,6 +119,8 @@ export default {
 
 .notification-bell {
    position: relative;
+
+   z-index: 500;
 }
 
 .red-alert {
@@ -127,6 +131,8 @@ export default {
    height: 13px;
    background-color: #E85C5C;
    border-radius: 20px;
+
+
 }
 
 

@@ -104,16 +104,6 @@ export default {
    overflow-y: auto;
 }
 
-.chat-list::-webkit-scrollbar {
-   width: 4px;
-}
-
-
-.chat-list::-webkit-scrollbar-thumb {
-   background: #454150;
-   border-radius: 15px;
-}
-
 .conv-logo {
    border-radius: 100px;
    background-color: #454150;

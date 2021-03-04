@@ -109,16 +109,6 @@ export default {
    height: calc(100% - 260px);
 }
 
-.navbar-visible-box::-webkit-scrollbar {
-   width: 3px;
-}
-
-
-.navbar-visible-box::-webkit-scrollbar-thumb {
-   background: #454150;
-   border-radius: 15px;
-}
-
 .navbar-content-box {
    margin-top: 20px;
    margin-left: 15px;
