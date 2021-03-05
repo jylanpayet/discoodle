@@ -29,6 +29,18 @@ export default createStore({
             currentConvShown: {
                 type: String,
             }
+        },
+        user: {
+            id: Number,
+            enabled: Boolean,
+            last_name: String,
+            link_to_avatar: String,
+            locked: Boolean,
+            mail: String,
+            name: String,
+            password: String,
+            role: String,
+            username: String,
         }
     },
     mutations: {
@@ -37,6 +49,9 @@ export default createStore({
         },
         SET_CONV_UUID(state, uuid) {
             state.messages.currentConvShown = uuid;
+        },
+        SET_USER(state, user) {
+            state.user = user;
         }
     },
     actions: {
@@ -44,8 +59,10 @@ export default createStore({
             context.commit('SWITCH_THEME');
         },
         setConvUUID(context, uuid) {
-            console.log("New UUID : " + uuid);
             context.commit('SET_CONV_UUID', uuid);
+        },
+        setUser(context, user) {
+            context.commit('SET_USER', user);
         }
     },
     getters: {
@@ -60,6 +77,9 @@ export default createStore({
         },
         getCurrentConv: state => {
             return state.messages.currentConvShown;
+        },
+        getUser: state => {
+            return state.user;
         }
     },
     modules: {
