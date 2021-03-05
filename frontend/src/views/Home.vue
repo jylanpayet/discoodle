@@ -6,7 +6,7 @@
          <div class="home-content">
             <div>
                <div class="welcome-discoodle">
-                  Bienvenue sur Discoodle ! {{ getUser.name + " " + getUser.last_name }}
+                  Bienvenue sur Discoodle !
                </div>
 
                <!-- TODO : Intégrer les flux RSS et les posts -->

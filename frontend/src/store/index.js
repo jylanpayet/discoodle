@@ -31,16 +31,46 @@ export default createStore({
             }
         },
         user: {
-            id: Number,
-            enabled: Boolean,
-            last_name: String,
-            link_to_avatar: String,
-            locked: Boolean,
-            mail: String,
-            name: String,
-            password: String,
-            role: String,
-            username: String,
+            id: {
+                type: Number,
+                default: -1,
+            },
+            enabled: {
+                type: Boolean,
+                default: false,
+            },
+            last_name: {
+                type: String,
+                default: "",
+            },
+            link_to_avatar: {
+                type: String,
+                default: "",
+            },
+            locked: {
+                type: Boolean,
+                default: false,
+            },
+            mail: {
+                type: String,
+                default: "",
+            },
+            name: {
+                type: String,
+                default: "",
+            },
+            password: {
+                type: String,
+                default: "",
+            },
+            role: {
+                type: String,
+                default: "",
+            },
+            username: {
+                type: String,
+                default: ""
+            },
         }
     },
     mutations: {
