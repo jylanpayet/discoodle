@@ -79,9 +79,9 @@ public class UserService implements UserDetailsService {
         return token;
     }
 
-    public Boolean login(String mail, String password) {
-        if(userRepository.findUserByMail(mail).isPresent() && userRepository.findUserByMail(mail).get().isEnabled()) {
-            return bCryptPasswordEncoder.matches(password, userRepository.findUserByMail(mail).get().getPassword());
+    public Boolean login(String username, String password) {
+        if(userRepository.findUserByPseudo(username).isPresent() && userRepository.findUserByPseudo(username).get().isEnabled()) {
+            return bCryptPasswordEncoder.matches(password, userRepository.findUserByPseudo(username).get().getPassword());
         }
         return false;
     }

@@ -69,6 +69,8 @@ export default {
 
    color: #F4F4F4;
    font-size: 15px;
+
+   overflow-y: auto;
 }
 
 .Post > * {

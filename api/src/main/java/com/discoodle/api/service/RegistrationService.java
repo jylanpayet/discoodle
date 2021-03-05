@@ -50,7 +50,7 @@ public class RegistrationService {
     }
 
     public Boolean login(RegistrationRequest request) {
-        return (userService.login(request.getMail(), request.getPassword()));
+        return (userService.login(request.getUsername(), request.getPassword()));
     }
 
     @Transactional

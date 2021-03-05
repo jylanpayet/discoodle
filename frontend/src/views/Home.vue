@@ -12,7 +12,8 @@
                <!-- TODO : Intégrer les flux RSS et les posts -->
 
                <div class="posts-content">
-                  <div v-if="posts.length === 0" style="color: #F4F4F4; font-size: 20px; display: flex; align-items: center; justify-content: center">
+                  <div v-if="posts.length === 0"
+                       style="color: #F4F4F4; font-size: 20px; display: flex; align-items: center; justify-content: center">
                      Votre fil d'actualité est vide :( <br>
                      Vérifiez vos paramètres pour arranger ça !
                   </div>
@@ -24,7 +25,6 @@
                         :user-name="post.user"
                   />
                </div>
-
             </div>
          </div>
       </div>
@@ -35,6 +35,7 @@
 import SearchBar from "@/components/common/SearchBar";
 import axios from "axios";
 import Post from "@/components/common/Post";
+import { mapGetters } from "vuex"
 
 export default {
    name: 'Home',
@@ -47,27 +48,46 @@ export default {
          posts: [
             // Posts to be display on the home page.
          ],
-         fullscreenPost: undefined
+         fullscreenPost: undefined,
+         rssFeed: [
+            "https://www.letudiant.fr/rss/metiers.html",
+            "https://www.letudiant.fr/rss.html",
+            "https://jobs-stages.letudiant.fr/stages-etudiants/rss.xml",
+            "https://jobs-stages.letudiant.fr/jobs-etudiants/rss.xml"
+         ]
       }
    },
    mounted() {
-      axios.get("https://www.letudiant.fr/rss/metiers.html").then(response => {
-         const content = new DOMParser().parseFromString(response.data, "text/xml");
-         const items = content.getElementsByTagName("item");
-         items.forEach(elt => {
-            const childs = elt.children;
-
-            let temp = {
-               title: childs[0].innerHTML.replace("<![CDATA[", "").replace("]]>", ""),
-               link: childs[1].innerHTML.replace("<![CDATA[", "").replace("]]>", ""),
-               description: childs[2].innerHTML.replace("<![CDATA[", "").replace("]]>", ""),
-               type: "RSS",
-               user: "info l'étudiant"
-            }
-            console.log(temp);
-            this.posts.push(temp);
+      this.rssFeed.forEach(elt => {
+         axios.get(elt).then(response => {
+            const content = new DOMParser().parseFromString(response.data, "text/xml");
+            const items = content.getElementsByTagName("item");
+            items.forEach(elt => {
+               const childs = elt.children;
+               if (childs[0].tagName === "title" && childs[1].tagName === "link" && childs[2].tagName === "description") {
+                  let temp = {
+                     title: childs[0].innerHTML.replace("<![CDATA[", "").replace("]]>", ""),
+                     link: childs[1].innerHTML.replace("<![CDATA[", "").replace("]]>", ""),
+                     description: childs[2].innerHTML.replace("<![CDATA[", "").replace("]]>", ""),
+                     type: "RSS",
+                     user: content.querySelector("channel > title").innerHTML
+                  }
+                  this.posts.splice(this.rand(this.posts.length), 0, temp);
+               }
+            });
          });
-      })
+      });
+   },
+   methods: {
+      rand(max) {
+         return Math.floor(Math.random() * Math.floor(max));
+      },
+      printFullName() {
+         return this.getUser.name + " " + this.getUser.last_name
+      }
+   },
+   computed: {
+      ...mapGetters(['getUser'])
    }
 }
 </script>

@@ -68,6 +68,9 @@ export default {
             }
          ]
       }
+   },
+   beforeMount() {
+      // TODO : Charger les conversations ici
    }
 }
 </script>

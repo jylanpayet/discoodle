@@ -29,6 +29,48 @@ export default createStore({
             currentConvShown: {
                 type: String,
             }
+        },
+        user: {
+            id: {
+                type: Number,
+                default: -1,
+            },
+            enabled: {
+                type: Boolean,
+                default: false,
+            },
+            last_name: {
+                type: String,
+                default: "",
+            },
+            link_to_avatar: {
+                type: String,
+                default: "",
+            },
+            locked: {
+                type: Boolean,
+                default: false,
+            },
+            mail: {
+                type: String,
+                default: "",
+            },
+            name: {
+                type: String,
+                default: "",
+            },
+            password: {
+                type: String,
+                default: "",
+            },
+            role: {
+                type: String,
+                default: "",
+            },
+            username: {
+                type: String,
+                default: ""
+            },
         }
     },
     mutations: {
@@ -37,6 +79,9 @@ export default createStore({
         },
         SET_CONV_UUID(state, uuid) {
             state.messages.currentConvShown = uuid;
+        },
+        SET_USER(state, user) {
+            state.user = user;
         }
     },
     actions: {
@@ -44,8 +89,10 @@ export default createStore({
             context.commit('SWITCH_THEME');
         },
         setConvUUID(context, uuid) {
-            console.log("New UUID : " + uuid);
             context.commit('SET_CONV_UUID', uuid);
+        },
+        setUser(context, user) {
+            context.commit('SET_USER', user);
         }
     },
     getters: {
@@ -60,6 +107,9 @@ export default createStore({
         },
         getCurrentConv: state => {
             return state.messages.currentConvShown;
+        },
+        getUser: state => {
+            return state.user;
         }
     },
     modules: {

@@ -53,14 +53,37 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex"
+import vueCookie from "vue-cookie"
+import axios from "axios";
 
 export default {
    name: "App",
    methods: {
-      ...mapActions(['switchTheme'])
+      ...mapActions(['switchTheme', 'setUser'])
    },
    computed: {
       ...mapGetters(['getColors', 'getTheme'])
+   },
+   mounted() {
+      if (vueCookie.get("username") !== null && vueCookie.get("username") !== "") {
+         axios.get(`http://localhost:8080/api/users/${vueCookie.get("username")}`).then(response => {
+            const user = response.data;
+            console.log(user);
+            this.setUser({
+               id: user.id,
+               enabled: user.enabled,
+               last_name: user.last_name,
+               link_to_avatar: user.link_to_avatar,
+               locked: user.locked,
+               mail: user.mail,
+               name: user.name,
+               password: user.password,
+               role: user.role,
+               username: user.username
+            });
+         })
+
+      }
    }
 }
 </script>
