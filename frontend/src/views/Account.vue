@@ -3,13 +3,15 @@
       <SearchBar/>
    </div>
    <div class="Account" v-else>
-      <Authentication />
+      <Authentication @logSuccess="isAuthentificated = true" />
    </div>
 </template>
 
 <script>
 import SearchBar from "@/components/common/SearchBar";
 import Authentication from "@/components/Authentification";
+
+import vueCookie from "vue-cookie"
 
 export default {
    name: "Account",
@@ -25,7 +27,7 @@ export default {
       }
    },
    beforeMount() {
-      this.isAuthentificated = document.cookie !== "";
+      this.isAuthentificated = vueCookie.get("username") !== null && vueCookie.get("username") !== "";
    }
 }
 </script>

@@ -64,7 +64,6 @@ export default {
                type: "RSS",
                user: "info l'étudiant"
             }
-            console.log(temp);
             this.posts.push(temp);
          });
       })
