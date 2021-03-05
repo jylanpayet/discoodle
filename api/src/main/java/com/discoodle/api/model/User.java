@@ -14,60 +14,47 @@ import java.util.*;
 @Table(name = "user")
 public class User {
 
-    public User(String mail, String pseudo, String password, String name, String last_name, Date date, String link_to_avatar, UserRole role) {
+    public User(String mail, String username, String password, String name, String last_name, UserRole role) {
         this.mail = mail;
-        this.pseudo = pseudo;
+        this.username = username;
         this.password = password;
         this.name = name;
         this.last_name = last_name;
-        this.birth_day = date;
-        this.link_to_avatar = link_to_avatar;
         this.role = role;
     }
 
     @Id
-    @SequenceGenerator(
-            name = "user_sequence",
-            sequenceName = "user_sequence",
-            allocationSize = 1
-    )
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "user_sequence"
-    )
-    @Column(name = "user_id", unique = true, nullable = false)
+    @GeneratedValue
+    @Column(name = "id", unique = true, nullable = false)
     private Integer id;
 
-    @Column(name="mail")
+    @Column(name = "mail")
     private String mail;
 
-    @Column(name="pseudo")
-    private String pseudo;
+    @Column(name = "username")
+    private String username;
 
-    @Column(name="password")
+    @Column(name = "password")
     private String password;
 
-    @Column(name="name")
+    @Column(name = "name")
     private String name;
 
-    @Column(name="last_name")
+    @Column(name = "last_name")
     private String last_name;
 
-    @Column(name="birth_day")
-    private Date birth_day;
+    @Column(name = "link_to_avatar")
+    private String linkToAvatar;
 
-    @Column(name="link_to_avatar")
-    private String link_to_avatar;
-
-    @Column(name="role")
     @Enumerated(EnumType.STRING)
+    @Column(name = "role")
     private UserRole role;
 
-    @Column(name="locked")
-    private Boolean locked = false;
+    @Column(nullable = false, columnDefinition = "TINYINT(1)")
+    private boolean locked;
 
-    @Column(name="enabled")
-    private Boolean enabled = false;
+    @Column(nullable = false, columnDefinition = "TINYINT(1)")
+    private boolean enabled;
 
     @ManyToMany
     @JoinTable( name = "link_user_subject",
