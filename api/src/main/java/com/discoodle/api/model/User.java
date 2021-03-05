@@ -14,12 +14,12 @@ import java.util.*;
 @Table(name = "user")
 public class User {
 
-    public User(String mail, String username, String password, String name, String lastName, UserRole role) {
+    public User(String mail, String username, String password, String name, String last_name, UserRole role) {
         this.mail = mail;
         this.username = username;
         this.password = password;
         this.name = name;
-        this.lastName = lastName;
+        this.last_name = last_name;
         this.role = role;
     }
 
@@ -41,7 +41,7 @@ public class User {
     private String name;
 
     @Column(name = "last_name")
-    private String lastName;
+    private String last_name;
 
     @Column(name = "link_to_avatar")
     private String linkToAvatar;
