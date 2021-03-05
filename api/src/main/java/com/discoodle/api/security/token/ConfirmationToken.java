@@ -14,16 +14,8 @@ import java.time.LocalDateTime;
 @Entity
 public class ConfirmationToken {
 
-    @SequenceGenerator(
-            name = "confirmation_token_sequence",
-            sequenceName = "confirmation_token_sequence",
-            allocationSize = 1
-    )
     @Id
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "confirmation_token_sequence"
-    )
+    @GeneratedValue
     private Long id;
 
     @Column(nullable = false)

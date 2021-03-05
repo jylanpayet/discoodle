@@ -24,15 +24,7 @@ public class User {
     }
 
     @Id
-    @SequenceGenerator(
-            name = "user_sequence",
-            sequenceName = "user_sequence",
-            allocationSize = 1
-    )
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "user_sequence"
-    )
+    @GeneratedValue
     @Column(name = "id", unique = true, nullable = false)
     private Integer id;
 
@@ -58,11 +50,11 @@ public class User {
     @Column(name = "role")
     private UserRole role;
 
-    @Column(name = "locked")
-    private Boolean locked = false;
+    @Column(nullable = false, columnDefinition = "TINYINT(1)")
+    private boolean locked;
 
-    @Column(name = "enabled")
-    private Boolean enabled = false;
+    @Column(nullable = false, columnDefinition = "TINYINT(1)")
+    private boolean enabled;
 
     @ManyToMany
     @JoinTable( name = "link_user_subject",

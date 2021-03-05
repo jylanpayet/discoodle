@@ -36,7 +36,7 @@ public class UserService implements UserDetailsService {
         Optional<User> TestMail = userRepository.findUserByPseudo(user.getMail());
 
         if (TestPseudo.isPresent() || TestMail.isPresent()) {
-            throw new IllegalStateException("pseudo déjà pris");
+            throw new IllegalStateException("Le pseudo est déjà pris.");
         }
         userRepository.save(user);
     }
@@ -80,13 +80,13 @@ public class UserService implements UserDetailsService {
     }
 
     public Boolean login(String mail, String password) {
-        if(userRepository.findUserByMail(mail).isPresent()) {
+        if(userRepository.findUserByMail(mail).isPresent() && userRepository.findUserByMail(mail).get().isEnabled()) {
             return bCryptPasswordEncoder.matches(password, userRepository.findUserByMail(mail).get().getPassword());
         }
         return false;
     }
 
-    public int enableUser(String email) {
-        return userRepository.enableUser(email);
+    public int enableUser(String mail) {
+        return userRepository.enableUser(mail);
     }
 }
