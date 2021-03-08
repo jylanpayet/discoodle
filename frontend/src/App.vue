@@ -163,7 +163,7 @@ export default {
 }
 
 .menu > .links > .router-link-active .navbar-icon {
-   background-color: #E85C5C;
+   background-color: #e85c5c;
 }
 
 .router-link-active .navbar-icon > img {
