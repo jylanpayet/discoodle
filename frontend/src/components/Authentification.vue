@@ -41,6 +41,7 @@
 <script>
 import axios from 'axios';
 import vueCookie from 'vue-cookie'
+import { mapActions } from 'vuex'
 
 export default {
    data() {
@@ -72,7 +73,7 @@ export default {
 
                axios.get(`http://localhost:8080/api/users/${document.querySelector("input[name=userlog]").value}`).then(response => {
                   const user = response.data;
-                  console.log(user);
+                  this.setUser(user);
                })
 
                this.$emit("logSuccess")
@@ -80,7 +81,8 @@ export default {
          }).catch(error => {
             console.log(error.response);
          });
-      }
+      },
+      ...mapActions(['setUser'])
    }
 }
 </script>

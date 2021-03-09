@@ -69,20 +69,8 @@ export default {
          axios.get(`http://localhost:8080/api/users/${vueCookie.get("username")}`).then(response => {
             const user = response.data;
             console.log(user);
-            this.setUser({
-               id: user.id,
-               enabled: user.enabled,
-               last_name: user.last_name,
-               link_to_avatar: user.link_to_avatar,
-               locked: user.locked,
-               mail: user.mail,
-               name: user.name,
-               password: user.password,
-               role: user.role,
-               username: user.username
-            });
-         })
-
+            this.setUser(user);
+         });
       }
    }
 }

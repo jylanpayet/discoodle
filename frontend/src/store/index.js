@@ -30,48 +30,7 @@ export default createStore({
                 type: String,
             }
         },
-        user: {
-            id: {
-                type: Number,
-                default: -1,
-            },
-            enabled: {
-                type: Boolean,
-                default: false,
-            },
-            last_name: {
-                type: String,
-                default: "",
-            },
-            link_to_avatar: {
-                type: String,
-                default: "",
-            },
-            locked: {
-                type: Boolean,
-                default: false,
-            },
-            mail: {
-                type: String,
-                default: "",
-            },
-            name: {
-                type: String,
-                default: "",
-            },
-            password: {
-                type: String,
-                default: "",
-            },
-            role: {
-                type: String,
-                default: "",
-            },
-            username: {
-                type: String,
-                default: ""
-            },
-        }
+        user: {  }
     },
     mutations: {
         SWITCH_THEME(state) {
