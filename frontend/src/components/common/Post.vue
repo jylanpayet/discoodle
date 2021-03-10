@@ -76,4 +76,21 @@ export default {
 .Post > * {
    margin-bottom: 10px;
 }
+
+.Post:hover {
+   transform: scale(1.02);
+   animation: background-change infinite 2s ease-in-out;
+}
+
+@keyframes background-change {
+   0% {
+      background-color: #454150;
+   }
+   50% {
+      background-color: #4f4b5a;
+   }
+   100% {
+      background-color: #454150;
+   }
+}
 </style>
