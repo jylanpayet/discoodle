@@ -1,6 +1,5 @@
 <template>
    <div class="Home">
-      <img src="../assets/home-image.png" alt="">
       <div>
          <SearchBar/>
          <div class="home-content">
@@ -98,29 +97,27 @@ export default {
    height: 100%;
 }
 
-.Home > img {
-   position: absolute;
-   width: calc(100% - 270px);
-
-
-   z-index: 1;
-
-   opacity: 0.1;
-
-   --finalOpacity: 0.1;
-   animation: appear-opacity 0.7s ease-in-out;
-}
 
 .Home > div {
-   position: absolute;
-
-   width: calc(100% - 270px);
+   width: 100%;
    height: 100%;
 
    z-index: 2;
 
    overflow-y: auto;
    overflow-x: hidden;
+}
+
+.Home > div::before {
+   content: "";
+   width: calc(100% - 270px);
+   height: 100%;
+   position: absolute;
+   background-image: url("../assets/home-image.png");
+   background-size: cover;
+   top: 0;
+   right: 0;
+   filter: opacity(0.2) grayscale(0.5);
 }
 
 .home-content {
