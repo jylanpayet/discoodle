@@ -154,6 +154,7 @@ export default {
             date = date.substr(0, 13) + ((Number(date.substr(13, 2)) + 1) % 24) + date.substr(15, 3);
 
             let chatMessage = {
+               ID: 10,
                content: messageContent.value,
                sender: this.user,
                messageDate: date,
@@ -165,7 +166,7 @@ export default {
             };
 
             this.messages.unshift(chatMessage);
-            stompClient.send(`/conversationListener/${this.getCurrentConv}/room.send`, { priority: 9 }, JSON.stringify(chatMessage));
+            stompClient.send(`/conversationListener/${this.getCurrentConv}/room.send`, { }, JSON.stringify(chatMessage));
             messageContent.value = '';
          }
       },
