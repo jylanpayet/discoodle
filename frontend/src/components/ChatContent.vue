@@ -29,7 +29,7 @@
       </div>
       <div class="writing-content" v-if="writers.length > 0 && writers.length < 4">
          <span :key="items" v-for="items in writers">
-            {{ items }},
+            {{ items }} {{ writers.length > 1 ? "," : "" }}
          </span>
          {{ (writers.length > 1 ? "sont" : "est") + " en train d'écrire..." }}
       </div>
@@ -83,9 +83,6 @@ export default {
    },
    unmounted() {
       this.disconnect();
-      if (event.keyCode === 13 && document.querySelector(".input-content > input").value !== "") {
-         this.send();
-      }
    },
    methods: {
       actionInput(event) {
@@ -98,14 +95,17 @@ export default {
       },
       writing() {
          if (!this.writers.includes(this.user)) {
-            this.writers.push(this.user);
+            stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {  }, JSON.stringify({
+               sender: this.user,
+               type: "WRITING"
+            }));
          }
       },
       connect() {
          let ws = new SockJS("http://localhost:8080/ws");
          stompClient = Stomp.over(ws);
          // Comment the next line if you want to show websocket's logs
-         // stompClient.debug = null
+         stompClient.debug = null
 
          stompClient.connect({}, () => {
             stompClient.subscribe(`/conversations/rooms/${this.getCurrentConv}`, (sdkEvent) => {
@@ -127,13 +127,22 @@ export default {
          let message = JSON.parse(payload.body);
 
          if (message.sender !== this.user) {
-            this.messages.unshift({
-               content: message.content,
-               sender: message.sender,
-               messageDate: message.messageDate,
-               pinned: message.pinned,
-               // messageReactions: message.messageReactions
-            })
+            if (message.type === "MESSAGE") {
+               this.messages.unshift({
+                  content: message.content,
+                  sender: message.sender,
+                  messageDate: message.messageDate,
+                  pinned: message.pinned,
+                  // messageReactions: message.messageReactions
+               })
+            } else if (message.type === "WRITING") {
+               if (!this.writers.includes(message.sender)) {
+                  this.writers.push(message.sender)
+                  setTimeout(() => {
+                     this.writers.pop(message.sender)
+                  }, 5000)
+               }
+            }
          }
       },
       send() {
@@ -151,16 +160,17 @@ export default {
                pinned: false,
                convUUID: this.getCurrentConv,
                // messageReactions: []
+
+               type: "MESSAGE"
             };
 
             this.messages.unshift(chatMessage);
-            stompClient.send(`/conversationListener/${this.getCurrentConv}/room.send`, {}, JSON.stringify(chatMessage));
+            stompClient.send(`/conversationListener/${this.getCurrentConv}/room.send`, { priority: 9 }, JSON.stringify(chatMessage));
             messageContent.value = '';
          }
       },
       getMessagesFromJSON() {
          axios.get(`http://localhost:8080/api/messages?uuid=${this.getCurrentConv}`).then(response => {
-            console.log(response);
             this.messages = response.data.chatMessages;
             this.pinned = this.messages.filter(elt => (elt.pinned === true));
          });

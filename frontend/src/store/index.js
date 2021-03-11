@@ -44,7 +44,6 @@ export default createStore({
             context.commit('SWITCH_THEME');
         },
         setConvUUID(context, uuid) {
-            console.log("New UUID : " + uuid);
             context.commit('SET_CONV_UUID', uuid);
         }
     },

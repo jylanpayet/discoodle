@@ -29,11 +29,6 @@ public class ChatController {
 		}
 		return chatMessage;
 	}
-	@MessageMapping("/{roomUUID}/room.writing")
-	@SendTo("/conversations/rooms/{roomUUID}")
-	public ChatMessage sendWriting(@DestinationVariable String roomUUID, @Payload ChatMessage chatMessage ) {
-		return chatMessage;
-	}
 
 
 }

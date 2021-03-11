@@ -12,23 +12,16 @@ public class ChatMessage {
 	private boolean pinned;
 	private final UUID convUUID;
 
-	@Enumerated(EnumType.STRING)
-	private final Type type;
+	private final String type = "MESSAGE";
 
 
-	enum Type{
-		WRITING,
-		SEND
-	}
-
-	public ChatMessage(Integer ID, String content, String sender, String messageDate, boolean pinned, UUID convUUID, Type type) {
+	public ChatMessage(Integer ID, String content, String sender, String messageDate, boolean pinned, UUID convUUID) {
 		this.ID = ID;
 		this.content = content;
 		this.sender = sender;
 		this.messageDate = messageDate;
 		this.pinned = pinned;
 		this.convUUID = convUUID;
-		this.type = type;
 	}
 
 	public String getContent() {
@@ -71,7 +64,7 @@ public class ChatMessage {
 		return convUUID;
 	}
 
-	public Type getType() {
+	public String getType() {
 		return type;
 	}
 
