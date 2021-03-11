@@ -1,7 +1,6 @@
 <template>
    <div class="Home">
-      <img src="../assets/home-image.png" alt="">
-      <div>
+      <div @scroll="loadPosts">
          <SearchBar/>
          <div class="home-content">
             <div>
@@ -17,7 +16,7 @@
                      Votre fil d'actualité est vide :( <br>
                      Vérifiez vos paramètres pour arranger ça !
                   </div>
-                  <Post :key="post" v-for="post in posts"
+                  <Post :key="post" v-for="post in posts.slice(fromPost, toPost)"
                         :title="post.title"
                         :content="post.description"
                         :link="post.link"
@@ -54,7 +53,9 @@ export default {
             "https://www.letudiant.fr/rss.html",
             "https://jobs-stages.letudiant.fr/stages-etudiants/rss.xml",
             "https://jobs-stages.letudiant.fr/jobs-etudiants/rss.xml"
-         ]
+         ],
+         fromPost: 0,
+         toPost: 20,
       }
    },
    mounted() {
@@ -82,8 +83,14 @@ export default {
       rand(max) {
          return Math.floor(Math.random() * Math.floor(max));
       },
-      printFullName() {
-         return this.getUser.name + " " + this.getUser.last_name
+      loadPosts() {
+         const div = document.querySelector(".Home > div")
+         if (div.scrollTop / div.scrollHeight > 3/4) {
+            if (this.toPost + 10 > this.posts.length)
+               return
+            this.toPost += 10;
+            this.fromPost += 10;
+         }
       }
    },
    computed: {
@@ -98,29 +105,27 @@ export default {
    height: 100%;
 }
 
-.Home > img {
-   position: absolute;
-   width: calc(100% - 270px);
-
-
-   z-index: 1;
-
-   opacity: 0.1;
-
-   --finalOpacity: 0.1;
-   animation: appear-opacity 0.7s ease-in-out;
-}
 
 .Home > div {
-   position: absolute;
-
-   width: calc(100% - 270px);
+   width: 100%;
    height: 100%;
 
    z-index: 2;
 
    overflow-y: auto;
    overflow-x: hidden;
+}
+
+.Home > div::before {
+   content: "";
+   width: calc(100% - 270px);
+   height: 100%;
+   position: absolute;
+   background-image: url("../assets/home-image.png");
+   background-size: cover;
+   top: 0;
+   right: 0;
+   filter: opacity(0.2) grayscale(0.5);
 }
 
 .home-content {

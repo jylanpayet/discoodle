@@ -50,7 +50,21 @@ const routes = [
     {
         path: '/compte',
         name: 'Compte',
-        component: () => import(/* webpackChunkName: "account" */ '../views/Account')
+        component: () => import(/* webpackChunkName: "account" */ '../views/Account'),
+        children: [
+            {
+                path: "infos",
+                component: () => import(/* webpackChunkName: "account/infos" */ '../components/settings/AccountInfo')
+            },
+            {
+                path: "settings",
+                component: () => import(/* webpackChunkName: "account/settings" */ '../components/settings/AccountInfo')
+            },
+            {
+                path: "home-set",
+                component: () => import(/* webpackChunkName: "account/home-set" */ '../components/settings/AccountInfo')
+            }
+        ]
     }
 
 ]
