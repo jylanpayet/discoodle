@@ -5,7 +5,7 @@
             {{ printDate(messageDate) }}
          </div>
          <div class="message-content" :style="belongToMyself ? { marginRight: '10px', backgroundColor: '#E85C5C', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: getTheme ? '#C4C4C4' : '#F4F4F4' }">
-            {{ content }}
+            {{ filterEmoji(content)}}
          </div>
          <div class="user-logo" :style="{ backgroundColor: '#F4F4F4' }">
             {{ userLogo }}
@@ -16,6 +16,7 @@
 
 <script>
 import {mapGetters} from "vuex";
+import emojis from "@/assets/emojis";
 
 export default {
    name: "Message",
@@ -40,7 +41,31 @@ export default {
    methods: {
       printDate(messageDate) {
          return new Date().toLocaleString().substr(0, 10) === messageDate.substr(0, 10) ? messageDate.substr(13) : messageDate.substr(0, 10)
+      },
+
+      filterEmoji(content){
+         const regex = ":[a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*:";
+         const emoji = [...content.matchAll(regex)];
+         emoji.forEach(elt => emoji[0]= elt[0]);
+         if(emoji){
+            emoji.forEach(elt => {
+               elt = elt.replaceAll(":", "");
+               if (emojis.People[elt])
+                  content = content.replace(`:${elt}:`, emojis.People[elt.replaceAll(":","")]);
+               if (emojis.Nature[elt])
+                  content = content.replace(`:${elt}:`, emojis.Nature[elt.replaceAll(":","")]);
+               if (emojis.Objects[elt])
+                  content = content.replace(`:${elt}:`, emojis.Objects[elt.replaceAll(":","")]);
+               if (emojis.Places[elt])
+                  content = content.replace(`:${elt}:`, emojis.Places[elt.replaceAll(":","")]);
+               if (emojis.Symbols[elt])
+                  content = content.replace(`:${elt}:`, emojis.Symbols[elt.replaceAll(":","")]);
+
+            })
+         }
+         return content;
       }
+
    },
    computed: {
       ...mapGetters(['getColors', 'getTheme'])
