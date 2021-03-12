@@ -39,4 +39,9 @@ public class UserController {
     public void deleteUser(@PathVariable("userID") Integer userId) {
         userService.deleteUser(userId);
     }
+
+    @GetMapping(path = "/seeAllRooms")
+    public void findAllRoomsByUserID(Integer user_id) {
+        userService.findAllRoomsByUserID(user_id);
+    }
 }

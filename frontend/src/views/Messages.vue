@@ -55,31 +55,20 @@ export default {
           admin: this.getUser.id
         }).then(response => {
           console.log(response);
+          console.log(this.getUser)
         }).catch(error => {
           console.log(error.response);
+          console.log(this.getUser)
         });
       }
    },
    data() {
       return {
-         convList: [
-            {
-               uuid: "e485c6f4-72ca-11eb-9439-0242ac130002",
-               name: "Bob"
-            },
-            {
-               uuid: "e6e5c4c6-72ca-11eb-9439-0242ac130002",
-               name: "Dylan"
-            },
-            {
-               uuid: "b326cd8e-6468-4592-ba9c-24b5a87754b2",
-               name: "fetty"
-            },
-            {
-               uuid: "ac96ba0c-7313-11eb-9439-0242ac130002",
-               name: "OG.Mimmo"
-            }
-         ]
+         convList: axios.post(`http://localhost:8080/api/users/${this.getUser.pseudo}`).then(response => {
+           console.log(response);
+         }).catch(error => {
+           console.log(error.response);
+         })
       }
    },
    beforeMount() {
