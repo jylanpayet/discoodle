@@ -36,19 +36,12 @@
                     </execution>
 
                     <execution>
-                        <id>npm install</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                    </execution>
-
-                    <execution>
-                        <id>npm run build</id>
+                        <id>npm run serve</id>
                         <goals>
                             <goal>npm</goal>
                         </goals>
                         <configuration>
-                            <arguments>run build</arguments>
+                            <arguments>run serve</arguments>
                         </configuration>
                     </execution>
 
