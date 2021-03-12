@@ -62,4 +62,10 @@ public class User {
             inverseJoinColumns = @JoinColumn( name = "subject_id" )
     )
     private List<User> users = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable( name = "link_rooms_users",
+            joinColumns = @JoinColumn( name = "user_id" ),
+            inverseJoinColumns = @JoinColumn( name = "room_id" ) )
+    private List<Room> rooms = new ArrayList<>();
 }

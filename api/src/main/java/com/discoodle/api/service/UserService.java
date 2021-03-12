@@ -27,13 +27,13 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll();
     }
 
-    public Optional<User> getUser(String pseudo) {
-        return userRepository.findUserByPseudo(pseudo);
+    public Optional<User> getUser(String username) {
+        return userRepository.findUserByPseudo(username);
     }
 
     public void addNewUser(User user) {
         Optional<User> TestPseudo = userRepository.findUserByPseudo(user.getUsername());
-        Optional<User> TestMail = userRepository.findUserByPseudo(user.getMail());
+        Optional<User> TestMail = userRepository.findUserByMail(user.getMail());
 
         if (TestPseudo.isPresent() || TestMail.isPresent()) {
             throw new IllegalStateException("Le pseudo est déjà pris.");
@@ -88,5 +88,9 @@ public class UserService implements UserDetailsService {
 
     public int enableUser(String mail) {
         return userRepository.enableUser(mail);
+    }
+
+    public List<Integer> findAllRoomsByUserID(Integer user_id) {
+        return findAllRoomsByUserID(user_id);
     }
 }
