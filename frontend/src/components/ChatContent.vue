@@ -38,7 +38,8 @@
       </div>
       <div class="input-content">
          <input type="text" :placeholder="`Envoyer un message à ${ $route.query.name }`"
-                @keypress="actionInput">
+                @keypress="actionInput" list="smileys">
+
          <div class="right-side-input">
             ☺
             <button @click="user = 'Dylan'">
