@@ -25,7 +25,7 @@ public class User {
 
     @Id
     @GeneratedValue
-    @Column(name = "id", unique = true, nullable = false)
+    @Column(name = "user_id", unique = true, nullable = false)
     private Integer id;
 
     @Column(name = "mail")

@@ -6,7 +6,7 @@
 
             <router-link to="/messages/new">
                <div :style="{ color: getColors.color5, fontSize: '15px' }">
-                  <div class="conv-logo" :style="{ backgroundColor: getColors.color5, color: getColors.color1, fontSize: '40px' }">
+                  <div class="conv-logo" :style="{ backgroundColor: getColors.color5, color: getColors.color1, fontSize: '40px' }" @click="addConversation">
                      +
                   </div>
                   Ajouter une conversation
@@ -35,6 +35,7 @@
 <script>
 import SearchBar from "@/components/common/SearchBar";
 import {mapActions, mapGetters} from "vuex";
+import axios from 'axios';
 
 export default {
    name: "Messages",
@@ -42,10 +43,22 @@ export default {
       SearchBar
    },
    computed: {
-      ...mapGetters(['getColors', 'getTheme'])
+      ...mapGetters(['getColors', 'getTheme']),
+      ...mapGetters(['getUser'])
    },
    methods: {
-      ...mapActions(['setConvUUID'])
+      ...mapActions(['setConvUUID']),
+      ...mapGetters(['getUser']),
+      addConversation() {
+        axios.post(`http://localhost:8080/api/room/addNewRoom`, {
+          name: "Discoodle",
+          admin: this.getUser.id
+        }).then(response => {
+          console.log(response);
+        }).catch(error => {
+          console.log(error.response);
+        });
+      }
    },
    data() {
       return {
