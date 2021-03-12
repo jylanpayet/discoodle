@@ -135,6 +135,7 @@ export default {
                   pinned: message.pinned,
                   // messageReactions: message.messageReactions
                })
+               this.writers.pop(message.sender)
             } else if (message.type === "WRITING") {
                if (!this.writers.includes(message.sender)) {
                   this.writers.push(message.sender)
