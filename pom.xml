@@ -24,6 +24,11 @@
     <!-- Porject main properties -->
     <properties>
         <main.basedir>${project.basedir}</main.basedir>
+        <skipTests>true</skipTests>
+        <db.port>3306</db.port>
+        <db.username>root</db.username>
+        <db.password>root</db.password>
+        <db.host>localhost</db.host>
     </properties>
 
     <modules>
@@ -33,6 +38,42 @@
         <module>frontend</module>
     </modules>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.ragedunicorn.tools.maven</groupId>
+                <artifactId>sql-execute-maven-plugin</artifactId>
+                <version>1.0.0</version>
+
+                <dependencies>
+                    <!-- mariadbdriver -->
+                    <dependency>
+                        <groupId>org.mariadb.jdbc</groupId>
+                        <artifactId>mariadb-java-client</artifactId>
+                        <version>2.0.3</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <driver>org.mariadb.jdbc</driver>
+                    <url>jdbc:mariadb://localhost:${db.port}/</url>
+                    <user>${db.username}</user>
+                    <password>${db.password}</password>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>drop-table</id>
+                        <goals>
+                            <goal>sql-execute</goal>
+                        </goals>
+                        <configuration>
+                            <sqlQuery>drop schema if exists discoodle</sqlQuery>
+                        </configuration>
+                    </execution>
+
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
     <!-- Devteam with emails -->
     <developers>
