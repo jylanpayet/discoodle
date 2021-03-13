@@ -4,10 +4,10 @@
          <div class="date" :style="{ color: getTheme ? '#C4C4C4' : '#F4F4F4' }">
             {{ printDate(messageDate) }}
          </div>
-         <div class="message-content" :style="{ marginRight: '10px', backgroundColor: getTheme ? '#C4C4C4' : '#F4F4F4' }">
+         <div class="message-content" :style="{ marginRight: '10px', backgroundColor: '#E85C5C', color: '#F4F4F4', fontWeight: 500 }">
             {{ content }}
          </div>
-         <div class="user-logo" :style="{ backgroundColor: '#E85C5C' }">
+         <div class="user-logo" :style="{ backgroundColor: '#F4F4F4'}">
             {{ userLogo }}
          </div>
       </div>
@@ -82,13 +82,15 @@ export default {
    color: #454150;
    border-radius: 12px;
 
+   word-break: break-all;
+
    font-size: 14px;
    font-weight: 600;
 }
 
 .user-logo {
-   width: 42px;
-   height: 42px;
+   min-width: 42px;
+   min-height: 42px;
 
    background-color: #F4F4F4;
    color: #454150;
