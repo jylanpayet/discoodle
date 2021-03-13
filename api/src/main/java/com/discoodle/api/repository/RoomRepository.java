@@ -16,5 +16,5 @@ public interface RoomRepository extends JpaRepository<Room, Integer> {
     @Modifying
     @Query(value = "insert into link_rooms_users (user_id, room_id) VALUES (:user_id,:room_id)", nativeQuery = true)
     @Transactional
-    void addNewMember(@Param("user_id") Integer user_ID, @Param("room_id") Integer room_ID);
+    void addNewMember(@Param("user_id") Integer user_ID, @Param("room_id") String room_ID);
 }

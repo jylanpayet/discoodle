@@ -1,6 +1,7 @@
 package com.discoodle.api.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -20,12 +21,13 @@ public class Room {
         this.user_ID = user_ID;
     }
 
-    @Id
     /*@GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")*/
-    @GeneratedValue
+    @Id
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "room_id", unique = true, nullable = false)
-    private Integer uuid;
+    private String uuid;
     @Column(name = "name")
     private String name;
     @Column(name = "admin")
