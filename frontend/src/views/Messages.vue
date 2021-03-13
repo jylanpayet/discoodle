@@ -48,27 +48,27 @@ export default {
    },
    methods: {
       ...mapActions(['setConvUUID']),
-      ...mapGetters(['getUser']),
       addConversation() {
+        let test = axios.get(`http://localhost:8080/api/users/seeAllRooms/${this.getUser.id}`).then(response => {
+          console.log(response);
+        }).catch(error => {
+          console.log(error.response);
+        })
+        console.log(test)
+        console.log(this.getUser.id)
         axios.post(`http://localhost:8080/api/room/addNewRoom`, {
           name: "Discoodle",
           admin: this.getUser.id
         }).then(response => {
           console.log(response);
-          console.log(this.getUser)
         }).catch(error => {
           console.log(error.response);
-          console.log(this.getUser)
         });
       }
    },
    data() {
       return {
-         convList: axios.post(`http://localhost:8080/api/users/${this.getUser.pseudo}`).then(response => {
-           console.log(response);
-         }).catch(error => {
-           console.log(error.response);
-         })
+         convList: []
       }
    },
    beforeMount() {

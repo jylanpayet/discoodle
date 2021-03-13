@@ -1,4 +1,5 @@
 package com.discoodle.api.model;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -32,6 +33,7 @@ public class Room {
     @Column(name = "link_picture")
     private String link_picture;
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable( name = "link_rooms_users",
             joinColumns = @JoinColumn( name = "room_id" ),

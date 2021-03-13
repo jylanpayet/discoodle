@@ -1,5 +1,6 @@
 package com.discoodle.api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -63,9 +64,11 @@ public class User {
     )
     private List<User> users = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable( name = "link_rooms_users",
             joinColumns = @JoinColumn( name = "user_id" ),
-            inverseJoinColumns = @JoinColumn( name = "room_id" ) )
+            inverseJoinColumns = @JoinColumn( name = "room_id" )
+    )
     private List<Room> rooms = new ArrayList<>();
 }

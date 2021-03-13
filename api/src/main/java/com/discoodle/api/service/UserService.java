@@ -27,12 +27,16 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll();
     }
 
-    public Optional<User> getUser(String username) {
-        return userRepository.findUserByPseudo(username);
+    public Optional<User> getUserByUserName(String username) {
+        return userRepository.findUserByUserName(username);
+    }
+
+    public Optional<User> getUserByID(Integer user_id) {
+        return userRepository.findUserByID(user_id);
     }
 
     public void addNewUser(User user) {
-        Optional<User> TestPseudo = userRepository.findUserByPseudo(user.getUsername());
+        Optional<User> TestPseudo = userRepository.findUserByUserName(user.getUsername());
         Optional<User> TestMail = userRepository.findUserByMail(user.getMail());
 
         if (TestPseudo.isPresent() || TestMail.isPresent()) {
@@ -80,8 +84,8 @@ public class UserService implements UserDetailsService {
     }
 
     public Boolean login(String username, String password) {
-        if(userRepository.findUserByPseudo(username).isPresent() && userRepository.findUserByPseudo(username).get().isEnabled()) {
-            return bCryptPasswordEncoder.matches(password, userRepository.findUserByPseudo(username).get().getPassword());
+        if(userRepository.findUserByUserName(username).isPresent() && userRepository.findUserByUserName(username).get().isEnabled()) {
+            return bCryptPasswordEncoder.matches(password, userRepository.findUserByUserName(username).get().getPassword());
         }
         return false;
     }
