@@ -3,4 +3,13 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 
-createApp(App).use(store).use(router).mount('#app')
+import WaveUI from 'wave-ui'
+import 'wave-ui/dist/wave-ui.css'
+
+const app = createApp(App)
+
+new WaveUI(app, {
+
+});
+
+app.use(store).use(router).mount('#app')
