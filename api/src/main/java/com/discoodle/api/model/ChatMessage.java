@@ -1,10 +1,11 @@
 package com.discoodle.api.model;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.UUID;
 
 @Getter
 @Setter
-@ToString
 public class ChatMessage {
 
 	private final UUID convUUID;
@@ -12,16 +13,18 @@ public class ChatMessage {
 	private String sender;
 	private String messageDate;
 	private boolean pinned;
-	private String content;
+	private final UUID convUUID;
+
+	private final String type;
 
 
-	public ChatMessage(UUID convUUID, Integer senderID, String sender, String messageDate, boolean pinned, String content) {
-		this.convUUID = convUUID;
-		this.senderID = senderID;
+	public ChatMessage(Integer ID, String content, String sender, String messageDate, boolean pinned, UUID convUUID) {
+		this.ID = ID;
+		this.content = content;
 		this.sender = sender;
 		this.messageDate = messageDate;
 		this.pinned = pinned;
-		this.content = content;
+		this.convUUID = convUUID;
+		this.type = "MESSAGE";
 	}
-
 }

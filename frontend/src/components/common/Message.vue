@@ -1,25 +1,14 @@
 <template>
    <div class="Message" :style="belongToMyself ? { alignSelf: 'flex-end' } : { alignSelf: 'flex-start' }">
-      <div v-if="belongToMyself">
+      <div :style="!belongToMyself ? { flexDirection: 'row-reverse' } : { flexDirection: 'row' }">
          <div class="date" :style="{ color: getTheme ? '#C4C4C4' : '#F4F4F4' }">
             {{ printDate(messageDate) }}
          </div>
-         <div class="message-content" :style="{ marginRight: '10px', backgroundColor: '#E85C5C', color: '#F4F4F4', fontWeight: 500 }">
-            {{ content }}
+         <div class="message-content" :style="belongToMyself ? { marginRight: '10px', backgroundColor: '#E85C5C', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: getTheme ? '#C4C4C4' : '#F4F4F4' }">
+            {{ filterEmoji(content)}}
          </div>
-         <div class="user-logo" :style="{ backgroundColor: '#F4F4F4'}">
+         <div class="user-logo" :style="{ backgroundColor: '#F4F4F4' }">
             {{ userLogo }}
-         </div>
-      </div>
-      <div v-else>
-         <div class="user-logo">
-            {{ userLogo }}
-         </div>
-         <div class="message-content" :style="{ marginLeft: '10px', backgroundColor: getTheme ? '#C4C4C4' : '#F4F4F4' }">
-            {{ content }}
-         </div>
-         <div class="date" :style="{ color: getTheme ? '#C4C4C4' : '#F4F4F4' }">
-            {{ printDate(messageDate) }}
          </div>
       </div>
    </div>
@@ -27,6 +16,7 @@
 
 <script>
 import {mapGetters} from "vuex";
+import emojis from "@/assets/emojis";
 
 export default {
    name: "Message",
@@ -51,7 +41,31 @@ export default {
    methods: {
       printDate(messageDate) {
          return new Date().toLocaleString().substr(0, 10) === messageDate.substr(0, 10) ? messageDate.substr(13) : messageDate.substr(0, 10)
+      },
+
+      filterEmoji(content){
+         const regex = ":[a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*:";
+         const emoji = [...content.matchAll(regex)];
+         emoji.forEach(elt => emoji[0]= elt[0]);
+         if(emoji){
+            emoji.forEach(elt => {
+               elt = elt.replaceAll(":", "");
+               if (emojis.People[elt])
+                  content = content.replace(`:${elt}:`, emojis.People[elt.replaceAll(":","")]);
+               if (emojis.Nature[elt])
+                  content = content.replace(`:${elt}:`, emojis.Nature[elt.replaceAll(":","")]);
+               if (emojis.Objects[elt])
+                  content = content.replace(`:${elt}:`, emojis.Objects[elt.replaceAll(":","")]);
+               if (emojis.Places[elt])
+                  content = content.replace(`:${elt}:`, emojis.Places[elt.replaceAll(":","")]);
+               if (emojis.Symbols[elt])
+                  content = content.replace(`:${elt}:`, emojis.Symbols[elt.replaceAll(":","")]);
+
+            })
+         }
+         return content;
       }
+
    },
    computed: {
       ...mapGetters(['getColors', 'getTheme'])
@@ -69,14 +83,19 @@ export default {
    position: relative;
    display: flex;
    align-items: flex-end;
+   justify-content: flex-end;
    max-width: 100%;
+
 
    margin-top: 10px;
 }
 
 .message-content {
    padding: 15px;
-   max-width: calc(100% - 42px - 10px - 30px);
+   max-width: calc(80% - 42px - 10px - 30px);
+
+   hyphens: manual;
+   word-wrap: break-word;
 
    background-color: #C4C4C4;
    color: #454150;

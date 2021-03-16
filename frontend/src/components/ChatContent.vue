@@ -70,6 +70,7 @@ export default {
          messages: [],
          pinned: [],
          user: "Bob",
+         writers: [],
          showPinned: false
       }
    },
@@ -89,6 +90,17 @@ export default {
       isEnter(event) {
          if (event.keyCode === 13 && document.querySelector(".conv-input > div > input").value !== "") {
             this.send();
+            this.writers.pop(this.user);
+         } else if (event.keyCode !== 13) {
+            this.writing();
+         }
+      },
+      writing() {
+         if (!this.writers.includes(this.user)) {
+            stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {  }, JSON.stringify({
+               sender: this.user,
+               type: "WRITING"
+            }));
          }
       },
       connect() {
@@ -117,13 +129,23 @@ export default {
          let message = JSON.parse(payload.body);
 
          if (message.sender !== this.user) {
-            this.messages.unshift({
-               content: message.content,
-               sender: message.sender,
-               messageDate: message.messageDate,
-               pinned: message.pinned,
-               // messageReactions: message.messageReactions
-            })
+            if (message.type === "MESSAGE") {
+               this.messages.unshift({
+                  content: message.content,
+                  sender: message.sender,
+                  messageDate: message.messageDate,
+                  pinned: message.pinned,
+                  // messageReactions: message.messageReactions
+               })
+               this.writers.pop(message.sender)
+            } else if (message.type === "WRITING") {
+               if (!this.writers.includes(message.sender)) {
+                  this.writers.push(message.sender)
+                  setTimeout(() => {
+                     this.writers.pop(message.sender)
+                  }, 5000)
+               }
+            }
          }
       },
       send() {
@@ -135,16 +157,19 @@ export default {
             date = date.substr(0, 13) + ((Number(date.substr(13, 2)) + 1) % 24) + date.substr(15, 3);
 
             let chatMessage = {
+               ID: 10,
                content: messageContent.value,
                sender: this.user,
                messageDate: date,
                pinned: false,
                convUUID: this.getCurrentConv,
                // messageReactions: []
+
+               type: "MESSAGE"
             };
 
             this.messages.unshift(chatMessage);
-            stompClient.send(`/conversationListener/${this.getCurrentConv}/room.send`, {}, JSON.stringify(chatMessage));
+            stompClient.send(`/conversationListener/${this.getCurrentConv}/room.send`, { }, JSON.stringify(chatMessage));
             messageContent.value = '';
          }
       },
@@ -157,7 +182,6 @@ export default {
       switchPinDisplay() {
          this.showPinned = !this.showPinned;
       },
-
    },
    computed: {
       ...mapGetters(['getColors', 'getTheme', 'getCurrentConv', 'getUser'])
@@ -189,6 +213,7 @@ button {
    background-color: #18161F;
 
    display: flex;
+   justify-content: space-between;
    align-items: center;
    justify-content: center;
 }
@@ -348,6 +373,73 @@ button {
    cursor: pointer;
 }
 
+#pin > img {
+   width: 20px;
+   height: 20px;
+}
+
+#pin {
+   outline: none;
+   background: none;
+   border: none;
+
+   cursor: pointer;
+}
+
+#pin:hover {
+   transform: scale(1.1) rotate(-10deg);
+}
+
+.pinned-message {
+   animation: appear-opacity ease-in-out 0.5s;
+
+   position: absolute;
+
+   border-radius: 12px;
+   right: 50px;
+   max-width: 350px;
+   min-width: 350px;
+   transform: translateY(35px);
+
+   min-height: 50px;
+   background-color: #909090;
+}
+
+.pinned-message > div {
+   position: relative;
+   width: calc(100% - 20px);
+
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: flex-start;
+
+   margin: 10px 10px 0 10px;
+
+}
+
+.pinned-message > div::before {
+   content: "";
+   position: absolute;
+   right: 0;
+   top: 0;
+   width: 13px;
+   height: 13px;
+   background-color: #909090;
+   transform: rotate(45deg) translateY(-9px) translateX(-15px);
+}
+
+.pinned-message-content {
+   padding: 10px;
+   margin-bottom: 10px;
+   width: calc(100% - 20px);
+   background-color: #C4C4C4;
+   color: #454150;
+   border-radius: 12px;
+
+   cursor: pointer;
+}
+
 @keyframes appear-opacity {
    from {
       /* transform: translateX(100%); */
@@ -358,5 +450,4 @@ button {
       opacity: 1;
    }
 }
-
 </style>
