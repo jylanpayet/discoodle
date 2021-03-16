@@ -1,6 +1,14 @@
 package com.discoodle.api.model;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.util.LinkedList;
+
+@Getter
+@Setter
+@ToString
 
 public class ConversationMessages {
    private LinkedList<ChatMessage> chatMessages;
@@ -11,13 +19,5 @@ public class ConversationMessages {
 
    public ConversationMessages() {
       this(new LinkedList<>());
-   }
-
-   public LinkedList<ChatMessage> getChatMessages() {
-      return chatMessages;
-   }
-
-   public void setChatMessages(LinkedList<ChatMessage> chatMessages) {
-      this.chatMessages = chatMessages;
    }
 }

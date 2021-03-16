@@ -2,6 +2,7 @@ package com.discoodle.api.controller;
 
 import com.discoodle.api.model.User;
 import com.discoodle.api.service.UserService;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

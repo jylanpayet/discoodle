@@ -8,8 +8,8 @@ import java.util.UUID;
 @Setter
 public class ChatMessage {
 
-	private final Integer ID;
-	private String content;
+	private final UUID convUUID;
+	private Integer senderID;
 	private String sender;
 	private String messageDate;
 	private boolean pinned;

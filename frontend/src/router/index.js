@@ -1,6 +1,5 @@
 import {createRouter, createWebHashHistory} from 'vue-router'
 import Home from "@/views/Home";
-import * as path from "path";
 
 const routes = [
     {
@@ -27,18 +26,11 @@ const routes = [
         children: [
             {
                 path: "",
-                component: () => import(/* webpackChunkName: "messages/new" */ '../components/AddConversation')
-            },
-            {
-                path: "new",
-                component: () => import(/* webpackChunkName: "messages/new" */ '../components/AddConversation')
+                component: () => import(/* webpackChunkName: "messages/friends" */ '../components/FriendsList')
             },
             {
                 path: ':id',
                 component: () => import(/* webpackChunkName: "messages/:id" */ '../components/ChatContent'),
-                props: () => ({
-                    convUUID: path.valueOf()
-                })
             },
         ]
     },
@@ -50,7 +42,21 @@ const routes = [
     {
         path: '/compte',
         name: 'Compte',
-        component: () => import(/* webpackChunkName: "account" */ '../views/Account')
+        component: () => import(/* webpackChunkName: "account" */ '../views/Account'),
+        children: [
+            {
+                path: "infos",
+                component: () => import(/* webpackChunkName: "account/infos" */ '../components/settings/AccountInfo')
+            },
+            {
+                path: "settings",
+                component: () => import(/* webpackChunkName: "account/settings" */ '../components/settings/AccountInfo')
+            },
+            {
+                path: "home-set",
+                component: () => import(/* webpackChunkName: "account/home-set" */ '../components/settings/AccountInfo')
+            }
+        ]
     }
 
 ]

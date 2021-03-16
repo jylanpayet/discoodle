@@ -11,8 +11,10 @@
     "core-js": "^3.9.0",
     "stompjs": "^2.3.3",
     "vue": "^3.0.0",
+    "vue-cookie": "^1.1.4",
     "vue-router": "^4.0.0-0",
-    "vuex": "^4.0.0-0"
+    "vuex": "^4.0.0-0",
+    "wave-ui": "^2.14.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

@@ -101,13 +101,15 @@ export default {
    color: #454150;
    border-radius: 12px;
 
+   word-break: break-all;
+
    font-size: 14px;
    font-weight: 600;
 }
 
 .user-logo {
-   width: 42px;
-   height: 42px;
+   min-width: 42px;
+   min-height: 42px;
 
    background-color: #F4F4F4;
    color: #454150;

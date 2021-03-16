@@ -29,7 +29,8 @@ export default createStore({
             currentConvShown: {
                 type: String,
             }
-        }
+        },
+        user: {  }
     },
     mutations: {
         SWITCH_THEME(state) {
@@ -37,6 +38,9 @@ export default createStore({
         },
         SET_CONV_UUID(state, uuid) {
             state.messages.currentConvShown = uuid;
+        },
+        SET_USER(state, user) {
+            state.user = user;
         }
     },
     actions: {
@@ -45,6 +49,9 @@ export default createStore({
         },
         setConvUUID(context, uuid) {
             context.commit('SET_CONV_UUID', uuid);
+        },
+        setUser(context, user) {
+            context.commit('SET_USER', user);
         }
     },
     getters: {
@@ -59,6 +66,9 @@ export default createStore({
         },
         getCurrentConv: state => {
             return state.messages.currentConvShown;
+        },
+        getUser: state => {
+            return state.user;
         }
     },
     modules: {
