@@ -5,7 +5,7 @@
             {{ printDate(messageDate) }}
          </div>
          <div class="message-content" :style="belongToMyself ? { marginRight: '10px', backgroundColor: '#E85C5C', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: getTheme ? '#C4C4C4' : '#F4F4F4' }">
-            {{ messageID }}) {{ filterEmoji(content)}}
+            {{ filterEmoji(content)}}
          </div>
          <div class="user-logo" :style="{ backgroundColor: '#F4F4F4' }">
             {{ userLogo }}

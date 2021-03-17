@@ -37,23 +37,15 @@
       </div>
       <div class="conv-input">
          <span>
-            {{
-               writers.length > 3
-                     ? `${ "Plusieurs personnes" } sont en train d'écrire...`
-                     : writers.length > 1
-                        ? `${writers.forEach(elt => { return `${elt}, ` })} sont en train d'écrire...`
-                        : writers.length === 1
-                           ? `${ writers[0] } est en train d'écrire...`
-                           : ""
-            }}
+            {{ getWritersAsText() }}
          </span>
          <div>
-            <input type="text" :placeholder="`Envoyer un message à ${ $route.query.name }`" @keypress="actionInput">
+            <input type="text" autocomplete="off" :placeholder="`Envoyer un message à ${ $route.query.name }`" @keypress="actionInput">
             <div class="right-side-input">
                <button style="height: 32px; width: 32px;">
                   <img src="../assets/happy.svg" alt="Smiley">
                </button>
-               <button class="submit-file" @click="user = 'Dylan'">
+               <button class="submit-file" @click="user = 'Bob'">
                   +
                </button>
             </div>
@@ -80,9 +72,9 @@ export default {
       return {
          messages: [],
          pinned: [],
-         user: "Bob",
+         user: "Alice",
          writers: [],
-         showPinned: false
+         showPinned: false,
       }
    },
    mounted() {
@@ -98,6 +90,19 @@ export default {
       this.disconnect();
    },
    methods: {
+      getWritersAsText() {
+         if (this.writers.length === 0)
+            return "";
+         if (this.writers.length === 1)
+            return `${this.writers[0]} est en train d'écrire...`
+         if (this.writers.length > 4)
+            return "Plusieurs personnes sont en train d'écrire";
+         let res = "";
+         this.writers.forEach(elt => {
+            res += (elt === this.writers[this.writers.length - 1] ? `et ${elt}` : `${elt}${elt === this.writers[this.writers.length - 2] ? "" : ","} `)
+         });
+         return `${res} sont en train d'écrire...`;
+      },
       actionInput(event) {
          if (event.keyCode === 13 && document.querySelector(".conv-input > div > input").value !== "") {
             this.send();
@@ -141,7 +146,6 @@ export default {
 
          if (message.sender !== this.user) {
             if (message.type === "MESSAGE") {
-               console.log(message);
 
                this.messages.unshift({
                   convUUID: message.convUUID,
@@ -172,8 +176,6 @@ export default {
             date = date.toLocaleString('fr-FR', {timeZone: 'UTC'}).substr(0, 17).replace(",", " -");
             date = date.substr(0, 13) + ((Number(date.substr(13, 2)) + 1) % 24) + date.substr(15, 3);
 
-            console.log(`ID : ${this.messages.length}`);
-
             let chatMessage = {
                id: this.messages.length,
                content: messageContent.value,
@@ -185,8 +187,6 @@ export default {
 
                type: "MESSAGE"
             };
-
-            console.log(chatMessage);
 
             this.messages.unshift(chatMessage);
             stompClient.send(`/conversationListener/${this.getCurrentConv}/room.send`, { }, JSON.stringify(chatMessage));
