@@ -5,7 +5,7 @@
             {{ printDate(messageDate) }}
          </div>
          <div class="message-content" :style="belongToMyself ? { marginRight: '10px', backgroundColor: '#E85C5C', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: getTheme ? '#C4C4C4' : '#F4F4F4' }">
-            {{ filterEmoji(content)}}
+            {{ messageID }}) {{ filterEmoji(content)}}
          </div>
          <div class="user-logo" :style="{ backgroundColor: '#F4F4F4' }">
             {{ userLogo }}
@@ -16,7 +16,7 @@
 
 <script>
 import {mapGetters} from "vuex";
-import emojis from "@/assets/emojis";
+import emojis from "@/assets/emojis_uncathegorized";
 
 export default {
    name: "Message",
@@ -36,6 +36,10 @@ export default {
       messageDate: {
          type: String,
          required: true
+      },
+      messageID: {
+         type: Number,
+         required: true,
       }
    },
    methods: {
@@ -44,23 +48,14 @@ export default {
       },
 
       filterEmoji(content){
+         // Regex to match with the emoji string encode ( ':xxxxx_xxx_xxx_xxx:' where '_' is optionnal )
          const regex = ":[a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*:";
          const emoji = [...content.matchAll(regex)];
-         emoji.forEach(elt => emoji[0]= elt[0]);
-         if(emoji){
+         if(emoji && emoji.length > 0) {
             emoji.forEach(elt => {
-               elt = elt.replaceAll(":", "");
-               if (emojis.People[elt])
-                  content = content.replace(`:${elt}:`, emojis.People[elt.replaceAll(":","")]);
-               if (emojis.Nature[elt])
-                  content = content.replace(`:${elt}:`, emojis.Nature[elt.replaceAll(":","")]);
-               if (emojis.Objects[elt])
-                  content = content.replace(`:${elt}:`, emojis.Objects[elt.replaceAll(":","")]);
-               if (emojis.Places[elt])
-                  content = content.replace(`:${elt}:`, emojis.Places[elt.replaceAll(":","")]);
-               if (emojis.Symbols[elt])
-                  content = content.replace(`:${elt}:`, emojis.Symbols[elt.replaceAll(":","")]);
-
+               console.log(elt[0]);
+               if (emojis[elt[0].replaceAll(":", "")])
+                  content = content.replace(elt[0], emojis[elt[0].replaceAll(":", "")]);
             })
          }
          return content;
@@ -77,6 +72,7 @@ export default {
 .Message {
    position: relative;
    max-width: calc(50% + 42px + 10px + 30px);
+   width: 60%;
 }
 
 .Message > div {

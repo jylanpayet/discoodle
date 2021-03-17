@@ -92,12 +92,23 @@ export default {
 }
 
 .settings-box {
+   position: relative;
    min-height: 80px;
    width: 100%;
 
    display: flex;
    align-items: center;
    justify-content: center;
+}
+
+.settings-box:after {
+   position: absolute;
+   content: "";
+   bottom: 0;
+   height: 1px;
+   width: 90%;
+   opacity: 0.5;
+   background-color: #909090;
 }
 
 .settings-box > div {
@@ -152,6 +163,7 @@ export default {
    justify-content: flex-start;
 
    width: 100%;
+   height: 100%;
 
    overflow-y: auto;
    overflow-x: hidden;
@@ -167,10 +179,10 @@ export default {
    justify-content: center;
 }
 
-.convs-list > a:before {
+.convs-list > a:after {
    position: absolute;
    content: "";
-   bottom: 0;
+   bottom: -1px;
    height: 1px;
    width: 90%;
    opacity: 0.5;
@@ -180,11 +192,10 @@ export default {
 .router-link-active {
    background-color: #E85C5C;
    border-radius: 7px;
-   width: 95%;
 }
 
-.router-link-active:before {
-   height: 0;
+.router-link-active:after {
+   content: none !important;
 }
 
 .link-content {
