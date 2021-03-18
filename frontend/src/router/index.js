@@ -1,6 +1,5 @@
 import {createRouter, createWebHashHistory} from 'vue-router'
 import Home from "@/views/Home";
-import * as path from "path";
 
 const routes = [
     {
@@ -27,18 +26,11 @@ const routes = [
         children: [
             {
                 path: "",
-                component: () => import(/* webpackChunkName: "messages/new" */ '../components/AddConversation')
-            },
-            {
-                path: "new",
-                component: () => import(/* webpackChunkName: "messages/new" */ '../components/AddConversation')
+                component: () => import(/* webpackChunkName: "messages/friends" */ '../components/FriendsList')
             },
             {
                 path: ':id',
                 component: () => import(/* webpackChunkName: "messages/:id" */ '../components/ChatContent'),
-                props: () => ({
-                    convUUID: path.valueOf()
-                })
             },
         ]
     },

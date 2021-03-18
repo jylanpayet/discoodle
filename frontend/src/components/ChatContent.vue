@@ -1,35 +1,65 @@
 <template>
-   <div class="ChatContent" :style="getTheme ? { backgroundColor: '#454150' } : { backgroundColor: '#909090' }"
+   <div class="ChatContent"
         :key="$route.fullPath">
-      <div class="user-info-content"
-           :style="getTheme ? { backgroundColor: '#454150' } : { backgroundColor: '#909090' }">
-         {{ $route.query.name }}
-      </div>
-      <div class="conversation-content">
+      <div class="conv-info">
+         <div>
+            <span style="font-size: 23px; font-weight: 500; color: #F4F4F4">{{ $route.query.name }}</span>
+            <div class="top-right-buttons">
+               <button style="height: 100%;" @click="switchPinDisplay">
+                  <img src="../assets/pin.png" alt="" style="height: 60%;">
+               </button>
+               <button style="color: #F4F4F4; font-size: 33px; font-weight: 500; height: 100%">
+                  +
+               </button>
+            </div>
 
-         <Message v-for="message in messages" :key="message" :content="message.content"
+            <div class="pinned-message" v-if="showPinned">
+               <div>
+                  {{ pinned.length === 0 ? "Aucun message épinglé" : "" }}
+                  <div class="pinned-message-content" :key="messages" v-for="messages in pinned">
+                     {{ messages.sender }} : <br>
+                     {{ messages.content }} <br>
+                     {{ messages.messageDate }}
+                  </div>
+               </div>
+            </div>
+
+         </div>
+      </div>
+      <div class="conv-messages">
+         <span v-if="messages.length === 0" style="align-self: center; font-size: 15px; font-weight: 500; color: #F4F4F4"> Soyez le premier à envoyer un message à {{ $route.query.name }}</span>
+         <Message :key="message" v-for="message in messages"
+                  :content="message.content"
                   :user-logo="message.sender.charAt(0).toUpperCase()"
-                  :belong-to-myself="message.sender === user" :message-date="message.messageDate"/>
-
+                  :belong-to-myself="message.sender === user"
+                  :message-date="message.messageDate"
+                  :message-i-d="message.id"/>
       </div>
-      <div class="input-content">
-         <input type="text" :placeholder="`Envoyer un message à ${ $route.query.name }`" @keypress="isEnter">
-         <div class="right-side-input">
-            ☺
-            <button @click="user = 'Dylan'">
-               +
-            </button>
+      <div class="conv-input">
+         <span>
+            {{ getWritersAsText() }}
+         </span>
+         <div>
+            <input type="text" autocomplete="off" :placeholder="`Envoyer un message à ${ $route.query.name }`" @keypress="actionInput">
+            <div class="right-side-input">
+               <button style="height: 32px; width: 32px;">
+                  <img src="../assets/happy.svg" alt="Smiley">
+               </button>
+               <button class="submit-file" @click="user = 'Bob'">
+                  +
+               </button>
+            </div>
          </div>
       </div>
    </div>
 </template>
 
 <script>
-import Message from "@/components/common/Message";
 import SockJS from "sockjs-client";
 import Stomp from "stompjs";
 import {mapGetters} from "vuex";
 import axios from 'axios';
+import Message from "@/components/common/Message";
 
 let stompClient = null;
 
@@ -41,7 +71,10 @@ export default {
    data() {
       return {
          messages: [],
-         user: "Bob",
+         pinned: [],
+         user: "Alice",
+         writers: [],
+         showPinned: false,
       }
    },
    mounted() {
@@ -57,9 +90,33 @@ export default {
       this.disconnect();
    },
    methods: {
-      isEnter(event) {
-         if (event.keyCode === 13 && document.querySelector(".input-content > input").value !== "") {
+      getWritersAsText() {
+         if (this.writers.length === 0)
+            return "";
+         if (this.writers.length === 1)
+            return `${this.writers[0]} est en train d'écrire...`
+         if (this.writers.length > 4)
+            return "Plusieurs personnes sont en train d'écrire";
+         let res = "";
+         this.writers.forEach(elt => {
+            res += (elt === this.writers[this.writers.length - 1] ? `et ${elt}` : `${elt}${elt === this.writers[this.writers.length - 2] ? "" : ","} `)
+         });
+         return `${res} sont en train d'écrire...`;
+      },
+      actionInput(event) {
+         if (event.keyCode === 13 && document.querySelector(".conv-input > div > input").value !== "") {
             this.send();
+            this.writers.pop(this.user);
+         } else if (event.keyCode !== 13) {
+            this.writing();
+         }
+      },
+      writing() {
+         if (!this.writers.includes(this.user)) {
+            stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {  }, JSON.stringify({
+               sender: this.user,
+               type: "WRITING"
+            }));
          }
       },
       connect() {
@@ -88,91 +145,162 @@ export default {
          let message = JSON.parse(payload.body);
 
          if (message.sender !== this.user) {
-            this.messages.unshift({
-               content: message.content,
-               sender: message.sender,
-               messageDate: message.messageDate,
-               pinned: message.pinned,
-               // messageReactions: message.messageReactions
-            })
+            if (message.type === "MESSAGE") {
+
+               this.messages.unshift({
+                  convUUID: message.convUUID,
+                  id: message.id,
+                  content: message.content,
+                  sender: message.sender,
+                  messageDate: message.messageDate,
+                  pinned: message.pinned,
+                  // TODO : Add messageReactions implementation.
+                  // messageReactions: message.messageReactions
+               })
+               this.writers.pop(message.sender)
+            } else if (message.type === "WRITING") {
+               if (!this.writers.includes(message.sender)) {
+                  this.writers.push(message.sender)
+                  setTimeout(() => {
+                     this.writers.pop(message.sender)
+                  }, 5000)
+               }
+            }
          }
       },
       send() {
-         let messageContent = document.querySelector(".input-content > input");
+         let messageContent = document.querySelector(".conv-input > div > input");
 
          if (messageContent && stompClient) {
             let date = new Date();
-            date = date.toLocaleString('fr-FR', { timeZone: 'UTC'}).substr(0, 17).replace(",", " -");
+            date = date.toLocaleString('fr-FR', {timeZone: 'UTC'}).substr(0, 17).replace(",", " -");
             date = date.substr(0, 13) + ((Number(date.substr(13, 2)) + 1) % 24) + date.substr(15, 3);
 
             let chatMessage = {
+               id: this.messages.length,
                content: messageContent.value,
                sender: this.user,
                messageDate: date,
                pinned: false,
                convUUID: this.getCurrentConv,
                // messageReactions: []
+
+               type: "MESSAGE"
             };
 
             this.messages.unshift(chatMessage);
-            stompClient.send(`/conversationListener/${this.getCurrentConv}/room.send`, {}, JSON.stringify(chatMessage));
+            stompClient.send(`/conversationListener/${this.getCurrentConv}/room.send`, { }, JSON.stringify(chatMessage));
             messageContent.value = '';
          }
       },
       getMessagesFromJSON() {
          axios.get(`http://localhost:8080/api/messages?uuid=${this.getCurrentConv}`).then(response => {
             this.messages = response.data.chatMessages;
+            this.pinned = this.messages.filter(elt => (elt.pinned === true));
          });
+      },
+      switchPinDisplay() {
+         this.showPinned = !this.showPinned;
       },
    },
    computed: {
-      ...mapGetters(['getColors', 'getTheme', 'getCurrentConv'])
+      ...mapGetters(['getColors', 'getTheme', 'getCurrentConv', 'getUser'])
    }
 }
 </script>
 
 <style scoped>
-.ChatContent {
-   width: calc(79% - 40px);
-   height: calc(100% - 40px);
-   border-radius: 12px;
-   background-color: #454150;
+button {
+   background: none;
+   border: none;
+   outline: none;
+   cursor: pointer;
+}
 
-   padding: 20px;
+.ChatContent {
+   width: 100%;
+   height: 100%;
 
    display: flex;
    flex-direction: column;
    align-items: center;
-   justify-content: space-between;
-
-   animation: appear-opacity ease-in-out 0.8s;
+   justify-content: center;
 }
 
-.user-info-content {
-   height: 3%;
+.conv-info {
    width: 100%;
+   height: 80px;
+   background-color: #18161F;
 
    display: flex;
+   justify-content: space-between;
    align-items: center;
-
-   color: #F4F4F4;
-   font-size: 19px;
-   font-weight: 600;
-
-   background-color: #454150;
 }
 
-.input-content {
-   width: 100%;
-   height: 6%;
-   border-radius: 100px;
-
-   background-color: #F4F4F4;
-
+.conv-info > div {
    display: flex;
    flex-direction: row;
    align-items: center;
    justify-content: space-between;
+
+   width: 95%;
+   height: 60px;
+}
+
+.top-right-buttons {
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+
+   height: 40px;
+   width: 65px;
+}
+
+.conv-input {
+   height: 100px;
+   width: 100%;
+
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+}
+
+.conv-input > div {
+   width: 90%;
+   height: 46px;
+   background-color: #F4F4F4;
+   border-radius: 100px;
+
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+
+   padding-left: 15px;
+   padding-right: 4px;
+}
+
+.conv-input > span {
+   color: #F4F4F4;
+   font-size: 12px;
+   width: 90%;
+   padding-left: 15px;
+   height: 20px;
+   margin-bottom: 5px;
+
+}
+
+.conv-messages {
+   height: calc(100% - 180px);
+   width: 95%;
+   align-self: center;
+
+   display: flex;
+   flex-direction: column-reverse;
+
+   overflow-y: auto;
+   overflow-x: hidden;
+   padding-right: 8px;
 }
 
 .right-side-input {
@@ -180,75 +308,166 @@ export default {
    flex-direction: row;
    align-items: center;
    justify-content: space-between;
-   padding-right: 5px;
 
-   font-size: 30px;
+   height: 44px;
+   width: 90px;
 }
 
-.conversation-content {
-   position: relative;
-   display: flex;
-   flex-direction: column-reverse;
-
-   width: calc(100% + 4px);
-
-   height: 80%;
-
-   overflow-y: auto;
-}
-
-.input-content > input {
-   height: 80%;
-   width: 70%;
-   background: none;
-
-   padding-left: 20px;
-   font-size: 14px;
-   color: #454150;
-   font-weight: 600;
-
-   border: none;
-   outline: none;
-}
-
-.input-content > input::placeholder {
-   color: #909090;
-}
-
-.right-side-input > button {
-   display: flex;
-   align-items: center;
-   justify-content: center;
-
-   background-color: #909090;
-   width: 35px;
-   height: 35px;
-   border-radius: 100px;
-
-   cursor: pointer;
-
+.submit-file {
+   background-color: #454150;
+   height: 38px;
+   width: 38px;
    color: #F4F4F4;
    font-size: 30px;
    font-weight: 600;
 
-   border: none;
-   outline: none;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+
+   border-radius: 50%;
 }
 
-.right-side-input > button:hover {
+.submit-file:hover {
    background-color: #E85C5C;
-   transform: rotate(90deg);
-   transition: transform 0.7s;
+   color: #F4F4F4;
 }
 
-.conversation-content::-webkit-scrollbar {
-   width: 4px;
+.conv-input > div > input {
+   outline: none;
+   border: none;
+   background: none;
+
+   max-width: calc(100% - 100px);
+   width: 1000px;
+   height: 35px;
+   font-size: 15px;
+   color: #454150;
+}
+
+.conv-input > div > input::placeholder {
+   font-size: 15px;
+   color: #909090;
 }
 
 
-.conversation-content::-webkit-scrollbar-thumb {
-   background: #909090;
-   border-radius: 15px;
+.pinned-message {
+   animation: appear-opacity ease-in-out 0.5s;
+
+   position: absolute;
+
+   z-index: 500;
+
+   border-radius: 12px;
+   right: 50px;
+   max-width: 350px;
+   min-width: 350px;
+   transform: translateY(35px);
+
+   min-height: 50px;
+   background-color: #909090;
+}
+
+.pinned-message > div {
+   position: relative;
+   width: calc(100% - 20px);
+
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: flex-start;
+
+   margin: 10px 10px 0 10px;
+
+}
+
+.pinned-message > div::before {
+   content: "";
+   position: absolute;
+   right: 0;
+   top: 0;
+   width: 13px;
+   height: 13px;
+   background-color: #909090;
+   transform: rotate(45deg) translateY(-9px) translateX(-15px);
+}
+
+.pinned-message-content {
+   padding: 10px;
+   margin-bottom: 10px;
+   width: calc(100% - 20px);
+   background-color: #C4C4C4;
+   color: #454150;
+   border-radius: 12px;
+
+   cursor: pointer;
+}
+
+#pin > img {
+   width: 20px;
+   height: 20px;
+}
+
+#pin {
+   outline: none;
+   background: none;
+   border: none;
+
+   cursor: pointer;
+}
+
+#pin:hover {
+   transform: scale(1.1) rotate(-10deg);
+}
+
+.pinned-message {
+   animation: appear-opacity ease-in-out 0.5s;
+
+   position: absolute;
+
+   border-radius: 12px;
+   right: 50px;
+   max-width: 350px;
+   min-width: 350px;
+   transform: translateY(35px);
+
+   min-height: 50px;
+   background-color: #909090;
+}
+
+.pinned-message > div {
+   position: relative;
+   width: calc(100% - 20px);
+
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: flex-start;
+
+   margin: 10px 10px 0 10px;
+
+}
+
+.pinned-message > div::before {
+   content: "";
+   position: absolute;
+   right: 0;
+   top: 0;
+   width: 13px;
+   height: 13px;
+   background-color: #909090;
+   transform: rotate(45deg) translateY(-9px) translateX(-15px);
+}
+
+.pinned-message-content {
+   padding: 10px;
+   margin-bottom: 10px;
+   width: calc(100% - 20px);
+   background-color: #C4C4C4;
+   color: #454150;
+   border-radius: 12px;
+
+   cursor: pointer;
 }
 
 @keyframes appear-opacity {
