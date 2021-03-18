@@ -4,8 +4,8 @@
          <div class="date" :style="{ color: getTheme ? '#C4C4C4' : '#F4F4F4' }">
             {{ printDate(messageDate) }}
          </div>
-         <div class="message-content" :style="belongToMyself ? { marginRight: '10px', backgroundColor: '#E85C5C', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: getTheme ? '#C4C4C4' : '#F4F4F4' }">
-            {{ filterEmoji(content)}}
+         <div class="message-content" v-html="filterMarkdown(filterEmoji(content))" :style="belongToMyself ? { marginRight: '10px', backgroundColor: '#E85C5C', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: getTheme ? '#C4C4C4' : '#F4F4F4' }">
+
          </div>
          <div class="user-logo" :style="{ backgroundColor: '#F4F4F4' }">
             {{ userLogo }}
@@ -17,6 +17,7 @@
 <script>
 import {mapGetters} from "vuex";
 import emojis from "@/assets/emojis_uncathegorized";
+import marked from "marked";
 
 export default {
    name: "Message",
@@ -59,6 +60,9 @@ export default {
             })
          }
          return content;
+      },
+      filterMarkdown(content){
+         return marked(content);
       }
 
    },
