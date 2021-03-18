@@ -8,7 +8,7 @@
                   Bienvenue sur Discoodle !
                </div>
 
-               <!-- TODO : Intégrer les flux RSS et les posts -->
+               <!-- TODO : Intégrer les posts -->
 
                <div class="posts-content">
                   <div v-if="posts.length === 0"

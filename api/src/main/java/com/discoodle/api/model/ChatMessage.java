@@ -9,17 +9,17 @@ import java.util.UUID;
 public class ChatMessage {
 
 	private final UUID convUUID;
-	private Integer senderID;
+	private final Integer id;
+	private String content;
 	private String sender;
 	private String messageDate;
 	private boolean pinned;
-	private final UUID convUUID;
 
 	private final String type;
 
 
-	public ChatMessage(Integer ID, String content, String sender, String messageDate, boolean pinned, UUID convUUID) {
-		this.ID = ID;
+	public ChatMessage(Integer id, String content, String sender, String messageDate, boolean pinned, UUID convUUID) {
+		this.id = id;
 		this.content = content;
 		this.sender = sender;
 		this.messageDate = messageDate;

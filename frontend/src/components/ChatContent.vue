@@ -33,16 +33,19 @@
                   :user-logo="message.sender.charAt(0).toUpperCase()"
                   :belong-to-myself="message.sender === user"
                   :message-date="message.messageDate"
-                  />
+                  :message-i-d="message.id"/>
       </div>
       <div class="conv-input">
+         <span>
+            {{ getWritersAsText() }}
+         </span>
          <div>
-            <input type="text" :placeholder="`Envoyer un message à ${ $route.query.name }`" @keypress="isEnter">
+            <input type="text" autocomplete="off" :placeholder="`Envoyer un message à ${ $route.query.name }`" @keypress="actionInput">
             <div class="right-side-input">
                <button style="height: 32px; width: 32px;">
                   <img src="../assets/happy.svg" alt="Smiley">
                </button>
-               <button class="submit-file" @click="user = 'Dylan'">
+               <button class="submit-file" @click="user = 'Bob'">
                   +
                </button>
             </div>
@@ -69,9 +72,9 @@ export default {
       return {
          messages: [],
          pinned: [],
-         user: "Bob",
+         user: "Alice",
          writers: [],
-         showPinned: false
+         showPinned: false,
       }
    },
    mounted() {
@@ -87,7 +90,20 @@ export default {
       this.disconnect();
    },
    methods: {
-      isEnter(event) {
+      getWritersAsText() {
+         if (this.writers.length === 0)
+            return "";
+         if (this.writers.length === 1)
+            return `${this.writers[0]} est en train d'écrire...`
+         if (this.writers.length > 4)
+            return "Plusieurs personnes sont en train d'écrire";
+         let res = "";
+         this.writers.forEach(elt => {
+            res += (elt === this.writers[this.writers.length - 1] ? `et ${elt}` : `${elt}${elt === this.writers[this.writers.length - 2] ? "" : ","} `)
+         });
+         return `${res} sont en train d'écrire...`;
+      },
+      actionInput(event) {
          if (event.keyCode === 13 && document.querySelector(".conv-input > div > input").value !== "") {
             this.send();
             this.writers.pop(this.user);
@@ -130,11 +146,15 @@ export default {
 
          if (message.sender !== this.user) {
             if (message.type === "MESSAGE") {
+
                this.messages.unshift({
+                  convUUID: message.convUUID,
+                  id: message.id,
                   content: message.content,
                   sender: message.sender,
                   messageDate: message.messageDate,
                   pinned: message.pinned,
+                  // TODO : Add messageReactions implementation.
                   // messageReactions: message.messageReactions
                })
                this.writers.pop(message.sender)
@@ -157,7 +177,7 @@ export default {
             date = date.substr(0, 13) + ((Number(date.substr(13, 2)) + 1) % 24) + date.substr(15, 3);
 
             let chatMessage = {
-               ID: 10,
+               id: this.messages.length,
                content: messageContent.value,
                sender: this.user,
                messageDate: date,
@@ -215,7 +235,6 @@ button {
    display: flex;
    justify-content: space-between;
    align-items: center;
-   justify-content: center;
 }
 
 .conv-info > div {
@@ -242,13 +261,14 @@ button {
    width: 100%;
 
    display: flex;
+   flex-direction: column;
    align-items: center;
    justify-content: center;
 }
 
 .conv-input > div {
    width: 90%;
-   height: 50px;
+   height: 46px;
    background-color: #F4F4F4;
    border-radius: 100px;
 
@@ -257,7 +277,17 @@ button {
    justify-content: space-between;
 
    padding-left: 15px;
-   padding-right: 5px;
+   padding-right: 4px;
+}
+
+.conv-input > span {
+   color: #F4F4F4;
+   font-size: 12px;
+   width: 90%;
+   padding-left: 15px;
+   height: 20px;
+   margin-bottom: 5px;
+
 }
 
 .conv-messages {
@@ -285,8 +315,8 @@ button {
 
 .submit-file {
    background-color: #454150;
-   height: 40px;
-   width: 40px;
+   height: 38px;
+   width: 38px;
    color: #F4F4F4;
    font-size: 30px;
    font-weight: 600;
