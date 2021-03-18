@@ -3,14 +3,16 @@
       <div class="left-pannel">
          <div class="settings-box">
             <div>
-               <div class="add-conversation">
+               <div class="add-conversation" @click="addConversation">
                   +
                </div>
-               <div class="settings"><img src="../assets/settings.png" alt="Settings" style="height: 100%; width: 100%;"></div>
+               <div class="settings"><img src="../assets/settings.png" alt="Settings"
+                                          style="height: 100%; width: 100%;"></div>
             </div>
          </div>
          <div class="convs-list">
-            <router-link :key="convs.uuid" v-for="convs in convList" :to="`/messages/${convs.uuid}?name=${convs.name}`" @click="setConvUUID(convs.uuid)">
+            <router-link :key="convs.uuid" v-for="convs in convList" :to="`/messages/${convs.uuid}?name=${convs.name}`"
+                         @click="setConvUUID(convs.uuid)">
                <div class="link-content">
                   <div class="user-logo">
                      {{ convs.name.charAt(0).toUpperCase() }}
@@ -23,7 +25,7 @@
          </div>
       </div>
       <div class="right-pannel">
-         <router-view />
+         <router-view/>
       </div>
    </div>
 </template>
@@ -34,28 +36,25 @@ import axios from 'axios';
 
 export default {
    name: "Messages",
-   components: {
-   },
+   components: {},
    computed: {
       ...mapGetters(['getColors', 'getTheme']),
       ...mapGetters(['getUser'])
    },
    methods: {
       ...mapActions(['setConvUUID']),
-     getRoomsFromDB() {
-       axios.get(`http://localhost:8080/api/users/seeAllRooms/${this.getUser.id}`).then(response => {
-         this.convList = response.data
-       });
-     },
+      getRoomsFromDB() {
+         axios.get(`http://localhost:8080/api/users/seeAllRooms/${this.getUser.id}`).then(response => {
+            this.convList = response.data
+         });
+      },
       addConversation() {
-        axios.post(`http://localhost:8080/api/room/addNewRoom`, {
-          name: "Discoodle",
-          admin: this.getUser.id
-        }).then(response => {
-          console.log(response);
-        }).catch(error => {
-          console.log(error.response);
-        });
+         axios.post(`http://localhost:8080/api/room/addNewRoom`, {
+            name: "Discoodle",
+            admin: this.getUser.id
+         }).catch(error => {
+            console.log(error.response);
+         });
       }
    },
    data() {

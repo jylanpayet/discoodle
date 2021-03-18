@@ -23,13 +23,6 @@ public class RoomController {
 		roomService.createNewRoom(request);
 	}
 
-	@MessageMapping("/{roomUUID}/room.register")
-	@SendTo("/conversations/rooms/{roomUUID}")
-	public ChatMessage register(@DestinationVariable String roomUUID, @Payload ChatMessage chatMessage, SimpMessageHeaderAccessor headerAccessor) {
-		headerAccessor.getSessionAttributes().put("username", chatMessage.getSender());
-		return chatMessage;
-	}
-
 	@MessageMapping("/{roomUUID}/room.send")
 	@SendTo("/conversations/rooms/{roomUUID}")
 	public ChatMessage sendMessage(@DestinationVariable String roomUUID, @Payload ChatMessage chatMessage) {
