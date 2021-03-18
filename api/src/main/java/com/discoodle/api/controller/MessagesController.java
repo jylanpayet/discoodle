@@ -29,7 +29,7 @@ public class MessagesController {
          if (!myObj.exists()) {
             myObj.createNewFile();
             PrintWriter writer = new PrintWriter(myObj);
-            writer.write("[\n\n]");
+            writer.write("[\n\t\n]");
             writer.close();
             return conversationMessages;
          }

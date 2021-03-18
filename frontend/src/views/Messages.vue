@@ -1,46 +1,40 @@
 <template>
    <div class="Messages">
-      <SearchBar/>
-      <div class="messages-box-content">
-         <div class="chat-list">
-
-            <router-link to="/messages/new">
-               <div :style="{ color: getColors.color5, fontSize: '15px' }">
-                  <div class="conv-logo" :style="{ backgroundColor: getColors.color5, color: getColors.color1, fontSize: '40px' }" @click="addConversation">
-                     +
-                  </div>
-                  Ajouter une conversation
+      <div class="left-pannel">
+         <div class="settings-box">
+            <div>
+               <div class="add-conversation">
+                  +
                </div>
-            </router-link>
-
-            <!--
-               TODO : Afficher toutes les conversations d'une personne ici (groupes et MP)
-            -->
-            <router-link v-for="item in convList" :key="item.uuid" :to="`/messages/${item.uuid}?name=${item.name}`" @click="setConvUUID(item.uuid)">
-               <div :style="{ color: getColors.color5 }">
-                  <div class="conv-logo">
-                     {{ item.name.charAt(0).toUpperCase() }}
-                  </div>
-                  {{ item.name }}
-               </div>
-            </router-link>
-
-
+               <div class="settings"><img src="../assets/settings.png" alt="Settings" style="height: 100%; width: 100%;"></div>
+            </div>
          </div>
-         <router-view/>
+         <div class="convs-list">
+            <router-link :key="convs.uuid" v-for="convs in convList" :to="`/messages/${convs.uuid}?name=${convs.name}`" @click="setConvUUID(convs.uuid)">
+               <div class="link-content">
+                  <div class="user-logo">
+                     {{ convs.name.charAt(0).toUpperCase() }}
+                  </div>
+                  <div class="conv-name">
+                     {{ convs.name }}
+                  </div>
+               </div>
+            </router-link>
+         </div>
+      </div>
+      <div class="right-pannel">
+         <router-view />
       </div>
    </div>
 </template>
 
 <script>
-import SearchBar from "@/components/common/SearchBar";
 import {mapActions, mapGetters} from "vuex";
 import axios from 'axios';
 
 export default {
    name: "Messages",
    components: {
-      SearchBar
    },
    computed: {
       ...mapGetters(['getColors', 'getTheme']),
@@ -48,14 +42,12 @@ export default {
    },
    methods: {
       ...mapActions(['setConvUUID']),
+     getRoomsFromDB() {
+       axios.get(`http://localhost:8080/api/users/seeAllRooms/${this.getUser.id}`).then(response => {
+         this.convList = response.data
+       });
+     },
       addConversation() {
-        let test = axios.get(`http://localhost:8080/api/users/seeAllRooms/${this.getUser.id}`).then(response => {
-          console.log(response);
-        }).catch(error => {
-          console.log(error.response);
-        })
-        console.log(test)
-        console.log(this.getUser.id)
         axios.post(`http://localhost:8080/api/room/addNewRoom`, {
           name: "Discoodle",
           admin: this.getUser.id
@@ -71,8 +63,8 @@ export default {
          convList: []
       }
    },
-   beforeMount() {
-      // TODO : Charger les conversations ici
+   mounted() {
+      this.getRoomsFromDB();
    }
 }
 </script>
@@ -80,87 +72,186 @@ export default {
 <style scoped>
 .Messages {
    display: flex;
-   flex-direction: column;
+   flex-direction: row;
    justify-content: center;
    align-items: center;
    height: 100%;
+   width: 100%;
+   background-color: #18161F;
+
 }
 
-.messages-box-content {
+.left-pannel {
+   height: 100%;
+   width: 22%;
+
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: flex-start;
+}
+
+.settings-box {
+   position: relative;
+   min-height: 80px;
+   width: 100%;
+
+   display: flex;
+   align-items: center;
+   justify-content: center;
+}
+
+.settings-box:after {
+   position: absolute;
+   content: "";
+   bottom: 0;
+   height: 1px;
+   width: 90%;
+   opacity: 0.5;
+   background-color: #909090;
+}
+
+.settings-box > div {
+   width: 86%;
    display: flex;
    flex-direction: row;
    align-items: center;
    justify-content: space-between;
-
-   padding: 40px;
-
-   width: calc(100% - 80px);
-   height: calc(100% - 120px - 80px);
 }
 
-.chat-list {
-   width: 19%;
-   height: 100%;
+.settings {
+   cursor: pointer;
+   height: 40px;
+   width: 40px;
+
+   margin-right: 3px
+}
+
+.settings:hover {
+   animation: 10s cubic-bezier(.11, 0, .09, 1) settingsRoll;
+}
+
+.add-conversation {
+   height: 34px;
+   width: 34px;
+
+   background-color: #F4F4F4;
+   border-radius: 50%;
 
    display: flex;
-   flex-direction: column;
-   align-items: flex-start;
+   align-items: center;
+   justify-content: center;
 
-   overflow-y: auto;
+   font-size: 38px;
+   font-weight: 600;
+   color: #454150;
+
+   margin-left: 3px;
+
+   cursor: pointer;
 }
 
-.conv-logo {
-   border-radius: 100px;
-   background-color: #454150;
-   width: 47px;
-   height: 47px;
-
-   margin-right: 17px;
+.add-conversation:hover {
+   background-color: #E85C5C;
    color: #F4F4F4;
-   font-size: 19px;
-   font-weight: 600;
+}
+
+.convs-list {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: flex-start;
+
+   width: 100%;
+   height: 100%;
+
+   overflow-y: auto;
+   overflow-x: hidden;
+}
+
+.convs-list > a {
+   position: relative;
+   width: 96%;
+   height: 70px;
 
    display: flex;
    align-items: center;
    justify-content: center;
 }
 
-.chat-list > a {
-   width: 100%;
-   max-width: 100%;
+.convs-list > a:after {
+   position: absolute;
+   content: "";
+   bottom: -1px;
+   height: 1px;
+   width: 90%;
+   opacity: 0.5;
+   background-color: #909090;
 }
 
-.chat-list > a > div {
-   margin-bottom: 15px;
-
-   cursor: pointer;
-
-   color: #F4F4F4;
-   font-size: 19px;
-   font-weight: 600;
-
-   display: flex;
-   flex-direction: row;
-   justify-content: flex-start;
-   align-items: center;
-}
-
-
-a.router-link-exact-active div {
+.router-link-active {
    background-color: #E85C5C;
-   color: #F4F4F4;
-   border-radius: 100px;
+   border-radius: 7px;
 }
 
-.chat-list > div {
+.router-link-active:after {
+   content: none !important;
+}
+
+.link-content {
    display: flex;
    flex-direction: row;
    align-items: center;
    justify-content: flex-start;
-   width: 100%;
-   cursor: pointer;
-   color: #F4F4F4;
-   font-size: 15px;
+
+   width: 90%;
+   height: 100%;
+}
+
+.user-logo {
+   height: 40px;
+   width: 40px;
+   background-color: #C4C4C4;
+   color: #454150;
+   font-size: 23px;
    font-weight: 600;
+
+   margin-right: 20px;
+
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   border-radius: 50%;
+}
+
+.conv-name {
+   display: flex;
+   align-items: center;
+   width: calc(100% - 70px);
+   height: 60px;
+   font-size: 20px;
+   font-weight: 600;
+
+   overflow: hidden;
+}
+
+.right-pannel {
+   height: 100%;
+   width: 78%;
+}
+
+@keyframes settingsRoll {
+   0% {
+      transform: rotate(0);
+   }
+   85% {
+      transform: rotate(2164deg);
+   }
+   93% {
+      transform: rotate(2158deg);
+   }
+   100% {
+      transform: rotate(2160deg);
+   }
 }
 </style>
