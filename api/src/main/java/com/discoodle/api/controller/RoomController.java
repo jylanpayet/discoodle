@@ -30,12 +30,6 @@ public class RoomController {
 		return chatMessage;
 	}
 
-	@MessageMapping("/{roomUUID}/room.addMembers")
-	@SendTo("/conversations/rooms/{roomUUID}")
-	public ChatMessage addMembers(List<User> users, @DestinationVariable String roomUUID) {
-		return roomService.addMembers(users, roomUUID);
-	}
-
 	@MessageMapping("/{roomUUID}/room.send")
 	@SendTo("/conversations/rooms/{roomUUID}")
 	public ChatMessage sendMessage(@DestinationVariable String roomUUID, @Payload ChatMessage chatMessage) {

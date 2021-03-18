@@ -21,8 +21,4 @@ public class RoomService {
         roomRepository.addNewMember(request.getAdmin(), finalRoom.getUuid());
         return finalRoom;
     }
-
-    public ChatMessage addMembers(List<User> users, String roomUUID) {
-        return null;
-    }
 }
