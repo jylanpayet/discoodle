@@ -1,5 +1,6 @@
 package com.discoodle.api.controller;
 
+import com.discoodle.api.model.Room;
 import com.discoodle.api.model.User;
 import com.discoodle.api.service.UserService;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,10 +25,16 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @RequestMapping(value = "{pseudo}", method = GET)
+    @RequestMapping(value = "{username}", method = GET)
     @ResponseBody
-    public Optional<User> getUser(@PathVariable String pseudo){
-        return userService.getUser(pseudo);
+    public Optional<User> getUserByUserName(@PathVariable String username){
+        return userService.getUserByUserName(username);
+    }
+
+    @RequestMapping(value = "/infos/{user_id}", method = GET)
+    @ResponseBody
+    public Optional<User> getUserByID(@PathVariable Integer user_id){
+        return userService.getUserByID(user_id);
     }
 
     @PostMapping
@@ -38,5 +45,11 @@ public class UserController {
     @DeleteMapping(path = "{userID}")
     public void deleteUser(@PathVariable("userID") Integer userId) {
         userService.deleteUser(userId);
+    }
+
+    @GetMapping(path = "/seeAllRooms/{user_ID}")
+    @ResponseBody
+    public List<Room> findAllRoomsByUserID(@PathVariable Integer user_ID) {
+        return userService.getUserByID(user_ID).get().getRooms();
     }
 }

@@ -3,14 +3,16 @@
       <div class="left-pannel">
          <div class="settings-box">
             <div>
-               <div class="add-conversation">
+               <div class="add-conversation" @click="addConversation">
                   +
                </div>
-               <div class="settings"><img src="../assets/settings.png" alt="Settings" style="height: 100%; width: 100%;"></div>
+               <div class="settings"><img src="../assets/settings.png" alt="Settings"
+                                          style="height: 100%; width: 100%;"></div>
             </div>
          </div>
          <div class="convs-list">
-            <router-link :key="convs.uuid" v-for="convs in convList" :to="`/messages/${convs.uuid}?name=${convs.name}`" @click="setConvUUID(convs.uuid)">
+            <router-link :key="convs.uuid" v-for="convs in convList" :to="`/messages/${convs.uuid}?name=${convs.name}`"
+                         @click="setConvUUID(convs.uuid)">
                <div class="link-content">
                   <div class="user-logo">
                      {{ convs.name.charAt(0).toUpperCase() }}
@@ -23,48 +25,45 @@
          </div>
       </div>
       <div class="right-pannel">
-         <router-view />
+         <router-view/>
       </div>
    </div>
 </template>
 
 <script>
 import {mapActions, mapGetters} from "vuex";
+import axios from 'axios';
 
 export default {
    name: "Messages",
-   components: {
-   },
+   components: {},
    computed: {
-      ...mapGetters(['getColors', 'getTheme'])
+      ...mapGetters(['getColors', 'getTheme']),
+      ...mapGetters(['getUser'])
    },
    methods: {
-      ...mapActions(['setConvUUID'])
+      ...mapActions(['setConvUUID']),
+      getRoomsFromDB() {
+         axios.get(`http://localhost:8080/api/users/seeAllRooms/${this.getUser.id}`).then(response => {
+            this.convList = response.data
+         });
+      },
+      addConversation() {
+         axios.post(`http://localhost:8080/api/room/addNewRoom`, {
+            name: "Discoodle",
+            admin: this.getUser.id
+         }).catch(error => {
+            console.log(error.response);
+         });
+      }
    },
    data() {
       return {
-         convList: [
-            {
-               uuid: "e485c6f4-72ca-11eb-9439-0242ac130002",
-               name: "Bob"
-            },
-            {
-               uuid: "e6e5c4c6-72ca-11eb-9439-0242ac130002",
-               name: "Dylan"
-            },
-            {
-               uuid: "b326cd8e-6468-4592-ba9c-24b5a87754b2",
-               name: "fetty"
-            },
-            {
-               uuid: "ac96ba0c-7313-11eb-9439-0242ac130002",
-               name: "OG.Mimmo"
-            }
-         ]
+         convList: []
       }
    },
-   beforeMount() {
-      // TODO : Charger les conversations ici
+   mounted() {
+      this.getRoomsFromDB();
    }
 }
 </script>
