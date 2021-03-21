@@ -27,11 +27,11 @@ public class Subject {
     private Integer userId;
 
     @ManyToMany
-    @JoinTable( name = "link_degree_subject",
+    @JoinTable( name = "link_level_subject",
             joinColumns= @JoinColumn( name = "subject_id" ),
-            inverseJoinColumns = @JoinColumn( name = "degree_id" )
+            inverseJoinColumns = @JoinColumn( name = "level_id" )
             )
-    private List<Degree> degrees = new ArrayList<>();
+    private List<Level> level = new ArrayList<>();
 
     @ManyToMany
     @JoinTable( name = "link_user_subject",
