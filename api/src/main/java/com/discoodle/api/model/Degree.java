@@ -22,15 +22,6 @@ public class Degree {
         this.year = year;
     }
     @Id
-    @SequenceGenerator(
-            name = "degree_sequence",
-            sequenceName = "degree_sequence",
-            allocationSize = 1
-    )
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "degree_sequence"
-    )
     @Column(name = "degree_id", unique = true, nullable = false)
     private long degreeId;
 
