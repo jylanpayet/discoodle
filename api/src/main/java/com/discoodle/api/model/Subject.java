@@ -16,15 +16,6 @@ import java.util.List;
 public class Subject {
 
     @Id
-    @SequenceGenerator(
-            name = "subject_sequence",
-            sequenceName = "subject_sequence",
-            allocationSize = 1
-    )
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "subject_sequence"
-    )
     @Column(name = "subject_id", unique = true, nullable = false)
     private long id;
 
@@ -36,11 +27,11 @@ public class Subject {
     private Integer userId;
 
     @ManyToMany
-    @JoinTable( name = "link_degree_subject",
+    @JoinTable( name = "link_level_subject",
             joinColumns= @JoinColumn( name = "subject_id" ),
-            inverseJoinColumns = @JoinColumn( name = "degree_id" )
+            inverseJoinColumns = @JoinColumn( name = "level_id" )
             )
-    private List<Degree> degrees = new ArrayList<>();
+    private List<Level> level = new ArrayList<>();
 
     @ManyToMany
     @JoinTable( name = "link_user_subject",
