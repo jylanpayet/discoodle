@@ -4,21 +4,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.*;
 import java.util.List;
 
 @NoArgsConstructor
 @Getter
 @Setter
+@Entity
+@Table(name = "group")
 public class Group {
-
-    private Integer id;
-    private Group parent;
-    private String name;
-    private Integer depth;
-    private List<Group> underGroups;
-    private List<User> users;
-    private String usersGroupName;
-    private GroupRights groupRights;
 
     public Group(Group parent, String name, Integer depth, List<Group> underGroups, List<User> users, String usersGroupName, GroupRights groupRights) {
         this.parent = parent;
@@ -29,5 +23,34 @@ public class Group {
         this.usersGroupName = usersGroupName;
         this.groupRights = groupRights;
     }
+
+    @Id
+    @GeneratedValue
+    @Column(name = "group_id", unique = true, nullable = false)
+    private Integer group_id;
+
+    @Column(name = "parent")
+    private Group parent;
+
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "depth")
+    private Integer depth;
+
+    @Column(name = "under_groups")
+    private List<Group> underGroups;
+
+    @Column(name = "users")
+    private List<User> users;
+
+    @Column(name = "users_group_name")
+    private String usersGroupName;
+
+    @Column(name = "group_rights")
+    private GroupRights groupRights;
+
+
+
 
 }
