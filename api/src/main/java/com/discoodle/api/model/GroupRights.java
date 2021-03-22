@@ -3,6 +3,8 @@ package com.discoodle.api.model;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
+
 import javax.persistence.*;
 
 
@@ -10,6 +12,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Entity
+@ToString
 @Table(name = "group_rights")
 public class GroupRights {
 
@@ -28,7 +31,6 @@ public class GroupRights {
 
     @Column(name = "can_add_user")
     private boolean canAddUser;
-
 
 
 }

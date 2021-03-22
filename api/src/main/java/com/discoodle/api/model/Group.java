@@ -3,14 +3,17 @@ package com.discoodle.api.model;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor
 @Getter
 @Setter
 @Entity
+@ToString
 @Table(name = "group")
 public class Group {
 
@@ -29,7 +32,8 @@ public class Group {
     @Column(name = "group_id", unique = true, nullable = false)
     private Integer group_id;
 
-    @Column(name = "parent")
+    @OneToOne
+    @JoinColumn( name="parent")
     private Group parent;
 
     @Column(name = "name")
@@ -38,16 +42,23 @@ public class Group {
     @Column(name = "depth")
     private Integer depth;
 
-    @Column(name = "under_groups")
-    private List<Group> underGroups;
+    @OneToMany
+    @JoinTable( name = "link_group_to_group",
+            joinColumns = @JoinColumn( name = "group_id" ),
+            inverseJoinColumns = @JoinColumn( name = "group_id" ) )
+    private List<Group> underGroups = new ArrayList<>();
 
-    @Column(name = "users")
-    private List<User> users;
+    @OneToMany
+    @JoinTable( name = "link_group_to_user",
+            joinColumns = @JoinColumn( name = "group_id" ),
+            inverseJoinColumns = @JoinColumn( name = "user_id" ) )
+    private List<User> users = new ArrayList<>();
 
     @Column(name = "users_group_name")
     private String usersGroupName;
 
-    @Column(name = "group_rights")
+    @OneToOne
+    @JoinColumn( name="group_rights" )
     private GroupRights groupRights;
 
 
