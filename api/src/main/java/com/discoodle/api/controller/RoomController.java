@@ -19,8 +19,8 @@ public class RoomController {
 	public RoomController(RoomService roomService) { this.roomService = roomService; }
 
 	@PostMapping(path = "/api/room/addNewRoom")
-	public void addNewRoom(@RequestBody RoomRequest request){
-		roomService.createNewRoom(request);
+	public Room addNewRoom(@RequestBody RoomRequest request){
+		return roomService.createNewRoom(request);
 	}
 
 	@MessageMapping("/{roomUUID}/room.send")
