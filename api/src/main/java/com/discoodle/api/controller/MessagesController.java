@@ -1,7 +1,6 @@
 package com.discoodle.api.controller;
-
-import com.discoodle.api.model.ChatMessage;
-import com.discoodle.api.model.ConversationMessages;
+import com.discoodle.api.model.Message;
+import com.discoodle.api.model.Conversation;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,10 +17,10 @@ import java.util.Scanner;
 public class MessagesController {
 
    @GetMapping("api/messages")
-   public ConversationMessages getMessages(@RequestParam(value = "uuid", defaultValue = "messages") String uuid) {
+   public Conversation getMessages(@RequestParam(value = "uuid", defaultValue = "messages") String uuid) {
       Gson gson = new Gson();
 
-      ConversationMessages conversationMessages = new ConversationMessages();
+      Conversation conversation= new Conversation();
       StringBuilder jsonContent = new StringBuilder();
 
       try {
@@ -31,7 +30,7 @@ public class MessagesController {
             PrintWriter writer = new PrintWriter(myObj);
             writer.write("[\n\t\n]");
             writer.close();
-            return conversationMessages;
+            return conversation;
          }
          Scanner myReader = new Scanner(myObj);
          while (myReader.hasNextLine()) {
@@ -39,12 +38,12 @@ public class MessagesController {
             jsonContent.append(data);
          }
          myReader.close();
-         conversationMessages.setChatMessages(gson.fromJson(jsonContent.toString(), new TypeToken<LinkedList<ChatMessage>>() {}.getType()));
+         conversation.setMessages(gson.fromJson(jsonContent.toString(), new TypeToken<LinkedList<Message>>(){}.getType()));
       } catch (IOException e) {
          e.printStackTrace();
       }
 
-      return conversationMessages;
+      return conversation;
    }
 
 }

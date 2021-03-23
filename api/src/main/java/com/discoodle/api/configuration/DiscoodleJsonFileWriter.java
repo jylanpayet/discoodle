@@ -1,6 +1,6 @@
 package com.discoodle.api.configuration;
 
-import com.discoodle.api.model.ChatMessage;
+import com.discoodle.api.model.Message;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -15,8 +15,8 @@ import java.util.Scanner;
 public class DiscoodleJsonFileWriter {
 
 
-    public static void runWriter(ChatMessage msg, String roomUUID) {
-        LinkedList<ChatMessage> chatMessage;
+    public static void runWriter(Message msg, String roomUUID) {
+        LinkedList<Message> message;
         StringBuilder jsonContent = new StringBuilder();
 
         try {
@@ -36,15 +36,15 @@ public class DiscoodleJsonFileWriter {
                 jsonContent.append(data);
             }
             myReader.close();
-            chatMessage = gson.fromJson(String.valueOf(jsonContent), new TypeToken<LinkedList<ChatMessage>>() {}.getType());
+            message = gson.fromJson(String.valueOf(jsonContent), new TypeToken<LinkedList<Message>>() {}.getType());
 
-            if (chatMessage == null)
-                chatMessage = new LinkedList<>();
+            if (message == null)
+                message = new LinkedList<>();
 
-            chatMessage.addFirst(msg);
+            message.addFirst(msg);
 
             try (Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
-                gson.toJson(gson.toJsonTree(chatMessage), writer);
+                gson.toJson(gson.toJsonTree(message), writer);
             }
 
         } catch (Exception e) {

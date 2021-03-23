@@ -6,7 +6,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class ChatMessage {
+public class Message {
 
 	private final UUID convUUID;
 	private final Integer id;
@@ -18,7 +18,7 @@ public class ChatMessage {
 	private final String type;
 
 
-	public ChatMessage(Integer id, String content, String sender, String messageDate, boolean pinned, UUID convUUID) {
+	public Message(Integer id, String content, String sender, String messageDate, boolean pinned, UUID convUUID) {
 		this.id = id;
 		this.content = content;
 		this.sender = sender;
