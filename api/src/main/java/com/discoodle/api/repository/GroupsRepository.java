@@ -25,10 +25,6 @@ public interface GroupsRepository extends JpaRepository<Groups,Integer> {
     @Query(value = "SELECT groups FROM Groups groups where groups.depth=?1")
     Optional<Groups> findAllGroupsByDepth(Integer depth);
 
-    // Just to have the rights of this group and not all information.
-    @Query(value = "SELECT GroupRights FROM Groups groups where groups.groups_id=?1")
-    Optional<Groups> findRightsInGroup(Integer groups_id);
-
     @Modifying
     @Query(value = "insert into link_groups_to_user (user_id, groups_id) VALUES (:user_id,:groups_id)", nativeQuery = true)
     @Transactional
