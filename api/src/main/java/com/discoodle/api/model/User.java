@@ -15,7 +15,7 @@ import java.util.*;
 @Table(name = "user")
 public class User {
 
-    public User(String mail, String username, String password, String name, String last_name, UserRole role) {
+    public User(String mail, String username, String password, String name, String last_name, User.Role role) {
         this.mail = mail;
         this.username = username;
         this.password = password;
@@ -45,11 +45,11 @@ public class User {
     private String last_name;
 
     @Column(name = "link_to_avatar")
-    private String linkToAvatar;
+    private String link_to_avatar;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
-    private UserRole role;
+    private Role role;
 
     @Column(nullable = false, columnDefinition = "TINYINT(1)")
     private boolean locked;
@@ -71,4 +71,10 @@ public class User {
             inverseJoinColumns = @JoinColumn( name = "room_id" )
     )
     private List<Room> rooms = new ArrayList<>();
+
+    public enum Role {
+        STUDENT,
+        TEACHER,
+        ADMIN
+    }
 }
