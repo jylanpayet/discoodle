@@ -94,7 +94,4 @@ public class UserService implements UserDetailsService {
         return userRepository.enableUser(mail);
     }
 
-    public List<Integer> findAllRoomsByUserID(Integer user_id) {
-        return findAllRoomsByUserID(user_id);
-    }
 }

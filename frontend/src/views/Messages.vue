@@ -1,5 +1,5 @@
 <template>
-   <div class="Messages">
+   <div class="Messages" v-if="!(JSON.stringify(getUser) === JSON.stringify({}))">
       <div class="left-pannel">
          <div class="settings-box">
             <div>
@@ -28,18 +28,19 @@
          <router-view/>
       </div>
    </div>
+   <Account v-else />
 </template>
 
 <script>
 import {mapActions, mapGetters} from "vuex";
 import axios from 'axios';
+import Account from "@/views/Account";
 
 export default {
    name: "Messages",
-   components: {},
+   components: {Account},
    computed: {
-      ...mapGetters(['getColors', 'getTheme']),
-      ...mapGetters(['getUser'])
+      ...mapGetters(['getColors', 'getTheme', 'getUser']),
    },
    methods: {
       ...mapActions(['setConvUUID']),
@@ -64,7 +65,7 @@ export default {
       }
    },
    mounted() {
-      this.getRoomsFromDB();
+      this.getRoomsFromDB()
    }
 }
 </script>
