@@ -4,7 +4,7 @@
          Créer une nouvelle discussion ici :
 
          <div>
-            <input type="text" placeholder="Entrez un pseudo ..." @keypress="isEnter">
+            <input type="text" placeholder="Entrez un nom de conversation..." name="name_room" @keypress="isEnter">
             <button>
                +
             </button>
@@ -14,14 +14,24 @@
 </template>
 
 <script>
+import axios from "axios";
+import {mapGetters} from "vuex";
+
 export default {
    name: "AddConversation",
+   computed: {
+      ...mapGetters(['getUser'])
+   },
    methods: {
       isEnter(event) {
-         let inputValue = document.querySelector(".add-conv-box > div > input");
+         let inputValue = document.querySelector("input[name=name_room]").value;
          if (event.keyCode === 13 && inputValue.value !== "") {
-            // TODO : Envoyer une requete à l'API
-            inputValue.value = "";
+             axios.post(`http://localhost:8080/api/room/addNewRoom`, {
+               name: inputValue,
+               admin: this.getUser.id
+             }).catch(error => {
+               console.log(error.response);
+             });
          }
       },
    }
@@ -34,8 +44,8 @@ export default {
    align-items: center;
    justify-content: center;
 
-   width: calc(79% - 40px);
-   height: calc(100% - 40px);
+   width: 100%;
+   height: 100%;
 }
 
 .add-conv-box {
@@ -45,7 +55,9 @@ export default {
    font-size: 20px;
    font-weight: 600;
 
-   width: 370px;
+   width: 450px;
+
+   height: 150px;
 
    padding: 30px;
 
