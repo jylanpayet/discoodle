@@ -3,7 +3,7 @@
       <div class="left-pannel">
          <div class="settings-box">
             <div>
-               <div class="add-conversation" @click="addConversation">
+               <div class="add-conversation" @click="$emit('activatePopUp')">
                   +
                </div>
                <div class="settings"><img src="../assets/settings.png" alt="Settings"
@@ -60,7 +60,8 @@ export default {
    },
    data() {
       return {
-         convList: []
+         convList: [],
+         displayConversationPopUp: false
       }
    },
    mounted() {

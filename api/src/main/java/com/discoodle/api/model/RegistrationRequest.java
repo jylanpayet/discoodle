@@ -27,5 +27,5 @@ public class RegistrationRequest {
 
     private final String linkToAvatar;
 
-    private final UserRole role;
+    private final User.Role role;
 }
