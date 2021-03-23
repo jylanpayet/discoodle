@@ -70,5 +70,11 @@ public class User {
             joinColumns = @JoinColumn( name = "user_id" ),
             inverseJoinColumns = @JoinColumn( name = "groups_id" ) )
     private List<Groups> groups = new ArrayList<>();
+    
+    public enum Role {
+        STUDENT,
+        TEACHER,
+        ADMIN
+    }
 
 }
