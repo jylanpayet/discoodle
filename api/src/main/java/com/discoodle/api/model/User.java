@@ -57,13 +57,6 @@ public class User {
     @Column(nullable = false, columnDefinition = "TINYINT(1)")
     private boolean enabled;
 
-    @ManyToMany
-    @JoinTable( name = "link_user_subject",
-            joinColumns= @JoinColumn( name = "user_id" ),
-            inverseJoinColumns = @JoinColumn( name = "subject_id" )
-    )
-    private List<User> users = new ArrayList<>();
-
     @JsonIgnore
     @ManyToMany
     @JoinTable( name = "link_rooms_users",
@@ -71,4 +64,11 @@ public class User {
             inverseJoinColumns = @JoinColumn( name = "room_id" )
     )
     private List<Room> rooms = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable( name = "link_groups_to_user",
+            joinColumns = @JoinColumn( name = "user_id" ),
+            inverseJoinColumns = @JoinColumn( name = "groups_id" ) )
+    private List<Groups> groups = new ArrayList<>();
+
 }
