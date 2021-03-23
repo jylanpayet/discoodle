@@ -25,13 +25,13 @@ public class RoomController {
 
 	@MessageMapping("/{roomUUID}/room.send")
 	@SendTo("/conversations/rooms/{roomUUID}")
-	public ChatMessage sendMessage(@DestinationVariable String roomUUID, @Payload ChatMessage chatMessage) {
+	public Message sendMessage(@DestinationVariable String roomUUID, @Payload Message message) {
 		try{
-			DiscoodleJsonFileWriter.runWriter(chatMessage, roomUUID);
+			DiscoodleJsonFileWriter.runWriter(message, roomUUID);
 		}catch (Exception e){
 			e.printStackTrace();
 		}
-		return chatMessage;
+		return message;
 	}
 
 
