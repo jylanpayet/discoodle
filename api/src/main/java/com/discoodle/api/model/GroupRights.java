@@ -6,6 +6,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @NoArgsConstructor
@@ -31,6 +33,5 @@ public class GroupRights {
 
     @Column(name = "can_add_user")
     private boolean canAddUser;
-
 
 }

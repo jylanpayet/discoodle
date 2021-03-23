@@ -3,6 +3,7 @@ package com.discoodle.api.controller;
 import com.discoodle.api.configuration.DiscoodleJsonFileWriter;
 import com.discoodle.api.model.*;
 import com.discoodle.api.service.RoomService;
+import lombok.AllArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -12,11 +13,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@AllArgsConstructor
 @RestController
 public class RoomController {
 	private final RoomService roomService;
 
-	public RoomController(RoomService roomService) { this.roomService = roomService; }
 
 	@PostMapping(path = "/api/room/addNewRoom")
 	public void addNewRoom(@RequestBody RoomRequest request){

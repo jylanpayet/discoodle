@@ -17,11 +17,10 @@ import java.util.List;
 @Table(name = "groups")
 public class Groups {
 
-    public Groups(String name, Integer depth, String usersGroupName, GroupRights groupRights) {
+    public Groups(String name, Integer depth, String usersGroupName) {
         this.name = name;
         this.depth = depth;
         this.usersGroupName = usersGroupName;
-        this.groupRights = groupRights;
     }
 
     @Id
@@ -51,10 +50,6 @@ public class Groups {
     private String usersGroupName;
 
     @OneToOne
-    @JoinColumn( name="group_rights")
+    @JoinColumn(name="groups_rights_id")
     private GroupRights groupRights;
-
-
-
-
 }
