@@ -91,8 +91,7 @@ export default {
                   vueCookie.set("username", document.querySelector("input[name=userlog]").value, {expires: '1Y'});
 
                axios.get(`http://localhost:8080/api/users/${document.querySelector("input[name=userlog]").value}`).then(response => {
-                  const user = response.data;
-                  this.setUser(user);
+                  this.setUser(response.data);
                })
 
                this.$emit("logSuccess")
