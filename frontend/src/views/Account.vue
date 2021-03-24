@@ -35,14 +35,16 @@
 <script>
 import SearchBar from "@/components/common/SearchBar";
 import Authentication from "@/components/Authentification";
-
-import vueCookie from "vue-cookie"
+import { mapGetters } from 'vuex'
 
 export default {
    name: "Account",
    components: {
       SearchBar,
       Authentication
+   },
+   computed: {
+      ...mapGetters(['getUser'])
    },
    data() {
       return {
@@ -51,8 +53,8 @@ export default {
          }
       }
    },
-   beforeMount() {
-      this.isAuthentificated = vueCookie.get("username") !== null && vueCookie.get("username") !== "";
+   mounted() {
+      this.isAuthentificated = (JSON.stringify(this.getUser) !== JSON.stringify({}));
    }
 }
 </script>
