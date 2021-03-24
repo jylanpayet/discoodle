@@ -9,6 +9,11 @@
                +
             </button>
          </div>
+
+         <button class="closePopUp" @click="$emit('desactivatePopUp')">
+            X
+         </button>
+
       </div>
    </div>
 </template>
@@ -51,6 +56,8 @@ export default {
 .add-conv-box {
    border-radius: 12px;
    background-color: #F4F4F4;
+
+   position: relative;
 
    font-size: 20px;
    font-weight: 600;
@@ -112,6 +119,34 @@ export default {
    font-weight: 600;
 
    cursor: pointer;
+}
+
+
+.closePopUp {
+   position: absolute;
+   top: 0;
+   right: 0;
+   width: 25px;
+   height: 25px;
+
+   color: #F4F4F4;
+
+   border-radius: 50%;
+   background-color: #454150;
+   border: none;
+   outline: none;
+
+   display: flex;
+   align-items: center;
+   justify-content: center;
+
+   transform: translateY(-25%) translateX(25%);
+
+   cursor: pointer;
+}
+
+.closePopUp:hover {
+   background-color: #E85C5C;
 }
 
 @keyframes appear-opacity {
