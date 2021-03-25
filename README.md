@@ -84,21 +84,23 @@ _NB : npm est installé avec Node.js, il ne sera donc pas nécessaire de l'insta
 
 ### <div id="demarrage-global"><ins>Démarrage de l'intégralité du projet</ins></div>
 
-* Linux
+Avant de compiler pour la première fois le projet, pensez à exécuter la commande suivante:
 ```
-discoodle linux
+cd frontend && npm install
 ```
-
-* Windows
+Ensuite, depuis un terminal Unix, lancez la commande suivante à la racine du projet:
 ```
-discoodle linux
+./discoodle.sh [user] no-bdd
 ```
+Où user est le nom d'utilisateur MariaDB et no-bdd est un argument optionnel.
 #### <ins>_Uniquement le frontend_</ins> :
 
 - Lancer le frontend
 
 ```
-npm run serve
+cd frontend
+npm install
+npm run serve 
 ```
 
 Pour customiser la configuration : [here](https://cli.vuejs.org/config/).
@@ -108,7 +110,8 @@ Pour customiser la configuration : [here](https://cli.vuejs.org/config/).
 - Lancer le backend
 
 ```
-
+cd api
+mvn spring-boot:run
 ```
 
 
@@ -123,12 +126,12 @@ ainsi que des problèmes rencontrés.
 
 ## <div id="auteurs">Auteurs</div>
 
-* **Bastian SOMON** - [@somon](https://gaufre.informatique.univ-paris-diderot.fr/somon)
-* **Jylan PAYET** - [@payetj](https://gaufre.informatique.univ-paris-diderot.fr/payetj)
-* **Moïse CLIPAL** - [@clipal](https://gaufre.informatique.univ-paris-diderot.fr/clipal)
-* **Dylan ALEXANDRE** - [@alexandr](https://gaufre.informatique.univ-paris-diderot.fr/alexandr)
+* **SOMON Bastian** - [@somon](https://gaufre.informatique.univ-paris-diderot.fr/somon)
+* **PAYET Jylan** - [@payetj](https://gaufre.informatique.univ-paris-diderot.fr/payetj)
+* **CLIPAL Moïse** - [@clipal](https://gaufre.informatique.univ-paris-diderot.fr/clipal)
+* **ALEXANDRE Dylan** - [@alexandr](https://gaufre.informatique.univ-paris-diderot.fr/alexandr)
 
 <!-- REMERCIEMENTS -->
 ## <div id="remerciements">Remerciements</div>
 
-* [Aldric DEGORRE](https://www.irif.fr/users/adegorre/index)
+* [DEGORRE Aldric](https://www.irif.fr/users/adegorre/index)
