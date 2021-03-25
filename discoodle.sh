@@ -7,16 +7,18 @@ echo "  _____  _                         _ _
  |_____/|_|___/\___\___/ \___/ \__,_|_|\___|
 
                                             "
-if [ $# == 1 ]; then
+if [ $# == 2 ] || [ $# == 1 ]; then
   echo -e "\033[32;1m[ATTENTION] N'éteignez pas le programme avec un Ctrl+c au risque de laisser le port 8080 actif !\033[m"
   sleep 2
   echo ""
   clear
-  echo "Quel est votre mot de passe mariadb ? :"
-  mariadb -u $1 -p -e 'create database if not exists discoodle'
-  if [ $? != 0 ]; then
-    echo -e "\033[32;1m[ERREUR] Impossible d'exécuter le script SQL. Veuillez rééssayer.\033[m"
-    exit
+  if [ $# == 2 ] && [ $2 != "no-bdd" ] || [ $# == 1 ]; then
+    echo "Quel est votre mot de passe mariadb ? :"
+    mariadb -u $1 -p -e 'create database if not exists discoodle'
+    if [ $? != 0 ]; then
+      echo -e "\033[32;1m[ERREUR] Impossible d'exécuter le script SQL. Veuillez rééssayer.\033[m"
+      exit
+    fi
   fi
   cd api
   mvn spring-boot:run &
