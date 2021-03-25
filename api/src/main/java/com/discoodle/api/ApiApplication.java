@@ -9,10 +9,13 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import java.io.File;
 import java.util.Collections;
 
 @SpringBootApplication
 public class ApiApplication {
+
+   public static final String RESSOURCES = "src/main/resources/";
 
    public static void main(String[] args) {
       SpringApplication.run(ApiApplication.class, args);
