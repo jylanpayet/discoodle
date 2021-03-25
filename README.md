@@ -4,12 +4,12 @@
 </a>
 </p>
 
-<h3 align="center">Discoodle - La meilleur plateforme d'éducation et de communication</h3>
+<h3 align="center">Discoodle - La meilleure plateforme d'éducation et de communication</h3>
 
   <p align="center">
-    <a href="https://localhost:8081/">Voir la démonstration</a>
+    <a href="https://discoodle.fr/">Voir la démonstration</a>
     ·
-    <a href="https://gaufre.informatique.univ-paris-diderot.fr/somon/discoodle/issues">Retourner des bugs</a>
+    <a href="https://gaufre.informatique.univ-paris-diderot.fr/somon/discoodle/issues">Signaler des bugs</a>
     ·
     <a href="https://gaufre.informatique.univ-paris-diderot.fr/somon/discoodle/issues">Faire une requête d'amélioration</a>
   </p>
@@ -18,31 +18,41 @@
   <summary>Table des matières</summary>
   <ol>
     <li>
-      <a href="#à-propos-du-projet">À propos du projet</a>
+      <a href="projet">À propos du projet</a>
       <ul>
-        <li><a href="#langages-et-outils-utilisés">Langages et outils utilisés</a></li>
+        <li><a href="#langages-et-outils">Langages et outils utilisés</a></li>
       </ul>
     </li>
     <li>
-      <a href="#pour-commencer">Pour commencer</a>
+      <a href="#commencer">Pour commencer</a>
       <ul>
-        <li><a href="#prérequis">Prérequis</a></li>
-        <li><a href="#installation">Installation</a></li>
+        <li><a href="#prerequis">Prérequis</a></li>
+        <li><a href="#demarrage-global">Démarrage de l'intégralité du projet</a></li>
       </ul>
     </li>
-    <li><a href="#les-tests-à-réaliser">Les tests à réaliser</a></li>
-    <li><a href="#la-feuille-de-route-des-issues">La feuille de route des issues</a></li>
+    <li><a href="#tests">Les tests à réaliser</a></li>
+    <li><a href="#issues">La feuille de route des issues</a></li>
     <li><a href="#auteurs">Auteurs</a></li>
     <li><a href="#remerciements">Remerciements</a></li>
   </ol>
 </details>
 
-## À propos du projet
+## <div id="projet">À propos du projet</div>
 
-[![Product Name Screen Shot][screenshot]](https://localhost:8081/)
+<p align="center">
+    <img src="https://i.ibb.co/dgZHrw0/project-screenshot.png" alt="Discoodle" width="1000" height="500">
+</p>
 
-Discoodle a été réalisé suite à une proposition du projet par monsieur Degorre :  
-_Un jour, le covid est arrivé._
+Discoodle a été réalisé suite à une proposition du projet par monsieur Degorre, qui découlait de la situation sanitaire actuelle :  
+
+_Un jour, la covid est arrivée, et malheureusement le monde fut bouleverser... dont l'ordre public et son 
+infrastructure scolaire : les étudiants ne pouvaient plus se déplacer en cours car le virus était partout et 
+empêchait toutes les interactions sociales, les professeurs ne pouvaient assurer leurs cours dans de bonnes 
+conditions et devaient se creuser la tête afin de pouvoir réunir diverses outils pour communiquer facilement 
+avec les élèves tout en ayant une plateforme qui leur permettait de mettre à disposition de tous les éléments 
+essentiels au bon déroulement du cursus d'apprentissage... Le soucis c'est que chacun ne procédait pas de la 
+même façon et nous pouvions passer d'une plateforme à une autre entre le cours de d'AAL et celui de POO.  
+Heureusement, une équipe de développeurs hors du commun se mit à réaliser une application révolutionnaire : Discoodle !_
 
 Pourquoi Discoodle ?
 
@@ -52,72 +62,73 @@ Pourquoi Discoodle ?
   fonction de ses propres besoins : création de salons personnalisables, emploie du temps modifiable 
   selon nos tâches quotidiennes...
 
-### Langages et outils utilisés
+### <div id="langages-et-outils"><ins>Langages et outils utilisés</ins></div>
 
 * [Vue.js](https://vuejs.org/) - Le framework web utilisé
 * [Spring](https://spring.io/) - Le framework backend utilisé
 * [Maven](https://maven.apache.org/) - L'outil de gestion des dépendances utilisé
 
-## Pour commencer
+## <div id="commencer">Pour commencer</div>
 
-### Prérequis
+Nous allons vous faire part de toutes les instructions afin d'avoir le projet sur votre machine et 
+d'installer toutes les dépendances nécessaires pour la bonne compilation du projet.
 
-#### <ins>_Frontend_</ins> :
+### <div id="prerequis"><ins>Prérequis</ins>
+Vous aurez besoin d'avoir sur votre machine :
+* [MariaDB](https://mariadb.org/download/)
+* [Node.js](https://nodejs.org/fr/)
+* [Maven](https://maven.apache.org/download.cgi)
+* [npm](https://www.npmjs.com/get-npm)
 
-- Compiles and hot-reloads for development
+_NB : npm est installé avec Node.js, il ne sera donc pas nécessaire de l'installer._  
 
+### <div id="demarrage-global"><ins>Démarrage de l'intégralité du projet</ins></div>
+
+* Linux
 ```
-npm install
+discoodle linux
 ```
 
-- Compiles and hot-reloads for development
+* Windows
+```
+discoodle linux
+```
+#### <ins>_Uniquement le frontend_</ins> :
+
+- Lancer le frontend
 
 ```
 npm run serve
 ```
 
-- Compiles and minifies for production
-
-```
-npm run build
-```
-
-- Lints and fixes files
-
-```
-npm run lint
-```
-
 Pour customiser la configuration : [here](https://cli.vuejs.org/config/).
 
-#### <ins>_Backend_</ins> :
+#### <ins>_Uniquement le backend_</ins> :
 
-- Compiles and hot-reloads for development
-
-```
+- Lancer le backend
 
 ```
 
-### Installations
+```
 
-## Les tests à réaliser
+
+## <div id="tests">Les tests à réaliser</div>
 
 *Noter tous les tests envisageables*
 
-## Feuille de route des issues
+## <div id="issues">Feuille de route des issues</div>
 
-Regarder [les issues](https://gaufre.informatique.univ-paris-diderot.fr/somon/discoodle/issues) créées afin de prendre connaissance du travail réalisé, des améliorations déjà effectuées 
+Regardez [les issues](https://gaufre.informatique.univ-paris-diderot.fr/somon/discoodle/issues) créées afin de prendre connaissance du travail réalisé, des améliorations déjà effectuées 
 ainsi que des problèmes rencontrés.
 
-## Auteurs
+## <div id="auteurs">Auteurs</div>
 
 * **Bastian SOMON** - [@somon](https://gaufre.informatique.univ-paris-diderot.fr/somon)
 * **Jylan PAYET** - [@payetj](https://gaufre.informatique.univ-paris-diderot.fr/payetj)
 * **Moïse CLIPAL** - [@clipal](https://gaufre.informatique.univ-paris-diderot.fr/clipal)
 * **Dylan ALEXANDRE** - [@alexandr](https://gaufre.informatique.univ-paris-diderot.fr/alexandr)
 
-## Remerciements
+<!-- REMERCIEMENTS -->
+## <div id="remerciements">Remerciements</div>
 
 * [Aldric DEGORRE](https://www.irif.fr/users/adegorre/index)
-
-[screenshot]: frontend/src/assets/project-screenshot.png
