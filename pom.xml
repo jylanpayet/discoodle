@@ -29,6 +29,7 @@
         <db.username>root</db.username>
         <db.password>root</db.password>
         <db.host>localhost</db.host>
+        <mainClass>com.discoodle.api.ApiApplication</mainClass>
     </properties>
 
     <modules>
