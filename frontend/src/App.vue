@@ -75,7 +75,6 @@ export default {
       if (vueCookie.get("username") !== null && vueCookie.get("username") !== "") {
          axios.get(`http://localhost:8080/api/users/${vueCookie.get("username")}`).then(response => {
             const user = response.data;
-            console.log(user);
             this.setUser(user);
          });
       }

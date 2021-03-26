@@ -85,7 +85,6 @@ export default {
             username: document.querySelector("input[name=userlog]").value,
             password: document.querySelector("input[name=passwordlog]").value,
          }).then(response => {
-            console.log(response)
             if (response.data) {
                if (document.querySelector(".login > div > label > input[type=checkbox]").checked)
                   vueCookie.set("username", document.querySelector("input[name=userlog]").value, {expires: '1Y'});

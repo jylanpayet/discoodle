@@ -1,5 +1,5 @@
 <template>
-   <div class="AddConversation">
+   <div class="AddConversation" @click="clickEvent">
       <div class="add-conv-box">
          Créer une nouvelle discussion ici :
 
@@ -31,14 +31,19 @@ export default {
       isEnter(event) {
          let inputValue = document.querySelector("input[name=name_room]").value;
          if (event.keyCode === 13 && inputValue.value !== "") {
-             axios.post(`http://localhost:8080/api/room/addNewRoom`, {
+            axios.post(`http://localhost:8080/api/room/addNewRoom`, {
                name: inputValue,
                admin: this.getUser.id
-             }).catch(error => {
+            }).catch(error => {
                console.log(error.response);
-             });
+            });
+            this.$emit('desactivatePopUp');
          }
       },
+      clickEvent(event) {
+         if (event.path[0].className === "AddConversation")
+            this.$emit('desactivatePopUp');
+      }
    }
 }
 </script>

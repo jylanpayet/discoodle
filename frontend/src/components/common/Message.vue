@@ -1,10 +1,7 @@
 <template>
    <div class="Message" :style="belongToMyself ? { alignSelf: 'flex-end' } : { alignSelf: 'flex-start' }">
       <div :style="!belongToMyself ? { flexDirection: 'row-reverse' } : { flexDirection: 'row' }">
-         <div class="date" :style="{ color: getTheme ? '#C4C4C4' : '#F4F4F4' }">
-            {{ printDate(messageDate) }}
-         </div>
-         <div class="message-content" v-html="filterMarkdown(filterEmoji(content))" :style="belongToMyself ? { marginRight: '10px', backgroundColor: '#E85C5C', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: getTheme ? '#C4C4C4' : '#F4F4F4' }">
+         <div :class="mention ? 'message-content mention' : 'message-content'" v-html="displayMessage(content, true, true, true)" :style="belongToMyself ? { marginRight: '10px', backgroundColor: '#e85c5c', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: getTheme ? '#C4C4C4' : '#F4F4F4' }">
 
          </div>
          <div class="user-logo" :style="{ backgroundColor: '#F4F4F4' }">
@@ -18,6 +15,22 @@
 import {mapGetters} from "vuex";
 import emojis from "@/assets/emojis_uncathegorized";
 import marked from "marked";
+
+marked.setOptions({
+   renderer: new marked.Renderer(),
+   highlight: function(code, language) {
+      const hljs = require('highlight.js');
+      const validLanguage = hljs.getLanguage(language) ? language : 'plaintext';
+      return hljs.highlight(validLanguage, code).value;
+   },
+   pedantic: false,
+   gfm: true,
+   breaks: false,
+   sanitize: false,
+   smartLists: true,
+   smartypants: false,
+   xhtml: false
+});
 
 export default {
    name: "Message",
@@ -54,7 +67,6 @@ export default {
          const emoji = [...content.matchAll(regex)];
          if(emoji && emoji.length > 0) {
             emoji.forEach(elt => {
-               console.log(elt[0]);
                if (emojis[elt[0].replaceAll(":", "")])
                   content = content.replace(elt[0], emojis[elt[0].replaceAll(":", "")]);
             })
@@ -63,11 +75,31 @@ export default {
       },
       filterMarkdown(content){
          return marked(content);
+      },
+      filterPing(content) {
+         if (content.includes(`@${this.getUser.username}`)) {
+            this.mention = true;
+            return content.replaceAll(`@${this.getUser.username}`, `@${this.getUser.name}`);
+         }
+         return content;
+      },
+      displayMessage(content, mardkdown, emojis, ping) {
+         if (ping)
+            content = this.filterPing(content);
+         if (emojis)
+            content = this.filterEmoji(content);
+         if (mardkdown)
+            content = this.filterMarkdown(content);
+         return content;
       }
-
    },
    computed: {
-      ...mapGetters(['getColors', 'getTheme'])
+      ...mapGetters(['getColors', 'getTheme', 'getUser'])
+   },
+   data() {
+      return {
+         mention: false,
+      }
    }
 }
 </script>
@@ -123,11 +155,11 @@ export default {
    border-radius: 100px;
 }
 
-.date {
-   font-size: 13px;
-   margin-left: 7px;
-   margin-right: 7px;
-   font-weight: 500;
+.mention {
+   color: #ffffff !important;
+   background-color: #dea80a !important;
+   font-size: 17px;
+   font-weight: 700 !important;
 }
 
 @keyframes appear-right {
