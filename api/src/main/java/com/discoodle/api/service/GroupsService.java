@@ -13,11 +13,13 @@ public class GroupsService {
 
     public Groups createNewGroup(GroupsRequest request) {
         Groups group = new Groups(
-                request.getName(),
                 request.getDepth(),
-                request.getUsersGroupName()
+                request.getName(),
+                request.getDescription(),
+                request.getType()
         );
         Groups finalGroup = groupsRepository.save(group);
+        groupsRepository.addNewGroupsInGroup(request.getParent_id(),finalGroup.getGroups_id());
         groupsRepository.addNewMemberInGroup(request.getUser_id(),finalGroup.getGroups_id());
         return finalGroup;
     }

@@ -17,10 +17,11 @@ import java.util.List;
 @Table(name = "groups")
 public class Groups {
 
-    public Groups(String name, Integer depth, String usersGroupName) {
-        this.name = name;
+    public Groups(Integer depth, String name,String description, TypeOfGroup type) {
         this.depth = depth;
-        this.usersGroupName = usersGroupName;
+        this.name = name;
+        this.description=description;
+        this.type = type;
     }
 
     @Id
@@ -28,11 +29,18 @@ public class Groups {
     @Column(name = "groups_id", unique = true, nullable = false)
     private Integer groups_id;
 
+    @Column(name = "depth")
+    private Integer depth;
+
     @Column(name = "name")
     private String name;
 
-    @Column(name = "depth")
-    private Integer depth;
+    @Column(name = "description")
+    private String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type_of_group")
+    private TypeOfGroup type;
 
     @OneToMany
     @JoinTable( name = "link_groups_to_group",
@@ -46,10 +54,16 @@ public class Groups {
             inverseJoinColumns = @JoinColumn( name = "user_id" ) )
     private List<User> users = new ArrayList<>();
 
-    @Column(name = "users_group_name")
-    private String usersGroupName;
-
     @OneToOne
     @JoinColumn(name="groups_rights_id")
     private GroupRights groupRights;
+
+    public enum TypeOfGroup{
+        DISCOODLE,
+        ESTABLISHMENT,
+        FACULTY,
+        ADMINISTRATION,
+        SUBJECTS,
+        CLASS
+    }
 }
