@@ -1,7 +1,6 @@
 package com.discoodle.api.service;
 
 import com.discoodle.api.model.RegistrationRequest;
-import com.discoodle.api.model.UserRole;
 import com.discoodle.api.model.User;
 
 import com.discoodle.api.security.mailConfirmation.MailSender;
@@ -30,7 +29,7 @@ public class RegistrationService {
                                 request.getPassword(),
                                 request.getName(),
                                 request.getLastName(),
-                                UserRole.STUDENT
+                                User.Role.STUDENT
                         )
                 );
             /*String link = "http://localhost:8080/api/registration/confirm?token=" + token;

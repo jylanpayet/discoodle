@@ -47,19 +47,24 @@
             </div>
          </div>
          <div id="content">
-            <router-view/>
+            <router-view @activatePopUp="showPopUp = true"/>
          </div>
+      </div>
+      <div class="pop-up" v-if="showPopUp">
+         <AddConversation @desactivatePopUp="showPopUp = false" />
       </div>
    </w-app>
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex"
+import {mapGetters, mapActions} from "vuex"
 import vueCookie from "vue-cookie"
 import axios from "axios";
+import AddConversation from "@/components/AddConversation";
 
 export default {
    name: "App",
+   components: {AddConversation},
    methods: {
       ...mapActions(['switchTheme', 'setUser'])
    },
@@ -73,6 +78,11 @@ export default {
             console.log(user);
             this.setUser(user);
          });
+      }
+   },
+   data() {
+      return {
+         showPopUp: false
       }
    }
 }
@@ -251,6 +261,13 @@ label[for="switch"]:after {
    background: #F4F4F4;
    border-radius: 90px;
    transition: 0.3s;
+}
+
+.pop-up {
+   position: fixed;
+   height: 100vh;
+   width: 100vw;
+   background-image: url("./assets/pop-up-background.png");
 }
 
 #switch:checked + label[for="switch"] {

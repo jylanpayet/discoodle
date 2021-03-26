@@ -3,6 +3,7 @@ package com.discoodle.api.controller;
 import com.discoodle.api.configuration.DiscoodleJsonFileWriter;
 import com.discoodle.api.model.*;
 import com.discoodle.api.service.RoomService;
+import lombok.AllArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -12,26 +13,26 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@AllArgsConstructor
 @RestController
 public class RoomController {
 	private final RoomService roomService;
 
-	public RoomController(RoomService roomService) { this.roomService = roomService; }
 
 	@PostMapping(path = "/api/room/addNewRoom")
-	public void addNewRoom(@RequestBody RoomRequest request){
-		roomService.createNewRoom(request);
+	public Room addNewRoom(@RequestBody RoomRequest request){
+		return roomService.createNewRoom(request);
 	}
 
 	@MessageMapping("/{roomUUID}/room.send")
 	@SendTo("/conversations/rooms/{roomUUID}")
-	public ChatMessage sendMessage(@DestinationVariable String roomUUID, @Payload ChatMessage chatMessage) {
+	public Message sendMessage(@DestinationVariable String roomUUID, @Payload Message message) {
 		try{
-			DiscoodleJsonFileWriter.runWriter(chatMessage, roomUUID);
+			DiscoodleJsonFileWriter.runWriter(message, roomUUID);
 		}catch (Exception e){
 			e.printStackTrace();
 		}
-		return chatMessage;
+		return message;
 	}
 
 
