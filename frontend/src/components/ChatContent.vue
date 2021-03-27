@@ -195,7 +195,7 @@ export default {
       },
       getMessagesFromJSON() {
          axios.get(`http://localhost:8080/api/messages?uuid=${this.getCurrentConv}`).then(response => {
-            this.messages = response.data.chatMessages;
+            this.messages = response.data.messages;
             this.pinned = this.messages.filter(elt => (elt.pinned === true));
          });
       },

@@ -1,4 +1,5 @@
 package com.discoodle.api.controller;
+import com.discoodle.api.ApiApplication;
 import com.discoodle.api.model.Message;
 import com.discoodle.api.model.Conversation;
 import com.google.gson.Gson;
@@ -24,7 +25,7 @@ public class MessagesController {
       StringBuilder jsonContent = new StringBuilder();
 
       try {
-         File myObj = new File("static/common/json/"+uuid+".json");
+         File myObj = new File(ApiApplication.RESSOURCES + "static/common/json/"+uuid+".json");
          if (!myObj.exists()) {
             myObj.createNewFile();
             PrintWriter writer = new PrintWriter(myObj);
