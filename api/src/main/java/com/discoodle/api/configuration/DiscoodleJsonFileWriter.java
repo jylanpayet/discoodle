@@ -1,6 +1,5 @@
 package com.discoodle.api.configuration;
 
-import com.discoodle.api.ApiApplication;
 import com.discoodle.api.model.Message;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -21,14 +20,14 @@ public class DiscoodleJsonFileWriter {
         StringBuilder jsonContent = new StringBuilder();
 
         try {
-            File myObj = new File(String.format("%sstatic/common/json/%s.json", ApiApplication.RESSOURCES, roomUUID));
+            File myObj = new File(String.format("static/common/json/%s.json", roomUUID));
             if (!myObj.exists()) {
                 myObj.createNewFile();
                 PrintWriter writer = new PrintWriter(myObj);
                 writer.write("[\n\n]");
                 writer.close();
             }
-            Path path = Paths.get(String.format("%sstatic/common/json/%s.json", ApiApplication.RESSOURCES, roomUUID));
+            Path path = Paths.get(String.format("static/common/json/%s.json", roomUUID));
             Gson gson = new Gson();
 
             Scanner myReader = new Scanner(myObj);
