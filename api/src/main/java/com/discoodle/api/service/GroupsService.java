@@ -42,4 +42,8 @@ public class GroupsService {
             rightsRepository.updateRightsModify(r.getRightsId(),request.isModify());
         return true;
     }
+
+    public void deleteGroupByID(Integer groups_ID){
+        groupsRepository.deleteGroupsByID(groups_ID);
+    }
 }

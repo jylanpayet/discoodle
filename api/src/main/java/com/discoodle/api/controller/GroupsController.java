@@ -4,9 +4,7 @@ import com.discoodle.api.model.GroupRightsRequest;
 import com.discoodle.api.model.GroupsRequest;
 import com.discoodle.api.service.GroupsService;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @AllArgsConstructor
 @RestController
@@ -23,4 +21,7 @@ public class GroupsController {
     public void editGroupRights(@RequestBody GroupRightsRequest request){
         groupsService.editRights(request);
     }
+
+    @DeleteMapping(path = "/api/groups/deleteGroupById/{groups_id}")
+    public void deleteGroupByID(@PathVariable("groups_id") Integer groups_ID){groupsService.deleteGroupByID(groups_ID);}
 }
