@@ -6,12 +6,13 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
 import javax.transaction.Transactional;
 import java.util.Optional;
 
 
 @Repository
-public interface GroupsRepository extends JpaRepository<Groups,Integer> {
+public interface GroupsRepository extends JpaRepository<Groups, Integer> {
 
     @Query(value = "SELECT groups FROM Groups groups where groups.groups_id=?1")
     Optional<Groups> findGroupsById(Integer id);
@@ -44,7 +45,7 @@ public interface GroupsRepository extends JpaRepository<Groups,Integer> {
     void addNewRightsInGroup(@Param("groups_id") Integer groups_ID, @Param("rights_id") Integer right_ID);
 
     @Modifying
-    @Query(value ="DELETE FROM groups WHERE groups_id=?1", nativeQuery = true )
+    @Query(value = "DELETE FROM groups WHERE groups_id=?1", nativeQuery = true)
     @Transactional
     void deleteGroupsByID(@Param("group_id") Integer groups_ID);
 
