@@ -1,7 +1,9 @@
 package com.discoodle.api.service;
 
+import com.discoodle.api.model.GroupRights;
 import com.discoodle.api.model.Groups;
 import com.discoodle.api.model.GroupsRequest;
+import com.discoodle.api.repository.GroupRightsRepository;
 import com.discoodle.api.repository.GroupsRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,8 +12,11 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class GroupsService {
     private final GroupsRepository groupsRepository;
+    private final GroupRightsRepository rightsRepository;
 
     public Groups createNewGroup(GroupsRequest request) {
+        GroupRights rights=new GroupRights(false, false);
+        rights = rightsRepository.save(rights);
         Groups group = new Groups(
                 request.getDepth(),
                 request.getName(),
@@ -19,6 +24,7 @@ public class GroupsService {
                 request.getType()
         );
         Groups finalGroup = groupsRepository.save(group);
+        groupsRepository.addNewRightsInGroup(finalGroup.getGroups_id(),rights.getRightsId());
         groupsRepository.addNewGroupsInGroup(request.getParent_id(),finalGroup.getGroups_id());
         groupsRepository.addNewMemberInGroup(request.getUser_id(),finalGroup.getGroups_id());
         return finalGroup;

@@ -65,6 +65,7 @@ public class User {
     )
     private List<Room> rooms = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable( name = "link_groups_to_user",
             joinColumns = @JoinColumn( name = "user_id" ),

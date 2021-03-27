@@ -1,5 +1,6 @@
 package com.discoodle.api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -42,18 +43,21 @@ public class Groups {
     @Column(name = "type_of_group")
     private TypeOfGroup type;
 
+    @JsonIgnore
     @OneToMany
     @JoinTable( name = "link_groups_to_group",
             joinColumns = @JoinColumn( name = "groups_id"),
             inverseJoinColumns = @JoinColumn( name = "son_id", referencedColumnName = "groups_id"))
     private List<Groups> underGroups = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable( name = "link_groups_to_user",
             joinColumns = @JoinColumn( name = "groups_id" ),
             inverseJoinColumns = @JoinColumn( name = "user_id" ) )
     private List<User> users = new ArrayList<>();
 
+    @JsonIgnore
     @OneToOne
     @JoinColumn(name="groups_rights_id")
     private GroupRights groupRights;
