@@ -1,9 +1,9 @@
 <template>
-   <div class="Messages">
+   <div class="Messages" v-if="!(JSON.stringify(getUser) === JSON.stringify({}))">
       <div class="left-pannel">
          <div class="settings-box">
             <div>
-               <div class="add-conversation" @click="addConversation">
+               <div class="add-conversation" @click="$emit('activatePopUp')">
                   +
                </div>
                <div class="settings"><img src="../assets/settings.png" alt="Settings"
@@ -28,18 +28,19 @@
          <router-view/>
       </div>
    </div>
+   <Account v-else />
 </template>
 
 <script>
 import {mapActions, mapGetters} from "vuex";
 import axios from 'axios';
+import Account from "@/views/Account";
 
 export default {
    name: "Messages",
-   components: {},
+   components: {Account},
    computed: {
-      ...mapGetters(['getColors', 'getTheme']),
-      ...mapGetters(['getUser'])
+      ...mapGetters(['getColors', 'getTheme', 'getUser']),
    },
    methods: {
       ...mapActions(['setConvUUID']),
@@ -59,11 +60,12 @@ export default {
    },
    data() {
       return {
-         convList: []
+         convList: [],
+         displayConversationPopUp: false
       }
    },
    mounted() {
-      this.getRoomsFromDB();
+      this.getRoomsFromDB()
    }
 }
 </script>
