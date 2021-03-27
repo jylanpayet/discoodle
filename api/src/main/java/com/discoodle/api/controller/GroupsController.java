@@ -1,5 +1,6 @@
 package com.discoodle.api.controller;
 
+import com.discoodle.api.model.GroupRightsRequest;
 import com.discoodle.api.model.GroupsRequest;
 import com.discoodle.api.service.GroupsService;
 import lombok.AllArgsConstructor;
@@ -15,5 +16,11 @@ public class GroupsController {
     @PostMapping(path = "/api/groups/addNewGroup")
     public void addNewGroup(@RequestBody GroupsRequest request){
         groupsService.createNewGroup(request);
+    }
+
+
+    @PostMapping(path = "/api/groups/editRights")
+    public void editGroupRights(@RequestBody GroupRightsRequest request){
+        groupsService.editRights(request);
     }
 }

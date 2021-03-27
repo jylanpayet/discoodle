@@ -25,6 +25,9 @@ public interface GroupsRepository extends JpaRepository<Groups,Integer> {
     @Query(value = "SELECT groups FROM Groups groups where groups.type=?1")
     Optional<Groups> findAllGroupsByType(String type);
 
+    @Query(value = "SELECT groups_id FROM link_groups_to_group g where g.son_id=?1", nativeQuery = true)
+    Integer findParentOfGroup(Integer son_id);
+
     @Modifying
     @Query(value = "insert into link_groups_to_user (user_id, groups_id) VALUES (:user_id,:groups_id)", nativeQuery = true)
     @Transactional
