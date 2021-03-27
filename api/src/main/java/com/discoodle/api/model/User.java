@@ -15,7 +15,7 @@ import java.util.*;
 @Table(name = "user")
 public class User {
 
-    public User(String mail, String username, String password, String name, String last_name, User.Role role) {
+    public User(String mail, String username, String password, String name, String last_name, Role role) {
         this.mail = mail;
         this.username = username;
         this.password = password;
@@ -65,6 +65,7 @@ public class User {
     )
     private List<Room> rooms = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable( name = "link_groups_to_user",
             joinColumns = @JoinColumn( name = "user_id" ),
