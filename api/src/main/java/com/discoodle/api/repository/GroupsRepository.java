@@ -43,4 +43,9 @@ public interface GroupsRepository extends JpaRepository<Groups,Integer> {
     @Transactional
     void addNewRightsInGroup(@Param("groups_id") Integer groups_ID, @Param("rights_id") Integer right_ID);
 
+    @Modifying
+    @Query(value ="DELETE FROM groups WHERE groups_id=?1", nativeQuery = true )
+    @Transactional
+    void deleteGroupsByID(@Param("group_id") Integer groups_ID);
+
 }
