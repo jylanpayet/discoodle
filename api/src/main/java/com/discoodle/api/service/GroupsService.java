@@ -15,7 +15,7 @@ public class GroupsService {
     private final GroupRightsRepository rightsRepository;
 
     public Groups createNewGroup(GroupsRequest request) {
-        GroupRights rights=new GroupRights(false, false);
+        GroupRights rights=new GroupRights(false, false, false);
         rights = rightsRepository.save(rights);
         Groups group = new Groups(
                 request.getDepth(),
