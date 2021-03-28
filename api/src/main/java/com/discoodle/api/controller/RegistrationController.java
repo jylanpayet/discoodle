@@ -1,6 +1,6 @@
 package com.discoodle.api.controller;
 
-import com.discoodle.api.model.RegistrationRequest;
+import com.discoodle.api.request.RegistrationRequest;
 import com.discoodle.api.service.RegistrationService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;

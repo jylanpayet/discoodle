@@ -2,10 +2,9 @@ package com.discoodle.api.service;
 
 import com.discoodle.api.model.*;
 import com.discoodle.api.repository.RoomRepository;
+import com.discoodle.api.request.RoomRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @AllArgsConstructor

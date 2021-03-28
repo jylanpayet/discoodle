@@ -2,16 +2,14 @@ package com.discoodle.api.controller;
 
 import com.discoodle.api.configuration.DiscoodleJsonFileWriter;
 import com.discoodle.api.model.*;
+import com.discoodle.api.request.RoomRequest;
 import com.discoodle.api.service.RoomService;
 import lombok.AllArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @AllArgsConstructor
 @RestController

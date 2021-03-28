@@ -1,7 +1,7 @@
 package com.discoodle.api.controller;
 
-import com.discoodle.api.model.GroupRightsRequest;
-import com.discoodle.api.model.GroupsRequest;
+import com.discoodle.api.request.GroupRightsRequest;
+import com.discoodle.api.request.GroupsRequest;
 import com.discoodle.api.service.GroupsService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
