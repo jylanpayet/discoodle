@@ -55,4 +55,7 @@ public class GroupsService {
         }
         return true;
     }
+    public void deleteGroupByID(Integer groups_ID) {
+        groupsRepository.deleteGroupsByID(groups_ID);
+    }
 }

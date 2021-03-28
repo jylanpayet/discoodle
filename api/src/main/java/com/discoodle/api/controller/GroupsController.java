@@ -1,5 +1,6 @@
 package com.discoodle.api.controller;
 
+import com.discoodle.api.request.EditGroupRequest;
 import com.discoodle.api.request.GroupRightsRequest;
 import com.discoodle.api.request.GroupsRequest;
 import com.discoodle.api.service.GroupsService;
@@ -25,5 +26,10 @@ public class GroupsController {
     @DeleteMapping(path = "/api/groups/deleteGroupById/{groups_id}")
     public void deleteGroupByID(@PathVariable("groups_id") Integer groups_ID) {
         groupsService.deleteGroupByID(groups_ID);
+    }
+
+    @PostMapping(path = "/api/groups/editGroup")
+    public void editGroup(@RequestBody EditGroupRequest request){
+        groupsService.editGroup(request);
     }
 }
