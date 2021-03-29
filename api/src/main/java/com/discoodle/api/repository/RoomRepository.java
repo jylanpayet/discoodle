@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 
 @Repository
@@ -17,4 +18,12 @@ public interface RoomRepository extends JpaRepository<Room, Integer> {
     @Query(value = "insert into link_rooms_users (user_id, room_id) VALUES (:user_id,:room_id)", nativeQuery = true)
     @Transactional
     void addNewMember(@Param("user_id") Integer user_ID, @Param("room_id") String room_ID);
+
+    @Query(value = "SELECT room FROM Room room WHERE room.uuid=?1 ")
+    Optional<Room> findRoomByID(String id);
+
+    @Query(value = "SELECT room FROM Room room WHERE room.name=?1")
+    Optional<Room> findAllRoomByName(String name);
+
+
 }
