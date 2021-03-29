@@ -1,8 +1,13 @@
 <template>
-   <div class="Message" :style="belongToMyself ? { alignSelf: 'flex-end' } : { alignSelf: 'flex-start' }">
-      <div :style="!belongToMyself ? { flexDirection: 'row-reverse' } : { flexDirection: 'row' }">
+   <div class="Message" :style="belongToMyself ? { justifyContent: 'flex-end' } : { justifyContent: 'flex-start' }">
+      <div @mouseover="showPin = true" @mouseleave="showPin = false" class="content" :style="!belongToMyself ? { flexDirection: 'row-reverse' } : { flexDirection: 'row' }">
          <div :class="mention ? 'message-content mention' : 'message-content'" v-html="displayMessage(content, true, true, true)" :style="belongToMyself ? { marginRight: '10px', backgroundColor: '#e85c5c', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: getTheme ? '#C4C4C4' : '#F4F4F4' }">
 
+         </div>
+         <div class="buttons" v-if="showPin" :style="belongToMyself ? { left: 0 } : { right: 0 }">
+            <button class="pin-message" @click="pinMessage">
+               <img src="../../assets/pin.png" alt="">
+            </button>
          </div>
          <div class="user-logo" :style="{ backgroundColor: '#F4F4F4' }">
             {{ userLogo }}
@@ -15,6 +20,7 @@
 import {mapGetters} from "vuex";
 import emojis from "@/assets/emojis_uncathegorized";
 import marked from "marked";
+import axios from "axios";
 
 marked.setOptions({
    renderer: new marked.Renderer(),
@@ -91,14 +97,19 @@ export default {
          if (mardkdown)
             content = this.filterMarkdown(content);
          return content;
+      },
+      pinMessage() {
+         axios.put(`http://localhost:8080/api/room/pinMessage/${this.getCurrentConv}?messageID=${this.messageID}`);
+         this.$emit('pinnedMessage', this.messageID);
       }
    },
    computed: {
-      ...mapGetters(['getColors', 'getTheme', 'getUser'])
+      ...mapGetters(['getColors', 'getTheme', 'getUser', 'getCurrentConv'])
    },
    data() {
       return {
          mention: false,
+         showPin: false
       }
    }
 }
@@ -107,18 +118,20 @@ export default {
 <style scoped>
 .Message {
    position: relative;
-   max-width: calc(50% + 42px + 10px + 30px);
-   width: 60%;
+   width: 100%;
+
+   display: flex;
+   flex-direction: row;
 }
 
-.Message > div {
+.content {
    position: relative;
    display: flex;
    align-items: flex-end;
    justify-content: flex-end;
-   max-width: 100%;
+   width: 60%;
 
-
+   margin-right: 0;
    margin-top: 10px;
 }
 
@@ -160,6 +173,38 @@ export default {
    background-color: #dea80a !important;
    font-size: 17px;
    font-weight: 700 !important;
+}
+
+.buttons {
+   position: absolute;
+   background-color: #454150;
+   border-radius: 12px;
+
+   display: flex;
+   flex-direction: row;
+   align-self: center;
+   align-items: center;
+   justify-content: center;
+
+   visibility: visible;
+}
+
+.buttons > button {
+   height: 30px;
+   width: 30px;
+   border: none;
+   outline: none;
+   background: none;
+   cursor: pointer;
+}
+
+.buttons > button:hover {
+   transform: scale(1.1);
+}
+
+.buttons > button > img {
+   height: 15px;
+   width: 15px;
 }
 
 @keyframes appear-right {

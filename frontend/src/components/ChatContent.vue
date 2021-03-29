@@ -20,6 +20,9 @@
                      {{ messages.sender }} : <br>
                      {{ messages.content }} <br>
                      {{ messages.messageDate }}
+                     <button class="unpin-message" @click="unpinMessage(messages.id)">
+                        X
+                     </button>
                   </div>
                </div>
             </div>
@@ -27,20 +30,24 @@
          </div>
       </div>
       <div class="conv-messages">
-         <span v-if="messages.length === 0" style="align-self: center; font-size: 15px; font-weight: 500; color: #F4F4F4"> Soyez le premier à envoyer un message à {{ $route.query.name }}</span>
+         <span v-if="messages.length === 0"
+               style="align-self: center; font-size: 15px; font-weight: 500; color: #F4F4F4"> Soyez le premier à envoyer un message à {{
+               $route.query.name
+            }}</span>
          <Message :key="message" v-for="message in messages"
                   :content="message.content"
                   :user-logo="message.sender.charAt(0).toUpperCase()"
                   :belong-to-myself="message.sender === user"
                   :message-date="message.messageDate"
-                  :message-i-d="message.id"/>
+                  :message-i-d="message.id" @pinnedMessage="pinnedMessage" />
       </div>
       <div class="conv-input">
          <span>
             {{ getWritersAsText() }}
          </span>
          <div>
-            <input type="text" autocomplete="off" :placeholder="`Envoyer un message à ${ $route.query.name }`" @keypress="actionInput">
+            <input type="text" autocomplete="off" :placeholder="`Envoyer un message à ${ $route.query.name }`"
+                   @keypress="actionInput">
             <div class="right-side-input">
                <button style="height: 32px; width: 32px;">
                   <img src="../assets/happy.svg" alt="Smiley">
@@ -113,7 +120,7 @@ export default {
       },
       writing() {
          if (!this.writers.includes(this.user)) {
-            stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {  }, JSON.stringify({
+            stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify({
                sender: this.user,
                type: "WRITING"
             }));
@@ -189,7 +196,7 @@ export default {
             };
 
             this.messages.unshift(chatMessage);
-            stompClient.send(`/conversationListener/${this.getCurrentConv}/room.send`, { }, JSON.stringify(chatMessage));
+            stompClient.send(`/conversationListener/${this.getCurrentConv}/room.send`, {}, JSON.stringify(chatMessage));
             messageContent.value = '';
          }
       },
@@ -197,11 +204,29 @@ export default {
          axios.get(`http://localhost:8080/api/messages?uuid=${this.getCurrentConv}`).then(response => {
             this.messages = response.data.messages;
             this.pinned = this.messages.filter(elt => (elt.pinned === true));
+            console.log(this.messages);
          });
+
       },
       switchPinDisplay() {
          this.showPinned = !this.showPinned;
       },
+      unpinMessage(messageID) {
+         axios.put(`http://localhost:8080/api/room/unpinMessage/${this.getCurrentConv}?messageID=${messageID}`).then(() => {
+            let c = 0;
+            this.pinned.forEach(elt => {
+               if (elt.id === messageID)
+                  this.pinned.splice(c, 1);
+               c++;
+            })
+         })
+      },
+      pinnedMessage(messageID) {
+         this.messages.forEach(elt => {
+            if (elt.id === messageID && !this.pinned.includes(elt))
+               this.pinned.push(elt);
+         })
+      }
    },
    computed: {
       ...mapGetters(['getColors', 'getTheme', 'getCurrentConv', 'getUser'])
@@ -238,6 +263,7 @@ button {
 }
 
 .conv-info > div {
+   position: relative;
    display: flex;
    flex-direction: row;
    align-items: center;
@@ -358,27 +384,22 @@ button {
 
    z-index: 500;
 
+   padding: 10px 10px 0 10px;
    border-radius: 12px;
-   right: 50px;
-   max-width: 350px;
+   right: 36px;
+   top: 70px;
    min-width: 350px;
-   transform: translateY(35px);
-
-   min-height: 50px;
    background-color: #909090;
 }
 
 .pinned-message > div {
    position: relative;
-   width: calc(100% - 20px);
+   width: 100%;
 
    display: flex;
    flex-direction: column;
    align-items: center;
    justify-content: flex-start;
-
-   margin: 10px 10px 0 10px;
-
 }
 
 .pinned-message > div::before {
@@ -393,14 +414,13 @@ button {
 }
 
 .pinned-message-content {
+   position: relative;
    padding: 10px;
    margin-bottom: 10px;
-   width: calc(100% - 20px);
+   width: 100%;
    background-color: #C4C4C4;
    color: #454150;
    border-radius: 12px;
-
-   cursor: pointer;
 }
 
 #pin > img {
@@ -420,54 +440,20 @@ button {
    transform: scale(1.1) rotate(-10deg);
 }
 
-.pinned-message {
-   animation: appear-opacity ease-in-out 0.5s;
-
+.unpin-message {
    position: absolute;
-
-   border-radius: 12px;
-   right: 50px;
-   max-width: 350px;
-   min-width: 350px;
-   transform: translateY(35px);
-
-   min-height: 50px;
-   background-color: #909090;
-}
-
-.pinned-message > div {
-   position: relative;
-   width: calc(100% - 20px);
-
-   display: flex;
-   flex-direction: column;
-   align-items: center;
-   justify-content: flex-start;
-
-   margin: 10px 10px 0 10px;
-
-}
-
-.pinned-message > div::before {
-   content: "";
-   position: absolute;
-   right: 0;
-   top: 0;
-   width: 13px;
-   height: 13px;
-   background-color: #909090;
-   transform: rotate(45deg) translateY(-9px) translateX(-15px);
-}
-
-.pinned-message-content {
-   padding: 10px;
-   margin-bottom: 10px;
-   width: calc(100% - 20px);
-   background-color: #C4C4C4;
-   color: #454150;
-   border-radius: 12px;
-
+   right: 5px;
+   top: 5px;
+   height: 20px;
+   width: 20px;
+   border-radius: 29px;
+   background-color: #454150;
+   color: #f4f4f4;
    cursor: pointer;
+}
+
+.unpin-message:hover {
+   transform: scale(1.1);
 }
 
 @keyframes appear-opacity {

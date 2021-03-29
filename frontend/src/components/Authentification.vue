@@ -4,8 +4,8 @@
          <div class="login" v-if="showLogin">
             <div style="display: flex; flex-direction: column; align-items: flex-start; justify-content: center; width: 100%;">
                <span style="color: #F4F4F4; font-size: 30px; font-weight: 600">Se connecter</span>
-               <input type="text" placeholder="Pseudo" name="userlog" autocomplete="false" required spellcheck="false">
-               <input type="password" placeholder="Mot de passe" name="passwordlog" required spellcheck="false">
+               <input type="text" placeholder="Pseudo" name="userlog" autocomplete="false" required spellcheck="false" @keypress="actionInputLogin">
+               <input type="password" placeholder="Mot de passe" name="passwordlog" required spellcheck="false" @keypress="actionInputLogin">
                <a href="" style="font-size: 12px; color: #909090">Mot de passe oublié ?</a>
                <label>
                   <input type="checkbox">
@@ -19,11 +19,11 @@
          <div class="register" v-else>
             <span style="margin-bottom: 15px; color: #F4F4F4; font-size: 30px; font-weight: 600">Créer mon compte</span>
 
-            <input type="text" placeholder="Pseudo" name="username" required>
-            <input type="text" placeholder="Prénom" name="name" required>
-            <input type="text" placeholder="Nom" name="lastname" required>
-            <input type="email" placeholder="Mail" name="mailReg" required>
-            <input type="password" placeholder="Mot de passe" name="passwordReg" required>
+            <input type="text" placeholder="Pseudo" name="username" required @keypress="actionInputRegister">
+            <input type="text" placeholder="Prénom" name="name" required @keypress="actionInputRegister">
+            <input type="text" placeholder="Nom" name="lastname" required @keypress="actionInputRegister">
+            <input type="email" placeholder="Mail" name="mailReg" required @keypress="actionInputRegister">
+            <input type="password" placeholder="Mot de passe" name="passwordReg" required @keypress="actionInputRegister">
             <button @click="userRegistration" style="align-self: center; margin-top: 15px;" class="submit">C'est parti !</button>
 
 
@@ -91,13 +91,24 @@ export default {
 
                axios.get(`http://localhost:8080/api/users/${document.querySelector("input[name=userlog]").value}`).then(response => {
                   this.setUser(response.data);
+                  this.$emit("logSuccess")
+               }).catch(error => {
+                  console.log(error);
                })
-
-               this.$emit("logSuccess")
             }
          }).catch(error => {
             console.log(error.response);
          });
+      },
+      actionInputLogin(event) {
+         event.keyCode === 13
+            ? this.login()
+            : ""
+      },
+      actionInputRegister(event) {
+         event.keyCode === 13
+               ? this.userRegistration()
+               : ""
       },
       ...mapActions(['setUser'])
    }
