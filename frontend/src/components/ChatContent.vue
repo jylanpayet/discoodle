@@ -172,6 +172,18 @@ export default {
                      this.writers.pop(message.sender)
                   }, 5000)
                }
+            } else if (message.type === "PINNED") {
+               this.messages.forEach(elt => {
+                  if (elt.id === message.id && !this.pinned.includes(elt))
+                     this.pinned.push(elt);
+               });
+            } else if (message.type === "UNPINNED") {
+               let c = 0;
+               this.pinned.forEach(elt => {
+                  if (elt.id === message.id)
+                     this.pinned.splice(c, 1);
+                  c++;
+               });
             }
          }
       },
@@ -219,12 +231,21 @@ export default {
                   this.pinned.splice(c, 1);
                c++;
             })
+            stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify({
+               id: messageID,
+               type: "UNPINNED"
+            }));
          })
       },
       pinnedMessage(messageID) {
          this.messages.forEach(elt => {
-            if (elt.id === messageID && !this.pinned.includes(elt))
+            if (elt.id === messageID && !this.pinned.includes(elt)) {
+               stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify({
+                  id: messageID,
+                  type: "PINNED"
+               }));
                this.pinned.push(elt);
+            }
          })
       }
    },
