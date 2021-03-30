@@ -42,14 +42,19 @@ public class UserController {
         userService.addNewUser(user);
     }
 
-    @DeleteMapping(path = "{userID}")
-    public void deleteUser(@PathVariable("userID") Integer userId) {
+    @DeleteMapping(path = "{user_id}")
+    public void deleteUser(@PathVariable("user_id") Integer userId) {
         userService.deleteUser(userId);
     }
 
-    @GetMapping(path = "/seeAllRooms/{user_ID}")
+    @GetMapping(path = "/seeAllRooms/{user_id}")
     @ResponseBody
     public List<Room> findAllRoomsByUserID(@PathVariable Long user_ID) {
         return userService.getUserByID(user_ID).get().getRooms();
+    }
+
+    @PostMapping(path = "changeMail/{user_id}")
+    public Optional<User> changeMail(@PathVariable Long user_id, @RequestBody User.RegistrationRequest request) {
+        return userService.changeMail(user_id, request.getMail());
     }
 }

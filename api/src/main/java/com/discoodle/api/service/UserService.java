@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -92,6 +93,13 @@ public class UserService implements UserDetailsService {
 
     public int enableUser(String mail) {
         return userRepository.enableUser(mail);
+    }
+
+    public Optional<User> changeMail(Long user_id, String mail) {
+        if(mail.matches("^(.+)@(.+)$") && !userRepository.findUserByMail(mail).isPresent() && userRepository.changeMail(user_id, mail) == 1) {
+         return userRepository.findUserByID(user_id);
+        }
+        return null;
     }
 
 }
