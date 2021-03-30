@@ -33,7 +33,7 @@ public class UserController {
 
     @RequestMapping(value = "/infos/{user_id}", method = GET)
     @ResponseBody
-    public Optional<User> getUserByID(@PathVariable Integer user_id){
+    public Optional<User> getUserByID(@PathVariable Long user_id){
         return userService.getUserByID(user_id);
     }
 
@@ -49,7 +49,7 @@ public class UserController {
 
     @GetMapping(path = "/seeAllRooms/{user_ID}")
     @ResponseBody
-    public List<Room> findAllRoomsByUserID(@PathVariable Integer user_ID) {
+    public List<Room> findAllRoomsByUserID(@PathVariable Long user_ID) {
         return userService.getUserByID(user_ID).get().getRooms();
     }
 }

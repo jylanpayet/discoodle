@@ -1,6 +1,5 @@
 package com.discoodle.api.service;
 
-import com.discoodle.api.model.RegistrationRequest;
 import com.discoodle.api.model.User;
 
 import com.discoodle.api.security.mailConfirmation.MailSender;
@@ -19,7 +18,7 @@ public class RegistrationService {
     private final ConfirmationTokenService confirmationTokenService;
     private final MailSender mailSender;
 
-    public String register(RegistrationRequest request) {
+    public String register(User.RegistrationRequest request) {
         if (request.getPassword().matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}")) {
             if (request.getMail().matches("^(.+)@(.+)$")) {
                 String token = userService.signUpUser(
@@ -48,7 +47,7 @@ public class RegistrationService {
                 "- pas d'espace, retour à la ligne...\n";
     }
 
-    public Boolean login(RegistrationRequest request) {
+    public Boolean login(User.RegistrationRequest request) {
         return (userService.login(request.getUsername(), request.getPassword()));
     }
 

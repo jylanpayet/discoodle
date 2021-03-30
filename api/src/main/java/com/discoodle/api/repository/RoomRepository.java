@@ -14,11 +14,11 @@ import java.util.Optional;
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Integer> {
 
-    @Query("SELECT room FROM Room room where room.uuid = ?1")
+    @Query("SELECT room FROM Room room where room.room_id = ?1")
     Optional<Room> findRoomByUUID(String room_id);
 
     @Modifying
     @Query(value = "insert into link_rooms_users (user_id, room_id) VALUES (:user_id,:room_id)", nativeQuery = true)
     @Transactional
-    void addNewMembers(@Param("user_id") Integer user_ID, @Param("room_id") String room_ID);
+    void addNewMembers(@Param("user_id") Integer user_id, @Param("room_id") String room_id);
 }

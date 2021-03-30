@@ -11,14 +11,14 @@
             </div>
          </div>
          <div class="convs-list">
-            <router-link :key="convs.uuid" v-for="convs in convList" :to="`/messages/${convs.uuid}?name=${convs.name}`"
-                         @click="setConvUUID(convs.uuid)">
+            <router-link :key="convs.room_id" v-for="convs in convList" :to="`/messages/${convs.room_id}?name=${convs.room_name}`"
+                         @click="setConvUUID(convs.room_id)">
                <div class="link-content">
                   <div class="user-logo">
-                     {{ convs.name.charAt(0).toUpperCase() }}
+                     {{ convs.room_name.charAt(0).toUpperCase() }}
                   </div>
                   <div class="conv-name">
-                     {{ convs.name }}
+                     {{ convs.room_name }}
                   </div>
                </div>
             </router-link>
@@ -47,12 +47,13 @@ export default {
       getRoomsFromDB() {
          axios.get(`http://localhost:8080/api/users/seeAllRooms/${this.getUser.id}`).then(response => {
             this.convList = response.data
+            console.log(this.convList);
          });
       },
       addConversation() {
          axios.post(`http://localhost:8080/api/room/addNewRoom`, {
-            name: "Discoodle",
-            admin: this.getUser.id
+            room_name: "Discoodle",
+            room_members: [this.getUser.id]
          }).catch(error => {
             console.log(error.response);
          });

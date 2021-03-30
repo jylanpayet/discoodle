@@ -20,7 +20,7 @@ public class RoomService {
         );
         Room finalRoom = roomRepository.save(room);
         for(int i = 0; i < room_members.size(); i++) {
-            roomRepository.addNewMembers(room_members.get(i), finalRoom.getUuid());
+            roomRepository.addNewMembers(room_members.get(i), finalRoom.getRoom_id());
         }
         return finalRoom;
     }

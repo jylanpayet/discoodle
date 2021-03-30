@@ -23,8 +23,6 @@ public class RegistrationRequest {
 
     private final String lastName;
 
-    private final Date birthDay;
-
     private final String linkToAvatar;
 
     private final User.Role role;

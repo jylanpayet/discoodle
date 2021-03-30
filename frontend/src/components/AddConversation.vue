@@ -32,8 +32,8 @@ export default {
          let inputValue = document.querySelector("input[name=name_room]").value;
          if (event.keyCode === 13 && inputValue.value !== "") {
             axios.post(`http://localhost:8080/api/room/addNewRoom`, {
-               name: inputValue,
-               admin: this.getUser.id
+               room_name: inputValue,
+               room_members: [this.getUser.id]
             }).catch(error => {
                console.log(error.response);
             });

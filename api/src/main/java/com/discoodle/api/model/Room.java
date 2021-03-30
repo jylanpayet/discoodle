@@ -16,22 +16,20 @@ import java.util.List;
 @Table(name = "room")
 public class Room {
 
-    public Room(String name, Integer user_ID) {
-        this.name = name;
-        this.user_ID = user_ID;
+    public Room(String room_name, Integer room_admin) {
+        this.room_name = room_name;
+        this.room_admin = room_admin;
     }
 
-    /*@GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")*/
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "room_id", unique = true, nullable = false)
-    private String uuid;
-    @Column(name = "name")
-    private String name;
-    @Column(name = "admin")
-    private Integer user_ID;
+    private String room_id;
+    @Column(name = "room_name")
+    private String room_name;
+    @Column(name = "room_admin")
+    private Integer room_admin;
     @Column(name = "link_picture")
     private String link_picture;
 
@@ -48,6 +46,6 @@ public class Room {
     @ToString
     public static class RoomRequest {
         private final String room_name;
-        private final List<Integer> room_members;;
+        private final List<Integer> room_members;
     }
 }

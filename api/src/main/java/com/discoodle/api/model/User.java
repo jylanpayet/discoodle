@@ -27,7 +27,7 @@ public class User {
     @Id
     @GeneratedValue
     @Column(name = "user_id", unique = true, nullable = false)
-    private Integer id;
+    private Long id;
 
     @Column(name = "mail")
     private String mail;
@@ -70,11 +70,32 @@ public class User {
             joinColumns = @JoinColumn( name = "user_id" ),
             inverseJoinColumns = @JoinColumn( name = "groups_id" ) )
     private List<Groups> groups = new ArrayList<>();
-    
+
     public enum Role {
         STUDENT,
         TEACHER,
         ADMIN
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @EqualsAndHashCode
+    @ToString
+    public static class RegistrationRequest {
+
+        private final String mail;
+
+        private final String username;
+
+        private final String password;
+
+        private final String name;
+
+        private final String lastName;
+
+        private final String linkToAvatar;
+
+        private final User.Role role;
     }
 
 }

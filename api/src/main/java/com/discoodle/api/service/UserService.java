@@ -31,7 +31,7 @@ public class UserService implements UserDetailsService {
         return userRepository.findUserByUserName(username);
     }
 
-    public Optional<User> getUserByID(Integer user_id) {
+    public Optional<User> getUserByID(Long user_id) {
         return userRepository.findUserByID(user_id);
     }
 
@@ -84,7 +84,7 @@ public class UserService implements UserDetailsService {
     }
 
     public Boolean login(String username, String password) {
-        if(userRepository.findUserByUserName(username).isPresent() && userRepository.findUserByUserName(username).get().isEnabled()) {
+        if(userRepository.findUserByUserName(username).isPresent() /*&& userRepository.findUserByUserName(username).get().isEnabled()*/) {
             return bCryptPasswordEncoder.matches(password, userRepository.findUserByUserName(username).get().getPassword());
         }
         return false;
