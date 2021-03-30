@@ -5,7 +5,7 @@
          <div>
             <span style="font-size: 23px; font-weight: 500; color: #F4F4F4">{{ $route.query.name }}</span>
             <div class="top-right-buttons">
-               <button style="height: 100%;" @click="switchPinDisplay">
+               <button :style="pinAdd ? { animation: '' } : { animation: 'none' }" style="height: 100%;" @click="switchPinDisplay">
                   <img src="../assets/pin.png" alt="" style="height: 60%;">
                </button>
                <button style="color: #F4F4F4; font-size: 33px; font-weight: 500; height: 100%">
@@ -39,7 +39,8 @@
                   :user-logo="message.sender.charAt(0).toUpperCase()"
                   :belong-to-myself="message.sender === user"
                   :message-date="message.messageDate"
-                  :message-i-d="message.id" @pinnedMessage="pinnedMessage" />
+                  :message-i-d="message.id"
+                  @pinnedMessage="pinnedMessage" />
       </div>
       <div class="conv-input">
          <span>
@@ -52,7 +53,7 @@
                <button style="height: 32px; width: 32px;">
                   <img src="../assets/happy.svg" alt="Smiley">
                </button>
-               <button class="submit-file" @click="user = 'Bob'">
+               <button class="submit-file">
                   +
                </button>
             </div>
@@ -66,7 +67,9 @@ import SockJS from "sockjs-client";
 import Stomp from "stompjs";
 import {mapGetters} from "vuex";
 import axios from 'axios';
+import marked from "marked";
 import Message from "@/components/common/Message";
+import emojis from "@/assets/emojis_uncathegorized";
 
 let stompClient = null;
 
@@ -79,12 +82,14 @@ export default {
       return {
          messages: [],
          pinned: [],
-         user: "Alice",
+         user: "",
          writers: [],
          showPinned: false,
+         pinAdd: false,
       }
    },
    mounted() {
+      this.user = this.getUser.username;
       this.getMessagesFromJSON();
       this.connect();
    },
@@ -116,6 +121,8 @@ export default {
             this.writers.pop(this.user);
          } else if (event.keyCode !== 13) {
             this.writing();
+            const inputContent = document.querySelector(".conv-input > div > input");
+            inputContent.value = this.displayMessage(inputContent.value, false, true, false);
          }
       },
       writing() {
@@ -216,7 +223,6 @@ export default {
          axios.get(`http://localhost:8080/api/messages?uuid=${this.getCurrentConv}`).then(response => {
             this.messages = response.data.messages;
             this.pinned = this.messages.filter(elt => (elt.pinned === true));
-            console.log(this.messages);
          });
 
       },
@@ -247,7 +253,39 @@ export default {
                this.pinned.push(elt);
             }
          })
-      }
+      },
+
+      filterEmoji(content){
+         // Regex to match with the emoji string encode ( ':xxxxx_xxx_xxx_xxx:' where '_' is optionnal )
+         const regex = ":[a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*:";
+         const emoji = [...content.matchAll(regex)];
+         if(emoji && emoji.length > 0) {
+            emoji.forEach(elt => {
+               if (emojis[elt[0].replaceAll(":", "")])
+                  content = content.replace(elt[0], emojis[elt[0].replaceAll(":", "")]);
+            })
+         }
+         return content;
+      },
+      filterMarkdown(content){
+         return marked(content);
+      },
+      filterPing(content) {
+         if (content.includes(`@${this.getUser.username}`)) {
+            this.mention = true;
+            return content.replaceAll(`@${this.getUser.username}`, `@${this.getUser.name}`);
+         }
+         return content;
+      },
+      displayMessage(content, mardkdown, emojis, ping) {
+         if (ping)
+            content = this.filterPing(content);
+         if (emojis)
+            content = this.filterEmoji(content);
+         if (mardkdown)
+            content = this.filterMarkdown(content);
+         return content;
+      },
    },
    computed: {
       ...mapGetters(['getColors', 'getTheme', 'getCurrentConv', 'getUser'])
@@ -289,6 +327,7 @@ button {
    flex-direction: row;
    align-items: center;
    justify-content: space-between;
+   margin: auto;
 
    width: 95%;
    height: 60px;

@@ -86,7 +86,7 @@ export default {
 .left-pannel {
    height: 100%;
    width: 22%;
-
+   background-color: #15131c;
    display: flex;
    flex-direction: column;
    align-items: center;

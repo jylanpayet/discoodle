@@ -11,19 +11,19 @@
                      <span class="headerNavbar">MENU</span>
                      <div class="links">
                         <router-link to="/accueil">
-                           <div class="navbar-icon"><img src="./assets/home.png" alt="Home"></div>
+                           <div class="navbar-icon"><img src=assets/home.png alt="Home"></div>
                            <span :style="{ color: getColors.color5 }">ACCUEIL</span></router-link>
                         <router-link to="/cours">
-                           <div class="navbar-icon"><img src="./assets/courses.png" alt="Courses"></div>
+                           <div class="navbar-icon"><img src="assets/courses.png" alt="Courses"></div>
                            <span :style="{ color: getColors.color5 }">COURS</span></router-link>
                         <router-link to="/messages">
-                           <div class="navbar-icon"><img src="./assets/messages.png" alt="Messages"></div>
+                           <div class="navbar-icon"><img src="assets/messages.png" alt="Messages"></div>
                            <span :style="{ color: getColors.color5 }">MESSAGES</span></router-link>
                         <router-link to="/planning">
-                           <div class="navbar-icon"><img src="./assets/planning.png" alt="Planning"></div>
+                           <div class="navbar-icon"><img src="assets/planning.png" alt="Planning"></div>
                            <span :style="{ color: getColors.color5 }">PLANNING</span></router-link>
                         <router-link to="/compte">
-                           <div class="navbar-icon"><img src="./assets/account.png" alt="Account"></div>
+                           <div class="navbar-icon"><img src="assets/account.png" alt="Account"></div>
                            <span :style="{ color: getColors.color5 }">COMPTE</span></router-link>
                      </div>
                   </div>

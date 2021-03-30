@@ -207,6 +207,10 @@ export default {
    width: 15px;
 }
 
+.buttons:active {
+   background-color: #E85C5C;
+}
+
 @keyframes appear-right {
    from {
       transform: translateX(100%);
