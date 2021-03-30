@@ -95,6 +95,13 @@ public class UserService implements UserDetailsService {
         return userRepository.enableUser(mail);
     }
 
+    public Optional<User> changeUsername(Long user_id, String username) {
+        if(!userRepository.findUserByUserName(username).isPresent() && userRepository.changeUsername(user_id, username) == 1) {
+            return userRepository.findUserByID(user_id);
+        }
+        return null;
+    }
+
     public Optional<User> changeMail(Long user_id, String mail) {
         if(mail.matches("^(.+)@(.+)$") && !userRepository.findUserByMail(mail).isPresent() && userRepository.changeMail(user_id, mail) == 1) {
          return userRepository.findUserByID(user_id);

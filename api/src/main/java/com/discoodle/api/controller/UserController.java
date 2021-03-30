@@ -53,6 +53,11 @@ public class UserController {
         return userService.getUserByID(user_ID).get().getRooms();
     }
 
+    @PostMapping(path = "changeUsername/{user_id}")
+    public Optional<User> changeUsername(@PathVariable Long user_id, @RequestBody User.RegistrationRequest request) {
+        return userService.changeUsername(user_id, request.getUsername());
+    }
+
     @PostMapping(path = "changeMail/{user_id}")
     public Optional<User> changeMail(@PathVariable Long user_id, @RequestBody User.RegistrationRequest request) {
         return userService.changeMail(user_id, request.getMail());
