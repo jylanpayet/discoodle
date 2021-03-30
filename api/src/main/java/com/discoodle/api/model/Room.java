@@ -41,4 +41,13 @@ public class Room {
             joinColumns = @JoinColumn( name = "room_id" ),
             inverseJoinColumns = @JoinColumn( name = "user_id" ) )
     private List<User> users = new ArrayList<>();
+
+    @Getter
+    @AllArgsConstructor
+    @EqualsAndHashCode
+    @ToString
+    public static class RoomRequest {
+        private final String room_name;
+        private final List<Integer> room_members;;
+    }
 }

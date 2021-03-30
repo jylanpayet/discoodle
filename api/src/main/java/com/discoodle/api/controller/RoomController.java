@@ -12,6 +12,7 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @AllArgsConstructor
 @RestController
@@ -20,8 +21,13 @@ public class RoomController {
 
 
 	@PostMapping(path = "/api/room/addNewRoom")
-	public Room addNewRoom(@RequestBody RoomRequest request){
-		return roomService.createNewRoom(request);
+	public Room addNewRoom(@RequestBody Room.RoomRequest request){
+		return roomService.createNewRoom(request.getRoom_name(), request.getRoom_members());
+	}
+
+	@PostMapping(path = "/api/room/{room_id}/room.add")
+	public Optional<Room> addNewMembers(@PathVariable String room_id, @RequestBody Room.RoomRequest request){
+		return roomService.addNewMembers(room_id, request.getRoom_members());
 	}
 
 	@MessageMapping("/{roomUUID}/room.send")
