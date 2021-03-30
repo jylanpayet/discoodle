@@ -119,6 +119,13 @@ public class UserService implements UserDetailsService {
         return null;
     }
 
+    public Optional<User> changeName(Long user_id, String name) {
+        if(userRepository.changeName(user_id, name) == 1) {
+            return userRepository.findUserByID(user_id);
+        }
+        return null;
+    }
+
     public Optional<User> changeLastName(Long user_id, String last_name) {
             if(userRepository.changeLastName(user_id, last_name) == 1) {
                 return userRepository.findUserByID(user_id);
