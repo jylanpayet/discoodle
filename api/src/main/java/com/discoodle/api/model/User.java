@@ -91,7 +91,7 @@ public class User {
 
         private final String name;
 
-        private final String lastName;
+        private final String last_name;
 
         private final String linkToAvatar;
 

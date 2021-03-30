@@ -67,4 +67,9 @@ public class UserController {
     public Optional<User> changePassword(@PathVariable Long user_id, @RequestBody User.RegistrationRequest request) {
         return userService.changePassword(user_id, request.getPassword());
     }
+
+    @PostMapping(path = "changeLastName/{user_id}")
+    public Optional<User> changeLastName(@PathVariable Long user_id, @RequestBody User.RegistrationRequest request) {
+        return userService.changeLastName(user_id, request.getLast_name());
+    }
 }
