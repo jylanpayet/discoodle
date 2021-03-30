@@ -46,6 +46,7 @@ public class Room {
     @ToString
     public static class RoomRequest {
         private final String room_name;
+        private final String link_picture;
         private final List<Integer> room_members;
     }
 }

@@ -28,6 +28,11 @@ public class RoomController {
 		return roomService.addNewMembers(room_id, request.getRoom_members());
 	}
 
+	@PostMapping(path = "/api/room/changeLinkPicture/{room_id}")
+	public Optional<Room> changeLinkPicture(@PathVariable String room_id, @RequestBody Room.RoomRequest request){
+		return roomService.changeLinkPicture(room_id, request.getLink_picture());
+	}
+
 	@MessageMapping("/{roomUUID}/room.send")
 	@SendTo("/conversations/rooms/{roomUUID}")
 	public Message sendMessage(@DestinationVariable String roomUUID, @Payload Message message) {

@@ -31,4 +31,11 @@ public class RoomService {
         }
         return roomRepository.findRoomByUUID(room_id);
     }
+
+    public Optional<Room> changeLinkPicture(String room_id, String link_to_avatar) {
+        if(roomRepository.changeLinkPicture(room_id, link_to_avatar) == 1) {
+            return roomRepository.findRoomByUUID(room_id);
+        }
+        return null;
+    }
 }
