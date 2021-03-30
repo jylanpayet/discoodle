@@ -28,7 +28,7 @@
          <router-view/>
       </div>
    </div>
-   <Account v-else />
+   <Account @logSuccess="getRoomsFromDB" v-else />
 </template>
 
 <script>
@@ -65,7 +65,8 @@ export default {
       }
    },
    mounted() {
-      this.getRoomsFromDB()
+      if (!(JSON.stringify(this.getUser) === JSON.stringify({})))
+         this.getRoomsFromDB()
    }
 }
 </script>
@@ -85,7 +86,7 @@ export default {
 .left-pannel {
    height: 100%;
    width: 22%;
-
+   background-color: #15131c;
    display: flex;
    flex-direction: column;
    align-items: center;

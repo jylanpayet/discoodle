@@ -41,5 +41,8 @@ code {
     font-family: 'Inconsolata', monospace;
 }
 
+del {
+    text-decoration: line-through;
+}
 
 
