@@ -57,4 +57,9 @@ public class UserController {
     public Optional<User> changeMail(@PathVariable Long user_id, @RequestBody User.RegistrationRequest request) {
         return userService.changeMail(user_id, request.getMail());
     }
+
+    @PostMapping(path = "changePassword/{user_id}")
+    public Optional<User> changePassword(@PathVariable Long user_id, @RequestBody User.RegistrationRequest request) {
+        return userService.changePassword(user_id, request.getPassword());
+    }
 }

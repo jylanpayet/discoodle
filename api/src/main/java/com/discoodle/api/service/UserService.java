@@ -102,4 +102,13 @@ public class UserService implements UserDetailsService {
         return null;
     }
 
+    public Optional<User> changePassword(Long user_id, String password) {
+        if(password.matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}")) {
+            String passwordEncoded = bCryptPasswordEncoder.encode(password);
+            if(userRepository.changePassword(user_id, passwordEncoded) == 1) {
+                return userRepository.findUserByID(user_id);
+            }
+        }
+        return null;
+    }
 }
