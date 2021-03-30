@@ -88,4 +88,26 @@ public class RoomController {
 		}
 	}
 
+	@PutMapping(path = "/api/room/deleteMessage/{roomUUID}")
+	public void deleteMessage(@RequestParam(value = "messageID") Integer messageID, @PathVariable String roomUUID) {
+		Gson gson = new Gson();
+		try {
+			JsonReader reader = new JsonReader(new FileReader(ApiApplication.RESSOURCES + "static/common/json/"+roomUUID+".json"));
+			LinkedList<Message> messages = gson.fromJson(reader, new TypeToken<LinkedList<Message>>(){}.getType());
+			for (Message m : messages) {
+				if (m.getId().equals(messageID)) {
+					messages.remove(m);
+					System.out.println(messages);
+					Path path = Paths.get(ApiApplication.RESSOURCES + "static/common/json/"+roomUUID+".json");
+					try (Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
+						gson.toJson(gson.toJsonTree(messages), writer);
+					}
+					return;
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 }

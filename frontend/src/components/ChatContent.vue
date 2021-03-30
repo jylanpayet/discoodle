@@ -40,7 +40,7 @@
                   :belong-to-myself="message.sender === user"
                   :message-date="message.messageDate"
                   :message-i-d="message.id"
-                  @pinnedMessage="pinnedMessage" />
+                  @pinnedMessage="pinnedMessage" @deletedMessage="deletedMessage"/>
       </div>
       <div class="conv-input">
          <span>
@@ -185,12 +185,10 @@ export default {
                      this.pinned.push(elt);
                });
             } else if (message.type === "UNPINNED") {
-               let c = 0;
-               this.pinned.forEach(elt => {
-                  if (elt.id === message.id)
-                     this.pinned.splice(c, 1);
-                  c++;
-               });
+               this.pinned = this.pinned.filter(elt => elt.id !== message.id);
+            } else if (message.type === "DELETED") {
+               this.messages = this.messages.filter(elt => elt.id !== message.id);
+               this.pinned = this.pinned.filter(elt => elt.id !== message.id);
             }
          }
       },
@@ -253,6 +251,12 @@ export default {
                this.pinned.push(elt);
             }
          })
+      },
+      deletedMessage(messageID) {
+         stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify({
+            id: messageID,
+            type: "DELETED"
+         }));
       },
 
       filterEmoji(content){

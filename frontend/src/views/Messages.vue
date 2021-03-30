@@ -3,9 +3,10 @@
       <div class="left-pannel">
          <div class="settings-box">
             <div>
-               <div class="add-conversation" @click="$emit('activatePopUp')">
+               <div class="add-conversation" @click="showPopUp = true">
                   +
                </div>
+               <AddConversation v-if="showPopUp" @groupAdded="addNewGroup" @desactivatePopUp="showPopUp = false" />
                <div class="settings"><img src="../assets/settings.png" alt="Settings"
                                           style="height: 100%; width: 100%;"></div>
             </div>
@@ -35,10 +36,11 @@
 import {mapActions, mapGetters} from "vuex";
 import axios from 'axios';
 import Account from "@/views/Account";
+import AddConversation from "@/components/AddConversation";
 
 export default {
    name: "Messages",
-   components: {Account},
+   components: {AddConversation, Account},
    computed: {
       ...mapGetters(['getColors', 'getTheme', 'getUser']),
    },
@@ -49,19 +51,19 @@ export default {
             this.convList = response.data
          });
       },
-      addConversation() {
-         axios.post(`http://localhost:8080/api/room/addNewRoom`, {
-            name: "Discoodle",
-            admin: this.getUser.id
-         }).catch(error => {
-            console.log(error.response);
-         });
+      addNewGroup(group) {
+         this.convList.unshift({
+            link_picture: group.link_picture,
+            name: group.name,
+            uuid: group.uuid,
+         })
       }
    },
    data() {
       return {
          convList: [],
-         displayConversationPopUp: false
+         displayConversationPopUp: false,
+         showPopUp: false
       }
    },
    mounted() {

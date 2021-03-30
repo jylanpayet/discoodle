@@ -8,6 +8,9 @@
             <button class="pin-message" @click="pinMessage">
                <img src="../../assets/pin.png" alt="">
             </button>
+            <button class="delete-message" @click="deleteMessage" v-if="belongToMyself">
+               X
+            </button>
          </div>
          <div class="user-logo" :style="{ backgroundColor: '#F4F4F4' }">
             {{ userLogo }}
@@ -101,6 +104,10 @@ export default {
       pinMessage() {
          axios.put(`http://localhost:8080/api/room/pinMessage/${this.getCurrentConv}?messageID=${this.messageID}`);
          this.$emit('pinnedMessage', this.messageID);
+      },
+      deleteMessage() {
+         axios.put(`http://localhost:8080/api/room/deleteMessage/${this.getCurrentConv}?messageID=${this.messageID}`);
+         this.$emit('deletedMessage', this.messageID);
       }
    },
    computed: {
@@ -196,9 +203,12 @@ export default {
    outline: none;
    background: none;
    cursor: pointer;
+   display: flex;
+   align-items: center;
+   justify-content: center;
 }
 
-.buttons > button:hover {
+.pin-message:hover {
    transform: scale(1.1);
 }
 
@@ -209,6 +219,19 @@ export default {
 
 .buttons:active {
    background-color: #E85C5C;
+   color: #f4f4f4;
+}
+.delete-message {
+   font-weight: 600;
+   color: #f4f4f4;
+   border-radius: 12px;
+}
+.delete-message:hover {
+   color: #E85C5C;
+}
+.delete-message:active {
+   background-color: #E85C5C;
+   color: #f4f4f4;
 }
 
 @keyframes appear-right {
