@@ -47,7 +47,6 @@ export default {
       getRoomsFromDB() {
          axios.get(`http://localhost:8080/api/users/seeAllRooms/${this.getUser.id}`).then(response => {
             this.convList = response.data
-            console.log(this.convList);
          });
       },
       addConversation() {

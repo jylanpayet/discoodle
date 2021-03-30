@@ -60,27 +60,27 @@ public class UserService implements UserDetailsService {
     }
 
     public String signUpUser(User user) {
-        boolean userExist = userRepository.findUserByMail(user.getMail()).isPresent();
+            boolean userExist = userRepository.findUserByMail(user.getMail()).isPresent();
 
-        if (userExist) {
-            throw new IllegalStateException("L'email est déjà utilisé.");
-        }
+            if (userExist) {
+                return "L'email est déjà utilisé.";
+            }
 
-        String passwordEncoded = bCryptPasswordEncoder.encode(user.getPassword());
-        user.setPassword(passwordEncoded);
+            String passwordEncoded = bCryptPasswordEncoder.encode(user.getPassword());
+            user.setPassword(passwordEncoded);
 
-        userRepository.save(user);
+            userRepository.save(user);
 
-        String token = UUID.randomUUID().toString();
-        ConfirmationToken confirmationToken = new ConfirmationToken(
-                token,
-                LocalDateTime.now(),
-                LocalDateTime.now().plusMinutes(15),
-                user
-        );
+            String token = UUID.randomUUID().toString();
+            ConfirmationToken confirmationToken = new ConfirmationToken(
+                    token,
+                    LocalDateTime.now(),
+                    LocalDateTime.now().plusMinutes(15),
+                    user
+            );
 
-        confirmationTokenService.saveConfirmationToken(confirmationToken);
-        return token;
+            confirmationTokenService.saveConfirmationToken(confirmationToken);
+            return token;
     }
 
     public Boolean login(String username, String password) {
