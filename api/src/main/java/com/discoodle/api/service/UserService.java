@@ -132,4 +132,11 @@ public class UserService implements UserDetailsService {
             }
         return null;
     }
+
+    public Optional<User> changeLinkToAvatar(Long user_id, String link_to_avatar) {
+        if(userRepository.changeLinkToAvar(user_id, link_to_avatar) == 1) {
+            return userRepository.findUserByID(user_id);
+        }
+        return null;
+    }
 }

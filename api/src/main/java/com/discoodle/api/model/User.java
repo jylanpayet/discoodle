@@ -93,7 +93,7 @@ public class User {
 
         private final String last_name;
 
-        private final String linkToAvatar;
+        private final String link_to_avatar;
 
         private final User.Role role;
     }

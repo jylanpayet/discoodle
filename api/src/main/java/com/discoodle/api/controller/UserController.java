@@ -77,4 +77,9 @@ public class UserController {
     public Optional<User> changeLastName(@PathVariable Long user_id, @RequestBody User.RegistrationRequest request) {
         return userService.changeLastName(user_id, request.getLast_name());
     }
+
+    @PostMapping(path = "changeLinkToAvar/{user_id}")
+    public Optional<User> changeLinkToAvatar(@PathVariable Long user_id, @RequestBody User.RegistrationRequest request) {
+        return userService.changeLinkToAvatar(user_id, request.getLink_to_avatar());
+    }
 }
