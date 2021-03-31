@@ -40,7 +40,11 @@
                   :belong-to-myself="message.sender === user"
                   :message-date="message.messageDate"
                   :message-i-d="message.id"
-                  @pinnedMessage="pinnedMessage" @deletedMessage="deletedMessage"/>
+                  :is-edited="message.edited"
+                  @pinnedMessage="pinnedMessage"
+                  @deletedMessage="deletedMessage"
+                  @editedMessage="editedMessage"
+         />
       </div>
       <div class="conv-input">
          <span>
@@ -168,6 +172,7 @@ export default {
                   sender: message.sender,
                   messageDate: message.messageDate,
                   pinned: message.pinned,
+                  edited: false,
                   // TODO : Add messageReactions implementation.
                   // messageReactions: message.messageReactions
                })
@@ -189,6 +194,19 @@ export default {
             } else if (message.type === "DELETED") {
                this.messages = this.messages.filter(elt => elt.id !== message.id);
                this.pinned = this.pinned.filter(elt => elt.id !== message.id);
+            } else if (message.type === "EDITED") {
+               this.messages.forEach(elt => {
+                  if (elt.id === message.id) {
+                     elt.content = message.content;
+                     elt.edited = true;
+                  }
+               });
+               this.pinned.forEach(elt => {
+                  if (elt.id === message.id) {
+                     elt.content = message.content;
+                     elt.edited = true;
+                  }
+               });
             }
          }
       },
@@ -206,6 +224,7 @@ export default {
                sender: this.user,
                messageDate: date,
                pinned: false,
+               edited: false,
                convUUID: this.getCurrentConv,
                // messageReactions: []
 
@@ -256,6 +275,13 @@ export default {
          stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify({
             id: messageID,
             type: "DELETED"
+         }));
+      },
+      editedMessage(messageID, content) {
+         stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify({
+            id: messageID,
+            content: content,
+            type: "EDITED"
          }));
       },
 

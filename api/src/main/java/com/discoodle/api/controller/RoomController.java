@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -98,6 +99,35 @@ public class RoomController {
 				if (m.getId().equals(messageID)) {
 					messages.remove(m);
 					System.out.println(messages);
+					Path path = Paths.get(ApiApplication.RESSOURCES + "static/common/json/"+roomUUID+".json");
+					try (Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
+						gson.toJson(gson.toJsonTree(messages), writer);
+					}
+					return;
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Getter
+	@AllArgsConstructor
+	static class EditMessageRequest {
+		private final Integer messageID;
+		private final String content;
+	}
+
+	@PutMapping(path = "/api/room/editMessage/{roomUUID}")
+	public void editMessage(@PathVariable String roomUUID, @RequestBody EditMessageRequest messageRequest) {
+		Gson gson = new Gson();
+		try {
+			JsonReader reader = new JsonReader(new FileReader(ApiApplication.RESSOURCES + "static/common/json/"+roomUUID+".json"));
+			LinkedList<Message> messages = gson.fromJson(reader, new TypeToken<LinkedList<Message>>(){}.getType());
+			for (Message m : messages) {
+				if (m.getId().equals(messageRequest.getMessageID())) {
+					m.setContent(messageRequest.getContent());
+					m.setEdited(true);
 					Path path = Paths.get(ApiApplication.RESSOURCES + "static/common/json/"+roomUUID+".json");
 					try (Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
 						gson.toJson(gson.toJsonTree(messages), writer);

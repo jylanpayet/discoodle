@@ -14,6 +14,7 @@ public class Message {
 	private String sender;
 	private String messageDate;
 	private boolean pinned;
+	private boolean edited;
 
 	private final String type;
 
@@ -26,5 +27,6 @@ public class Message {
 		this.pinned = pinned;
 		this.convUUID = convUUID;
 		this.type = "MESSAGE";
+		this.edited = false;
 	}
 }

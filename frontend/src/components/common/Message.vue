@@ -1,12 +1,21 @@
 <template>
    <div class="Message" :style="belongToMyself ? { justifyContent: 'flex-end' } : { justifyContent: 'flex-start' }">
       <div @mouseover="showPin = true" @mouseleave="showPin = false" class="content" :style="!belongToMyself ? { flexDirection: 'row-reverse' } : { flexDirection: 'row' }">
-         <div :class="mention ? 'message-content mention' : 'message-content'" v-html="displayMessage(content, true, true, true)" :style="belongToMyself ? { marginRight: '10px', backgroundColor: '#e85c5c', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: getTheme ? '#C4C4C4' : '#F4F4F4' }">
+         <span v-if="isEdited" style="color: #7f7f7f; margin-left: 20px; margin-right: 20px; font-weight: 500; font-size: 11px;">
+            (Modifié)
+         </span>
+         <div v-if="!messageEdit" :class="mention ? 'message-content mention' : 'message-content'" v-html="displayMessage(content, true, true, true)" :style="belongToMyself ? { marginRight: '10px', backgroundColor: '#e85c5c', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: getTheme ? '#C4C4C4' : '#F4F4F4' }">
 
+         </div>
+         <div v-else :class="mention ? 'message-content mention' : 'message-content'" :style="belongToMyself ? { marginRight: '10px', backgroundColor: '#e85c5c', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: getTheme ? '#C4C4C4' : '#F4F4F4' }">
+            <input type="text" :value="content" @keydown="actionInput">
          </div>
          <div class="buttons" v-if="showPin" :style="belongToMyself ? { left: 0 } : { right: 0 }">
             <button class="pin-message" @click="pinMessage">
                <img src="../../assets/pin.png" alt="">
+            </button>
+            <button class="edit-message" @click="messageEdit = true" v-if="belongToMyself">
+               <img src="../../assets/pen.svg" alt="Pen">
             </button>
             <button class="delete-message" @click="deleteMessage" v-if="belongToMyself">
                X
@@ -63,6 +72,11 @@ export default {
       messageID: {
          type: Number,
          required: true,
+      },
+      isEdited: {
+         type: Boolean,
+         required: true,
+         default: false,
       }
    },
    methods: {
@@ -108,6 +122,27 @@ export default {
       deleteMessage() {
          axios.put(`http://localhost:8080/api/room/deleteMessage/${this.getCurrentConv}?messageID=${this.messageID}`);
          this.$emit('deletedMessage', this.messageID);
+      },
+      editMessage(content) {
+         axios.put(`http://localhost:8080/api/room/editMessage/${this.getCurrentConv}`, {
+            messageID: this.messageID,
+            content: content
+         })
+         this.$emit('editedMessage', this.messageID, content);
+      },
+
+      actionInput(event) {
+         const input = document.querySelector(".message-content > input")
+         if (event.keyCode === 13) {
+            if (input.value === "")
+               this.deleteMessage();
+            else
+               this.editMessage(input.value);
+            this.messageEdit = false;
+         } else {
+            this.messageEdit = event.keyCode !== 27;
+            input.value = this.displayMessage(input.value, false, true, false);
+         }
       }
    },
    computed: {
@@ -116,7 +151,8 @@ export default {
    data() {
       return {
          mention: false,
-         showPin: false
+         showPin: false,
+         messageEdit: false
       }
    }
 }
@@ -186,6 +222,7 @@ export default {
    position: absolute;
    background-color: #454150;
    border-radius: 12px;
+   height: 30px;
 
    display: flex;
    flex-direction: row;
@@ -200,6 +237,7 @@ export default {
    height: 30px;
    width: 30px;
    border: none;
+   border-radius: 12px;
    outline: none;
    background: none;
    cursor: pointer;
@@ -208,23 +246,18 @@ export default {
    justify-content: center;
 }
 
-.pin-message:hover {
-   transform: scale(1.1);
-}
-
 .buttons > button > img {
    height: 15px;
    width: 15px;
 }
 
-.buttons:active {
+.buttons > button:focus {
    background-color: #E85C5C;
    color: #f4f4f4;
 }
 .delete-message {
    font-weight: 600;
    color: #f4f4f4;
-   border-radius: 12px;
 }
 .delete-message:hover {
    color: #E85C5C;
@@ -232,6 +265,16 @@ export default {
 .delete-message:active {
    background-color: #E85C5C;
    color: #f4f4f4;
+}
+
+.message-content > input {
+   border: none;
+   outline: none;
+   background-color: #ff8888;
+   border-radius: 6px;
+   color: #f4f4f4;
+   height: 30px;
+   padding-left: 4px;
 }
 
 @keyframes appear-right {
