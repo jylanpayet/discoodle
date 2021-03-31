@@ -52,7 +52,7 @@
          </span>
          <div>
             <input type="text" autocomplete="off" :placeholder="`Envoyer un message à ${ $route.query.name }`"
-                   @keypress="actionInput">
+                   @keydown="actionInput">
             <div class="right-side-input">
                <button style="height: 32px; width: 32px;">
                   <img src="../assets/happy.svg" alt="Smiley">
