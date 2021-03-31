@@ -100,9 +100,11 @@ export default {
          return marked(content);
       },
       filterPing(content) {
-         if (content.includes(`@${this.getUser.username}`)) {
+         if (content.match(`(@${this.getUser.username})$|(@${this.getUser.username} )`)) {
             this.mention = true;
             return content.replaceAll(`@${this.getUser.username}`, `@${this.getUser.name}`);
+         } else {
+            this.mention = false;
          }
          return content;
       },
@@ -212,8 +214,8 @@ export default {
 }
 
 .mention {
-   color: #ffffff !important;
-   background-color: #dea80a !important;
+   color: #2d2d2d !important;
+   background-color: #5cb0e8 !important;
    font-size: 17px;
    font-weight: 700 !important;
 }

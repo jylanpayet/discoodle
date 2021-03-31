@@ -54,7 +54,7 @@
             <input type="text" autocomplete="off" :placeholder="`Envoyer un message à ${ $route.query.name }`"
                    @keydown="actionInput">
             <div class="right-side-input">
-               <EmojiPicker @selected-emoji="insertEmoji" @closeEmoji="showEmojis = false" v-if="showEmoji" class="emojiPicker" />
+               <EmojiPicker @selected-emoji="insertEmoji" @closeEmoji="showEmoji = false" v-if="showEmoji" class="emojiPicker" />
                <button style="height: 32px; width: 32px;" @click="showEmoji = !showEmoji">
                   <img src="../assets/happy.svg" alt="Smiley">
                </button>
@@ -428,6 +428,7 @@ button {
 }
 
 .right-side-input {
+   position: relative;
    display: flex;
    flex-direction: row;
    align-items: center;

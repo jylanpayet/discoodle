@@ -1,10 +1,14 @@
 <template>
    <div class="EmojiPicker">
       <div class="search-emojis">
-         <input type="text" spellcheck="false" placeholder="Recherchez un emoji ..." autocomplete="false">
-         <button style="margin-left: 10px; outline: none; border: none; background-color: #E85C5C; color: #f4f4f4; font-weight: 500; height: 20px; width: 20px; border-radius: 50px; cursor: pointer;" @click="$emit('closeEmoji')">X</button>
+         <input type="text" spellcheck="false" placeholder="Recherchez un emoji ..." @keydown="searchEmoji"
+                autocomplete="false">
+         <button
+               style="margin-left: 10px; outline: none; border: none; background-color: #E85C5C; color: #f4f4f4; font-weight: 500; height: 20px; width: 20px; border-radius: 50px; cursor: pointer;"
+               @click="$emit('closeEmoji')">X
+         </button>
       </div>
-      <div class="category-select">
+      <div class="category-select" v-if="!showSearch">
          <span style="color: #f4f4f4">Catégorie :</span>
          <button @click="changeCategory(0)" :style="category.indexOf(true) === 0 ? { backgroundColor: '#E85C5C' } : {}">
             😄
@@ -22,22 +26,32 @@
             💯
          </button>
       </div>
-      <div class="emojiList">
+      <div class="emojiList" v-if="!showSearch">
          <div class="People" v-if="category[0]">
-            <span :key="emoji" v-for="emoji of categorizedEmojis['People']" @click="$emit('selected-emoji', emoji)" >{{ emoji }}</span>
+            <span :key="emoji" v-for="emoji of categorizedEmojis['People']"
+                  @click="$emit('selected-emoji', emoji)">{{ emoji }}</span>
          </div>
          <div class="Nature" v-if="category[1]">
-            <span :key="emoji" v-for="emoji of categorizedEmojis['Nature']" @click="$emit('selected-emoji', emoji)" >{{ emoji }}</span>
+            <span :key="emoji" v-for="emoji of categorizedEmojis['Nature']"
+                  @click="$emit('selected-emoji', emoji)">{{ emoji }}</span>
          </div>
          <div class="Objects" v-if="category[2]">
-            <span :key="emoji" v-for="emoji of categorizedEmojis['Objects']" @click="$emit('selected-emoji', emoji)" >{{ emoji }}</span>
+            <span :key="emoji" v-for="emoji of categorizedEmojis['Objects']"
+                  @click="$emit('selected-emoji', emoji)">{{ emoji }}</span>
          </div>
          <div class="Places" v-if="category[3]">
-            <span :key="emoji" v-for="emoji of categorizedEmojis['Places']" @click="$emit('selected-emoji', emoji)" >{{ emoji }}</span>
+            <span :key="emoji" v-for="emoji of categorizedEmojis['Places']"
+                  @click="$emit('selected-emoji', emoji)">{{ emoji }}</span>
          </div>
          <div class="Symbols" v-if="category[4]">
-            <span :key="emoji" v-for="emoji of categorizedEmojis['Symbols']" @click="$emit('selected-emoji', emoji)" >{{ emoji }}</span>
+            <span :key="emoji" v-for="emoji of categorizedEmojis['Symbols']"
+                  @click="$emit('selected-emoji', emoji)">{{ emoji }}</span>
          </div>
+      </div>
+      <div class="filtered-emojis" v-else>
+         <span :key="emojis" v-for="emojis in searchedEmoji">
+            {{ emojis.emoji }}
+         </span>
       </div>
    </div>
 </template>
@@ -51,8 +65,10 @@ export default {
    data() {
       return {
          categorizedEmojis: emojis,
-         allEmojis: emojis_uncathegorized,
-         category: [true, false, false, false, false]
+         allEmoji: [],
+         searchedEmoji: [],
+         category: [true, false, false, false, false],
+         showSearch: false,
       }
    },
    methods: {
@@ -61,6 +77,32 @@ export default {
             this.category[i] = i === index;
          }
       },
+      searchEmoji(event) {
+         let inputValue = document.querySelector(".search-emojis > input").value.trim();
+         if (inputValue.length > 0 && event.keyCode >= 65 && event.keyCode <= 90) {
+            this.showSearch = true;
+            inputValue += event.key;
+            this.searchedEmoji = this.allEmoji.filter(elt =>
+                  elt.name.match(inputValue)
+            );
+         } else if (event.keyCode === 8 && inputValue.length > 2) {
+            inputValue = inputValue.substring(0, Math.max(0, inputValue.length - 1));
+            this.searchedEmoji = this.allEmoji.filter(elt =>
+                  elt.name.match(inputValue)
+            );
+         } else {
+            document.querySelector(".search-emojis > input").value = "";
+            this.showSearch = false;
+         }
+      }
+   },
+   mounted() {
+      for (let key in emojis_uncathegorized) {
+         this.allEmoji.push({
+            name: key,
+            emoji: emojis_uncathegorized[key]
+         })
+      }
    }
 }
 </script>
@@ -109,6 +151,8 @@ export default {
    align-items: center;
    justify-content: center;
 
+   margin-bottom: 5px;
+
    height: 10%;
    width: 100%;
 }
@@ -153,6 +197,7 @@ export default {
 }
 
 .category-select {
+   margin-bottom: 2px;
    position: relative;
    height: 30px;
    width: 100%;
@@ -170,7 +215,7 @@ export default {
    background-color: #7f7f7f;
    border-radius: 50px;
    display: flex;
-   align-items: center;
+   padding-top: 2px;
    justify-content: center;
    cursor: pointer;
    font-size: 14px;
@@ -179,6 +224,10 @@ export default {
 .category-select > button:hover {
    background-color: #E85C5C;
    font-size: 16px;
+}
+
+.filtered-emojis {
+   width: 100%;
 }
 
 
