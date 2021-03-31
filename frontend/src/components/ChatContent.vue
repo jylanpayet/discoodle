@@ -40,7 +40,11 @@
                   :belong-to-myself="message.sender === user"
                   :message-date="message.messageDate"
                   :message-i-d="message.id"
-                  @pinnedMessage="pinnedMessage" />
+                  :is-edited="message.edited"
+                  @pinnedMessage="pinnedMessage"
+                  @deletedMessage="deletedMessage"
+                  @editedMessage="editedMessage"
+         />
       </div>
       <div class="conv-input">
          <span>
@@ -48,7 +52,7 @@
          </span>
          <div>
             <input type="text" autocomplete="off" :placeholder="`Envoyer un message à ${ $route.query.name }`"
-                   @keypress="actionInput">
+                   @keydown="actionInput">
             <div class="right-side-input">
                <button style="height: 32px; width: 32px;">
                   <img src="../assets/happy.svg" alt="Smiley">
@@ -168,6 +172,7 @@ export default {
                   sender: message.sender,
                   messageDate: message.messageDate,
                   pinned: message.pinned,
+                  edited: false,
                   // TODO : Add messageReactions implementation.
                   // messageReactions: message.messageReactions
                })
@@ -185,11 +190,22 @@ export default {
                      this.pinned.push(elt);
                });
             } else if (message.type === "UNPINNED") {
-               let c = 0;
+               this.pinned = this.pinned.filter(elt => elt.id !== message.id);
+            } else if (message.type === "DELETED") {
+               this.messages = this.messages.filter(elt => elt.id !== message.id);
+               this.pinned = this.pinned.filter(elt => elt.id !== message.id);
+            } else if (message.type === "EDITED") {
+               this.messages.forEach(elt => {
+                  if (elt.id === message.id) {
+                     elt.content = message.content;
+                     elt.edited = true;
+                  }
+               });
                this.pinned.forEach(elt => {
-                  if (elt.id === message.id)
-                     this.pinned.splice(c, 1);
-                  c++;
+                  if (elt.id === message.id) {
+                     elt.content = message.content;
+                     elt.edited = true;
+                  }
                });
             }
          }
@@ -208,6 +224,7 @@ export default {
                sender: this.user,
                messageDate: date,
                pinned: false,
+               edited: false,
                convUUID: this.getCurrentConv,
                // messageReactions: []
 
@@ -253,6 +270,19 @@ export default {
                this.pinned.push(elt);
             }
          })
+      },
+      deletedMessage(messageID) {
+         stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify({
+            id: messageID,
+            type: "DELETED"
+         }));
+      },
+      editedMessage(messageID, content) {
+         stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify({
+            id: messageID,
+            content: content,
+            type: "EDITED"
+         }));
       },
 
       filterEmoji(content){
