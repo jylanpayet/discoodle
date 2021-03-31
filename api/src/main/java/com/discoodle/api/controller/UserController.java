@@ -33,7 +33,7 @@ public class UserController {
 
     @RequestMapping(value = "/infos/{user_id}", method = GET)
     @ResponseBody
-    public Optional<User> getUserByID(@PathVariable Integer user_id){
+    public Optional<User> getUserByID(@PathVariable Long user_id){
         return userService.getUserByID(user_id);
     }
 
@@ -42,14 +42,44 @@ public class UserController {
         userService.addNewUser(user);
     }
 
-    @DeleteMapping(path = "{userID}")
-    public void deleteUser(@PathVariable("userID") Integer userId) {
+    @DeleteMapping(path = "{user_id}")
+    public void deleteUser(@PathVariable("user_id") Integer userId) {
         userService.deleteUser(userId);
     }
 
-    @GetMapping(path = "/seeAllRooms/{user_ID}")
+    @GetMapping(path = "/seeAllRooms/{user_id}")
     @ResponseBody
-    public List<Room> findAllRoomsByUserID(@PathVariable Integer user_ID) {
+    public List<Room> findAllRoomsByUserID(@PathVariable Long user_ID) {
         return userService.getUserByID(user_ID).get().getRooms();
+    }
+
+    @PostMapping(path = "changeUsername/{user_id}")
+    public Optional<User> changeUsername(@PathVariable Long user_id, @RequestBody User.RegistrationRequest request) {
+        return userService.changeUsername(user_id, request.getUsername());
+    }
+
+    @PostMapping(path = "changeMail/{user_id}")
+    public Optional<User> changeMail(@PathVariable Long user_id, @RequestBody User.RegistrationRequest request) {
+        return userService.changeMail(user_id, request.getMail());
+    }
+
+    @PostMapping(path = "changePassword/{user_id}")
+    public Optional<User> changePassword(@PathVariable Long user_id, @RequestBody User.RegistrationRequest request) {
+        return userService.changePassword(user_id, request.getPassword());
+    }
+
+    @PostMapping(path = "changeName/{user_id}")
+    public Optional<User> changeName(@PathVariable Long user_id, @RequestBody User.RegistrationRequest request) {
+        return userService.changeName(user_id, request.getName());
+    }
+
+    @PostMapping(path = "changeLastName/{user_id}")
+    public Optional<User> changeLastName(@PathVariable Long user_id, @RequestBody User.RegistrationRequest request) {
+        return userService.changeLastName(user_id, request.getLast_name());
+    }
+
+    @PostMapping(path = "changeLinkToAvar/{user_id}")
+    public Optional<User> changeLinkToAvatar(@PathVariable Long user_id, @RequestBody User.RegistrationRequest request) {
+        return userService.changeLinkToAvatar(user_id, request.getLink_to_avatar());
     }
 }

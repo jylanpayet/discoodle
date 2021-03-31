@@ -3,7 +3,7 @@
       <div class="left-pannel">
          <div class="settings-box">
             <div>
-               <div class="add-conversation" @click="showPopUp = true">
+               <div class="add-conversation" @click="$emit('activatePopUp')">
                   +
                </div>
                <AddConversation v-if="showPopUp" @groupAdded="addNewGroup" @desactivatePopUp="showPopUp = false" />
@@ -12,14 +12,14 @@
             </div>
          </div>
          <div class="convs-list">
-            <router-link :key="convs.uuid" v-for="convs in convList" :to="`/messages/${convs.uuid}?name=${convs.name}`"
-                         @click="setConvUUID(convs.uuid)">
+            <router-link :key="convs.room_id" v-for="convs in convList" :to="`/messages/${convs.room_id}?name=${convs.room_name}`"
+                         @click="setConvUUID(convs.room_id)">
                <div class="link-content">
                   <div class="user-logo">
-                     {{ convs.name.charAt(0).toUpperCase() }}
+                     {{ convs.room_name.charAt(0).toUpperCase() }}
                   </div>
                   <div class="conv-name">
-                     {{ convs.name }}
+                     {{ convs.room_name }}
                   </div>
                </div>
             </router-link>
@@ -54,7 +54,7 @@ export default {
       addNewGroup(group) {
          this.convList.unshift({
             link_picture: group.link_picture,
-            name: group.name,
+            room_name: group.name,
             uuid: group.uuid,
          })
       }

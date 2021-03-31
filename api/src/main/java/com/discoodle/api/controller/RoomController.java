@@ -13,9 +13,9 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
 import java.io.FileReader;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
@@ -32,8 +32,18 @@ public class RoomController {
 
 
 	@PostMapping(path = "/api/room/addNewRoom")
-	public Room addNewRoom(@RequestBody RoomRequest request){
-		return roomService.createNewRoom(request);
+	public Room addNewRoom(@RequestBody Room.RoomRequest request){
+		return roomService.createNewRoom(request.getRoom_name(), request.getRoom_members());
+	}
+
+	@PostMapping(path = "/api/room/{room_id}/room.add")
+	public Optional<Room> addNewMembers(@PathVariable String room_id, @RequestBody Room.RoomRequest request){
+		return roomService.addNewMembers(room_id, request.getRoom_members());
+	}
+
+	@PostMapping(path = "/api/room/changeLinkPicture/{room_id}")
+	public Optional<Room> changeLinkPicture(@PathVariable String room_id, @RequestBody Room.RoomRequest request){
+		return roomService.changeLinkPicture(room_id, request.getLink_picture());
 	}
 
 	@MessageMapping("/{roomUUID}/room.send")

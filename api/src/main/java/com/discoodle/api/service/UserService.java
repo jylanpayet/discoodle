@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,7 +32,7 @@ public class UserService implements UserDetailsService {
         return userRepository.findUserByUserName(username);
     }
 
-    public Optional<User> getUserByID(Integer user_id) {
+    public Optional<User> getUserByID(Long user_id) {
         return userRepository.findUserByID(user_id);
     }
 
@@ -60,31 +61,31 @@ public class UserService implements UserDetailsService {
     }
 
     public String signUpUser(User user) {
-        boolean userExist = userRepository.findUserByMail(user.getMail()).isPresent();
+            boolean userExist = userRepository.findUserByMail(user.getMail()).isPresent();
 
-        if (userExist) {
-            throw new IllegalStateException("L'email est déjà utilisé.");
-        }
+            if (userExist) {
+                return "L'email est déjà utilisé.";
+            }
 
-        String passwordEncoded = bCryptPasswordEncoder.encode(user.getPassword());
-        user.setPassword(passwordEncoded);
+            String passwordEncoded = bCryptPasswordEncoder.encode(user.getPassword());
+            user.setPassword(passwordEncoded);
 
-        userRepository.save(user);
+            userRepository.save(user);
 
-        String token = UUID.randomUUID().toString();
-        ConfirmationToken confirmationToken = new ConfirmationToken(
-                token,
-                LocalDateTime.now(),
-                LocalDateTime.now().plusMinutes(15),
-                user
-        );
+            String token = UUID.randomUUID().toString();
+            ConfirmationToken confirmationToken = new ConfirmationToken(
+                    token,
+                    LocalDateTime.now(),
+                    LocalDateTime.now().plusMinutes(15),
+                    user
+            );
 
-        confirmationTokenService.saveConfirmationToken(confirmationToken);
-        return token;
+            confirmationTokenService.saveConfirmationToken(confirmationToken);
+            return token;
     }
 
     public Boolean login(String username, String password) {
-        if(userRepository.findUserByUserName(username).isPresent() && userRepository.findUserByUserName(username).get().isEnabled()) {
+        if(userRepository.findUserByUserName(username).isPresent() /*&& userRepository.findUserByUserName(username).get().isEnabled()*/) {
             return bCryptPasswordEncoder.matches(password, userRepository.findUserByUserName(username).get().getPassword());
         }
         return false;
@@ -94,4 +95,48 @@ public class UserService implements UserDetailsService {
         return userRepository.enableUser(mail);
     }
 
+    public Optional<User> changeUsername(Long user_id, String username) {
+        if(!userRepository.findUserByUserName(username).isPresent() && userRepository.changeUsername(user_id, username) == 1) {
+            return userRepository.findUserByID(user_id);
+        }
+        return null;
+    }
+
+    public Optional<User> changeMail(Long user_id, String mail) {
+        if(mail.matches("^(.+)@(.+)$") && !userRepository.findUserByMail(mail).isPresent() && userRepository.changeMail(user_id, mail) == 1) {
+         return userRepository.findUserByID(user_id);
+        }
+        return null;
+    }
+
+    public Optional<User> changePassword(Long user_id, String password) {
+        if(password.matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}")) {
+            String passwordEncoded = bCryptPasswordEncoder.encode(password);
+            if(userRepository.changePassword(user_id, passwordEncoded) == 1) {
+                return userRepository.findUserByID(user_id);
+            }
+        }
+        return null;
+    }
+
+    public Optional<User> changeName(Long user_id, String name) {
+        if(userRepository.changeName(user_id, name) == 1) {
+            return userRepository.findUserByID(user_id);
+        }
+        return null;
+    }
+
+    public Optional<User> changeLastName(Long user_id, String last_name) {
+            if(userRepository.changeLastName(user_id, last_name) == 1) {
+                return userRepository.findUserByID(user_id);
+            }
+        return null;
+    }
+
+    public Optional<User> changeLinkToAvatar(Long user_id, String link_to_avatar) {
+        if(userRepository.changeLinkToAvar(user_id, link_to_avatar) == 1) {
+            return userRepository.findUserByID(user_id);
+        }
+        return null;
+    }
 }
