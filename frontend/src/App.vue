@@ -76,11 +76,6 @@ export default {
             this.setUser(user);
          });
       }
-   },
-   data() {
-      return {
-         showPopUp: false
-      }
    }
 }
 </script>

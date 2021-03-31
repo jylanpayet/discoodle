@@ -19,15 +19,15 @@ public class RoomService {
                 room_members.get(0)
         );
         Room finalRoom = roomRepository.save(room);
-        for(int i = 0; i < room_members.size(); i++) {
-            roomRepository.addNewMembers(room_members.get(i), finalRoom.getRoom_id());
+        for (Integer room_member : room_members) {
+            roomRepository.addNewMembers(room_member, finalRoom.getRoom_id());
         }
         return finalRoom;
     }
 
     public Optional<Room> addNewMembers(String room_id, List<Integer> room_members) {
-        for(int i = 0; i < room_members.size(); i++) {
-            roomRepository.addNewMembers(room_members.get(i), room_id);
+        for (Integer room_member : room_members) {
+            roomRepository.addNewMembers(room_member, room_id);
         }
         return roomRepository.findRoomByUUID(room_id);
     }

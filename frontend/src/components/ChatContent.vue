@@ -54,7 +54,8 @@
             <input type="text" autocomplete="off" :placeholder="`Envoyer un message à ${ $route.query.name }`"
                    @keydown="actionInput">
             <div class="right-side-input">
-               <button style="height: 32px; width: 32px;">
+               <EmojiPicker @selected-emoji="insertEmoji" @closeEmoji="showEmojis = false" v-if="showEmoji" class="emojiPicker" />
+               <button style="height: 32px; width: 32px;" @click="showEmoji = !showEmoji">
                   <img src="../assets/happy.svg" alt="Smiley">
                </button>
                <button class="submit-file">
@@ -74,12 +75,14 @@ import axios from 'axios';
 import marked from "marked";
 import Message from "@/components/common/Message";
 import emojis from "@/assets/emojis_uncathegorized";
+import EmojiPicker from "@/components/common/EmojiPicker";
 
 let stompClient = null;
 
 export default {
    name: "ChatContent",
    components: {
+      EmojiPicker,
       Message
    },
    data() {
@@ -89,6 +92,7 @@ export default {
          user: "",
          writers: [],
          showPinned: false,
+         showEmoji: false,
          pinAdd: false,
       }
    },
@@ -316,6 +320,10 @@ export default {
             content = this.filterMarkdown(content);
          return content;
       },
+
+      insertEmoji(emoji) {
+         document.querySelector(".conv-input > div > input").value += emoji;
+      }
    },
    computed: {
       ...mapGetters(['getColors', 'getTheme', 'getCurrentConv', 'getUser'])
@@ -544,6 +552,13 @@ button {
 
 .unpin-message:hover {
    transform: scale(1.1);
+}
+
+.emojiPicker {
+   position: absolute;
+   top: -10px;
+   left: 32px;
+   transform: translateX(-100%) translateY(-100%);
 }
 
 @keyframes appear-opacity {

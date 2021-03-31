@@ -49,8 +49,8 @@ public class UserController {
 
     @GetMapping(path = "/seeAllRooms/{user_id}")
     @ResponseBody
-    public List<Room> findAllRoomsByUserID(@PathVariable Long user_ID) {
-        return userService.getUserByID(user_ID).get().getRooms();
+    public List<Room> findAllRoomsByUserID(@PathVariable Long user_id) {
+        return userService.getUserByID(user_id).get().getRooms();
     }
 
     @PostMapping(path = "changeUsername/{user_id}")
