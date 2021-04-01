@@ -23,6 +23,15 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT user FROM User user where user.mail = ?1")
     Optional<User> findUserByMail(String mail);
 
+    @Query("SELECT friendships FROM Friendships friendships where friendships.receiver_id = ?1 AND friendships.status = false")
+    List<Friendships> getFriendList(Long user_id);
+
+    @Query("SELECT friendships.sender_id FROM Friendships friendships where friendships.receiver_id = ?1")
+    List<Long> getFriendListForReceiver(Long user_id);
+
+    @Query("SELECT friendships.receiver_id FROM Friendships friendships where friendships.sender_id = ?1")
+    List<Long> getFriendListForSender(Long user_id);
+
     @Transactional
     @Modifying
     @Query("UPDATE User user SET user.enabled = true WHERE user.mail = ?1")

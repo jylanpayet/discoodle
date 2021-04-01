@@ -13,9 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -102,6 +100,17 @@ public class UserService implements UserDetailsService {
 
     public int enableUser(String mail) {
         return userRepository.enableUser(mail);
+    }
+
+    public List<User> getFriendList(Long user_id) {
+        List<Long> list = userRepository.getFriendListForReceiver(user_id);
+        list.addAll(userRepository.getFriendListForSender(user_id));
+        List<User> res = new LinkedList<>();
+        for (int i = 0; i < list.size(); i++) {
+            Optional<User> tmp = userRepository.findUserByID(list.get(i));
+            tmp.ifPresent(res::add);
+        }
+        return res;
     }
 
     public Optional<User> changeUsername(Long user_id, String username) {

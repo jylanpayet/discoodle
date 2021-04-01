@@ -53,6 +53,12 @@ public class UserController {
         return userService.getUserByID(user_id).get().getRooms();
     }
 
+    @GetMapping(path = "/seeAllFriends/{user_id}")
+    @ResponseBody
+    public List<User> getFriendList(@PathVariable Long user_id) {
+        return userService.getFriendList(user_id);
+    }
+
     @PostMapping(path = "changeUsername/{user_id}")
     public Optional<User> changeUsername(@PathVariable Long user_id, @RequestBody User.RegistrationRequest request) {
         return userService.changeUsername(user_id, request.getUsername());
