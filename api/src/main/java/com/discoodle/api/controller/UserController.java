@@ -1,5 +1,6 @@
 package com.discoodle.api.controller;
 
+import com.discoodle.api.model.Groups;
 import com.discoodle.api.model.Room;
 import com.discoodle.api.model.User;
 import com.discoodle.api.service.UserService;
@@ -51,5 +52,11 @@ public class UserController {
     @ResponseBody
     public List<Room> findAllRoomsByUserID(@PathVariable Integer user_ID) {
         return userService.getUserByID(user_ID).get().getRooms();
+    }
+
+    @GetMapping(path = "/seeAllGroups/{user_ID}")
+    @ResponseBody
+    public List<Groups> findAllGroupsByUserID(@PathVariable Integer user_ID){
+        return userService.getUserByID(user_ID).get().getGroups();
     }
 }
