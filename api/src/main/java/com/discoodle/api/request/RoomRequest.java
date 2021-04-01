@@ -1,4 +1,4 @@
-package com.discoodle.api.model;
+package com.discoodle.api.request;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;

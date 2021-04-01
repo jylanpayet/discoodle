@@ -1,5 +1,6 @@
-package com.discoodle.api.model;
+package com.discoodle.api.request;
 
+import com.discoodle.api.model.User;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

@@ -1,6 +1,6 @@
 package com.discoodle.api.service;
 
-import com.discoodle.api.model.RegistrationRequest;
+import com.discoodle.api.request.RegistrationRequest;
 import com.discoodle.api.model.User;
 
 import com.discoodle.api.security.mailConfirmation.MailSender;
