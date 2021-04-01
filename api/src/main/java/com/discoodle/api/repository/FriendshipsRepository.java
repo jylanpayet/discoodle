@@ -10,7 +10,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 public interface FriendshipsRepository extends JpaRepository<Friendships, Long> {
-    @Query("SELECT friendships FROM Friendships friendships where friendships.receiver_id = ?1")
+    @Query("SELECT friendships FROM Friendships friendships where friendships.receiver_id = ?1 AND friendships.status = false")
     List<Friendships> getAllInvitations(Long user_id);
 
     @Transactional
