@@ -37,6 +37,8 @@ public class UserService implements UserDetailsService {
         return userRepository.findUserByID(user_id);
     }
 
+    public Optional<User.Role> findUserByRole(User.Role role){return userRepository.findUserByRole(role); }
+
     public void addNewUser(User user) {
         Optional<User> TestPseudo = userRepository.findUserByUserName(user.getUsername());
         Optional<User> TestMail = userRepository.findUserByMail(user.getMail());

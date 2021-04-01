@@ -29,6 +29,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT friendships.receiver_id FROM Friendships friendships where friendships.sender_id = ?1 AND friendships.status = true")
     List<Long> getFriendListForSender(Long user_id);
 
+    @Query("SELECT user FROM User user where user.role= ?1")
+    Optional<User.Role> findUserByRole(User.Role role);
+
     @Transactional
     @Modifying
     @Query("UPDATE User user SET user.enabled = true WHERE user.mail = ?1")
