@@ -18,7 +18,7 @@ public class FriendshipsController {
         return friendshipService.inviteMembers(user_id, friends_id.getFriendships());
     }
 
-    @PostMapping(path = "getAllInvitations/{user_id}")
+    @GetMapping(path = "getAllInvitations/{user_id}")
     public List<Friendships> getAllInvitations(@PathVariable Long user_id) {
         return friendshipService.getAllInvitations(user_id);
     }

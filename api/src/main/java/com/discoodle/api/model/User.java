@@ -59,13 +59,6 @@ public class User {
 
     @JsonIgnore
     @ManyToMany
-    @JoinTable( name = "link_users_friends",
-            joinColumns = @JoinColumn( name = "user_id" ),
-            inverseJoinColumns = @JoinColumn( name = "friends_id", referencedColumnName = "user_id"))
-    private List<User> friends = new ArrayList<>();
-
-    @JsonIgnore
-    @ManyToMany
     @JoinTable( name = "link_rooms_users",
             joinColumns = @JoinColumn( name = "user_id" ),
             inverseJoinColumns = @JoinColumn( name = "room_id" )
