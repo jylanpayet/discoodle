@@ -41,4 +41,12 @@ public class Room {
             joinColumns = @JoinColumn( name = "room_id" ),
             inverseJoinColumns = @JoinColumn( name = "user_id" ) )
     private List<User> users = new ArrayList<>();
+
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable( name = "link_groups_to_room",
+            joinColumns = @JoinColumn( name ="room_id"),
+            inverseJoinColumns = @JoinColumn( name ="groups_id" ))
+    private List<Groups> groups= new ArrayList<>();
+
 }

@@ -17,7 +17,6 @@ public class GroupsController {
         groupsService.createNewGroup(request);
     }
 
-
     @PostMapping(path = "/api/groups/editRights")
     public void editGroupRights(@RequestBody GroupRightsRequest request) {
         groupsService.editRights(request);
@@ -32,4 +31,7 @@ public class GroupsController {
     public void editGroup(@RequestBody EditGroupRequest request){
         groupsService.editGroup(request);
     }
+
+    @PostMapping(path = "/api/groups/editFileGroup/{groups_id}")
+    public void editFileGroup(@PathVariable("groups_id") Long groups_ID, @RequestBody GroupsRequest request){ groupsService.editFileGroup(groups_ID, request.getText()); }
 }
