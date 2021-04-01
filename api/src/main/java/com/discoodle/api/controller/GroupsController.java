@@ -33,5 +33,5 @@ public class GroupsController {
     }
 
     @PostMapping(path = "/api/groups/editFileGroup/{groups_id}")
-    public void editFileGroup(@PathVariable("groups_id") Long groups_ID, String text){ groupsService.editFileGroup(text, groups_ID); }
+    public void editFileGroup(@PathVariable("groups_id") Long groups_ID, @RequestBody GroupsRequest request){ groupsService.editFileGroup(groups_ID, request.getText()); }
 }

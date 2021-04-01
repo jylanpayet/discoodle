@@ -12,7 +12,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -77,15 +76,14 @@ public class GroupsService {
         return true;
     }
 
-    public void editFileGroup(String text, Long groups_id) {
+    public void editFileGroup(Long groups_id,String text) {
         try {
             File path = new File(String.format("%sstatic/common/groups/%d/%d.json", ApiApplication.RESSOURCES, groups_id, groups_id));
-            Files.writeString(Paths.get(String.valueOf(path)), text+"[\n]");
+            Files.writeString(Paths.get(String.valueOf(path)), text+"\n");
         } catch (Exception e) {
             System.out.println("erreur, fichier non édité");
             e.printStackTrace();
         }
-
     }
 
     public void deleteGroupByID(Integer groups_ID) {
