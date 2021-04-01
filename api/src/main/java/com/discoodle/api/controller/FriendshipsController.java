@@ -23,13 +23,13 @@ public class FriendshipsController {
         return friendshipService.getAllInvitations(user_id);
     }
 
-    @PutMapping(path = "acceptInvitation/{friendships_id}")
-    public void acceptInvitation(@PathVariable Long friendships_id) {
-        friendshipService.acceptInvitation(friendships_id);
+    @PutMapping(path = "acceptInvitation/")
+    public void acceptInvitation(@RequestBody Friendships.FriendshipsRequest request) {
+        friendshipService.acceptInvitation(request.getSender_id(), request.getReceiver_id());
     }
 
-    @DeleteMapping(path = "refuseInvitation/{friendships_id}")
-    public void refuseInvitation(@PathVariable Long friendships_id) {
-        friendshipService.refuseInvitation(friendships_id);
+    @DeleteMapping(path = "refuseInvitation")
+    public void refuseInvitation(@RequestBody Friendships.FriendshipsRequest request) {
+        friendshipService.refuseInvitation(request.getSender_id(), request.getReceiver_id());
     }
 }

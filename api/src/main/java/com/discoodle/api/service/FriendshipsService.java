@@ -2,6 +2,7 @@ package com.discoodle.api.service;
 
 import com.discoodle.api.model.Friendships;
 
+import com.discoodle.api.model.Room;
 import com.discoodle.api.repository.FriendshipsRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,12 +18,12 @@ public class FriendshipsService {
         return friendshipsRepository.getAllInvitations(user_id);
     }
 
-    public void acceptInvitation(Long friendships_id) {
-        friendshipsRepository.acceptInvitation(friendships_id);
+    public void acceptInvitation(Long sender_id, Long receiver_id) {
+        friendshipsRepository.acceptInvitation(sender_id, receiver_id);
     }
 
-    public void refuseInvitation(Long friendships_id) {
-        friendshipsRepository.deleteById(friendships_id);
+    public void refuseInvitation(Long sender_id, Long receiver_id) {
+        friendshipsRepository.refuseInvitation(sender_id, receiver_id);
     }
 
     public String inviteMembers(Long user_id, List<Long> friends_id) {

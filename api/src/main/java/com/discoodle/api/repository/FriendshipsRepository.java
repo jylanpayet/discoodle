@@ -15,6 +15,11 @@ public interface FriendshipsRepository extends JpaRepository<Friendships, Long> 
 
     @Transactional
     @Modifying
-    @Query("UPDATE Friendships friendships SET friendships.status = true WHERE friendships.friendships_id = ?1")
-    void acceptInvitation(Long friendships_id);
+    @Query("UPDATE Friendships friendships SET friendships.status = true WHERE friendships.sender_id = :sender_id AND friendships.receiver_id = :receiver_id")
+    void acceptInvitation(@Param("sender_id") Long sender_id, @Param("receiver_id") Long receiver_id);
+
+    @Transactional
+    @Modifying
+    @Query("DELETE FROM Friendships friendships WHERE friendships.sender_id = :sender_id AND friendships.receiver_id = :receiver_id")
+    void refuseInvitation(@Param("sender_id") Long sender_id, @Param("receiver_id") Long receiver_id);
 }

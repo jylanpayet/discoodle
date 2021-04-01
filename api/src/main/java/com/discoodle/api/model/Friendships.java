@@ -38,5 +38,7 @@ public class Friendships {
     @ToString
     public static class FriendshipsRequest {
         private final List<Long> friendships = new LinkedList<>();
+        private Long sender_id;
+        private Long receiver_id;
     }
 }
