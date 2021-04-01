@@ -67,6 +67,12 @@ public class UserService implements UserDetailsService {
                 return "L'email est déjà utilisé.";
             }
 
+            userExist = userRepository.findUserByUserName(user.getUsername()).isPresent();
+
+            if (userExist) {
+                return "Le nom d'utilisateur est déjà utilisé.";
+            }
+
             String passwordEncoded = bCryptPasswordEncoder.encode(user.getPassword());
             user.setPassword(passwordEncoded);
 

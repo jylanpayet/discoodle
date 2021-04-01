@@ -38,13 +38,15 @@ public class RegistrationService {
             }
             return "Votre mail n'est pas valide.\n";
         }
-        return "Votre mot de passe doit contenir :\n" +
-                "- au moins 8 caractères\n" +
-                "- un chiffre\n" +
-                "- une minuscule\n" +
-                "- une majuscule\n" +
-                "- un caractère spécial\n" +
-                "- pas d'espace, retour à la ligne...\n";
+        return """
+              Votre mot de passe doit contenir :
+              - au moins 8 caractères
+              - un chiffre
+              - une minuscule
+              - une majuscule
+              - un caractère spécial
+              - pas d'espace, retour à la ligne...
+              """;
     }
 
     public Boolean login(User.RegistrationRequest request) {

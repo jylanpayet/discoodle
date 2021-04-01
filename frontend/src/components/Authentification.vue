@@ -74,8 +74,8 @@ export default {
             name: document.querySelector("input[name=name]").value,
             username: document.querySelector("input[name=username]").value,
          }).then(response => {
-            console.log(response);
-            this.showLogin = true;
+            if (response.data.match("([a-z0-9]+-)+[a-z0-9]+"))
+               this.showLogin = true;
          }).catch(error => {
             console.log(error.response);
          });
@@ -85,6 +85,7 @@ export default {
             username: document.querySelector("input[name=userlog]").value,
             password: document.querySelector("input[name=passwordlog]").value,
          }).then(response => {
+            console.log(response.data);
             if (response.data) {
                if (document.querySelector(".login > div > label > input[type=checkbox]").checked)
                   vueCookie.set("username", document.querySelector("input[name=userlog]").value, {expires: '1Y'});

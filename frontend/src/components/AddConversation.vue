@@ -5,7 +5,7 @@
 
          <div>
             <input type="text" placeholder="Entrez un nom de conversation..." name="name_room" @keypress="isEnter">
-            <button>
+            <button @click="addRoom">
                +
             </button>
          </div>
@@ -31,20 +31,25 @@ export default {
       isEnter(event) {
          let inputValue = document.querySelector("input[name=name_room]").value;
          if (event.keyCode === 13 && inputValue.value !== "") {
-            axios.post(`http://localhost:8080/api/room/addNewRoom`, {
-               room_name: inputValue,
-               room_members: [this.getUser.id]
-            }).then(response => {
-               this.$emit('groupAdded', response.data);
-            }).catch(error => {
-               console.log(error.response);
-            });
-            this.$emit('desactivatePopUp');
+            this.addRoom(name);
          }
       },
       clickEvent(event) {
          if (event.target.className === "AddConversation")
             this.$emit('desactivatePopUp');
+      },
+      addRoom(event, name=document.querySelector('.add-conv-box > div > input').value) {
+         axios.post(`http://localhost:8080/api/room/addNewRoom`, {
+            room_name: name,
+            room_members: [this.getUser.id],
+            link_picture: null
+         }).then(response => {
+            this.$emit('groupAdded', response.data);
+            this.$emit('desactivatePopUp');
+         }).catch(error => {
+            console.log(error.response);
+            this.$emit('desactivatePopUp');
+         });
       }
    }
 }

@@ -65,15 +65,17 @@ export default {
             const items = content.getElementsByTagName("item");
             items.forEach(elt => {
                const childs = elt.children;
-               if (childs[0].tagName === "title" && childs[1].tagName === "link" && childs[2].tagName === "description") {
+               if (childs[0]?.tagName === "title" && childs[1]?.tagName === "link" && childs[2]?.tagName === "description" && childs[4]?.tagName === "pubDate") {
                   let temp = {
                      title: childs[0].innerHTML.replace("<![CDATA[", "").replace("]]>", ""),
                      link: childs[1].innerHTML.replace("<![CDATA[", "").replace("]]>", ""),
                      description: childs[2].innerHTML.replace("<![CDATA[", "").replace("]]>", ""),
                      type: "RSS",
-                     user: content.querySelector("channel > title").innerHTML
+                     user: content.querySelector("channel > title").innerHTML,
+                     pubDate: new Date(Date.parse(childs[4].textContent))
                   }
-                  this.posts.splice(this.rand(this.posts.length), 0, temp);
+                  if (temp.pubDate.getFullYear() > new Date().getFullYear() - 1)
+                     this.posts.push(temp);
                }
             });
          });
