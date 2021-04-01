@@ -10,7 +10,6 @@ import com.discoodle.api.repository.GroupRightsRepository;
 import com.discoodle.api.repository.GroupsRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.io.File;
 
 
@@ -36,12 +35,14 @@ public class GroupsService {
 
         if (finalGroup.getType().equals(Groups.TypeOfGroup.SUBJECTS)) {
             try {
-                File dossier = new File((String.format("%sstatic/common/json/Groups/", ApiApplication.RESSOURCES)));
+                File dossier = new File((String.format("%sstatic/common/groups/%d", ApiApplication.RESSOURCES,finalGroup.getGroups_id())));
                 dossier.mkdirs();
-                File fichier = new File((String.format("%sstatic/common/json/Groups/%s.json", ApiApplication.RESSOURCES,finalGroup.getGroups_id())));
-                fichier.createNewFile();
+                if(dossier.exists() && dossier.isDirectory()) {
+                    File fichier = new File((String.format("%sstatic/common/groups/%d/%d.json", ApiApplication.RESSOURCES, finalGroup.getGroups_id(), finalGroup.getGroups_id())));
+                    fichier.createNewFile();
+                }
             } catch (Exception e){
-                System.out.println("Groups non crée !");
+                System.out.println("Dossier du groups non crée !");
             }
         }
         return finalGroup;
@@ -49,8 +50,8 @@ public class GroupsService {
 
     public boolean editRights(GroupRightsRequest request) {
         try {
-            GroupRights ofParent = groupsRepository.findGroupsById(groupsRepository.findParentOfGroup(request.getGroupId())).get().getGroupRights();
-            GroupRights r = groupsRepository.findGroupsById(request.getGroupId()).get().getGroupRights();
+            GroupRights ofParent = groupsRepository.findById(groupsRepository.findParentOfGroup(request.getGroupId())).get().getGroupRights();
+            GroupRights r = groupsRepository.findById(request.getGroupId()).get().getGroupRights();
             if (ofParent.isCanAddUser())
                 rightsRepository.updateRightsAdd(r.getRightsId(), request.isAddUser());
             if (ofParent.isCanDeleteUser())
@@ -73,6 +74,6 @@ public class GroupsService {
     }
 
     public void deleteGroupByID(Integer groups_ID) {
-        groupsRepository.deleteGroupsByID(groups_ID);
+        groupsRepository.deleteById(groups_ID);
     }
 }

@@ -14,8 +14,6 @@ import java.util.Optional;
 @Repository
 public interface GroupsRepository extends JpaRepository<Groups, Integer> {
 
-    @Query(value = "SELECT groups FROM Groups groups where groups.groups_id=?1")
-    Optional<Groups> findGroupsById(Integer id);
 
     @Query(value = "SELECT groups FROM Groups groups where groups.depth=?1")
     Optional<Groups> findAllGroupsByDepth(Integer depth);
@@ -48,10 +46,4 @@ public interface GroupsRepository extends JpaRepository<Groups, Integer> {
     @Query(value = "UPDATE groups g SET g.groups_rights_id=?2 WHERE g.groups_id=?1", nativeQuery = true)
     @Transactional
     void addNewRightsInGroup(@Param("groups_id") Integer groups_ID, @Param("rights_id") Integer right_ID);
-
-    @Modifying
-    @Query(value = "DELETE FROM groups WHERE groups_id=?1", nativeQuery = true)
-    @Transactional
-    void deleteGroupsByID(@Param("group_id") Integer groups_ID);
-
 }
