@@ -62,6 +62,13 @@ public class Groups {
     @JoinColumn(name="groups_rights_id")
     private GroupRights groupRights;
 
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable( name = "link_groups_to_room",
+            joinColumns = @JoinColumn( name ="groups_id"),
+            inverseJoinColumns = @JoinColumn( name ="room_id" ))
+    private List<Room> rooms= new ArrayList<>();
+
     public enum TypeOfGroup{
         DISCOODLE,
         ESTABLISHMENT,

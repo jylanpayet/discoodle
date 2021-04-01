@@ -2,12 +2,14 @@ package com.discoodle.api.service;
 
 import com.discoodle.api.ApiApplication;
 import com.discoodle.api.model.GroupRights;
+import com.discoodle.api.model.Room;
 import com.discoodle.api.request.EditGroupRequest;
 import com.discoodle.api.request.GroupRightsRequest;
 import com.discoodle.api.model.Groups;
 import com.discoodle.api.request.GroupsRequest;
 import com.discoodle.api.repository.GroupRightsRepository;
 import com.discoodle.api.repository.GroupsRepository;
+import com.discoodle.api.request.RoomRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,7 @@ import java.nio.file.Paths;
 public class GroupsService {
     private final GroupsRepository groupsRepository;
     private final GroupRightsRepository rightsRepository;
+    private final RoomService roomService;
 
     public Groups createNewGroup(GroupsRequest request) {
         GroupRights rights = new GroupRights(false, false, false);
@@ -37,6 +40,8 @@ public class GroupsService {
         groupsRepository.addNewMemberInGroup(request.getUser_id(), finalGroup.getGroups_id());
 
         if (finalGroup.getType().equals(Groups.TypeOfGroup.SUBJECTS)) {
+            Room r=roomService.createNewRoom(new RoomRequest(request.getName(),request.getUser_id()));
+            groupsRepository.addNewRoomsInGroup(finalGroup.getGroups_id(),r.getUuid());
             try {
                 File dossier = new File((String.format("%sstatic/common/groups/%d", ApiApplication.RESSOURCES, finalGroup.getGroups_id())));
                 dossier.mkdirs();
