@@ -11,19 +11,19 @@
                      <span class="headerNavbar">MENU</span>
                      <div class="links">
                         <router-link to="/accueil">
-                           <div class="navbar-icon"><img src="./assets/home.png" alt="Home"></div>
+                           <div class="navbar-icon"><img src=assets/home.png alt="Home"></div>
                            <span :style="{ color: getColors.color5 }">ACCUEIL</span></router-link>
                         <router-link to="/cours">
-                           <div class="navbar-icon"><img src="./assets/courses.png" alt="Courses"></div>
+                           <div class="navbar-icon"><img src="assets/courses.png" alt="Courses"></div>
                            <span :style="{ color: getColors.color5 }">COURS</span></router-link>
                         <router-link to="/messages">
-                           <div class="navbar-icon"><img src="./assets/messages.png" alt="Messages"></div>
+                           <div class="navbar-icon"><img src="assets/messages.png" alt="Messages"></div>
                            <span :style="{ color: getColors.color5 }">MESSAGES</span></router-link>
                         <router-link to="/planning">
-                           <div class="navbar-icon"><img src="./assets/planning.png" alt="Planning"></div>
+                           <div class="navbar-icon"><img src="assets/planning.png" alt="Planning"></div>
                            <span :style="{ color: getColors.color5 }">PLANNING</span></router-link>
                         <router-link to="/compte">
-                           <div class="navbar-icon"><img src="./assets/account.png" alt="Account"></div>
+                           <div class="navbar-icon"><img src="assets/account.png" alt="Account"></div>
                            <span :style="{ color: getColors.color5 }">COMPTE</span></router-link>
                      </div>
                   </div>
@@ -47,11 +47,8 @@
             </div>
          </div>
          <div id="content">
-            <router-view @activatePopUp="showPopUp = true"/>
+            <router-view />
          </div>
-      </div>
-      <div class="pop-up" v-if="showPopUp">
-         <AddConversation @desactivatePopUp="showPopUp = false" />
       </div>
    </w-app>
 </template>
@@ -60,11 +57,12 @@
 import {mapGetters, mapActions} from "vuex"
 import vueCookie from "vue-cookie"
 import axios from "axios";
-import AddConversation from "@/components/AddConversation";
 
 export default {
    name: "App",
-   components: {AddConversation},
+   components: {
+
+   },
    methods: {
       ...mapActions(['switchTheme', 'setUser'])
    },
@@ -78,11 +76,6 @@ export default {
             console.log(user);
             this.setUser(user);
          });
-      }
-   },
-   data() {
-      return {
-         showPopUp: false
       }
    }
 }
@@ -261,13 +254,6 @@ label[for="switch"]:after {
    background: #F4F4F4;
    border-radius: 90px;
    transition: 0.3s;
-}
-
-.pop-up {
-   position: fixed;
-   height: 100vh;
-   width: 100vw;
-   background-image: url("./assets/pop-up-background.png");
 }
 
 #switch:checked + label[for="switch"] {

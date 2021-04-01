@@ -1,6 +1,5 @@
 package com.discoodle.api.service;
 
-import com.discoodle.api.request.RegistrationRequest;
 import com.discoodle.api.model.User;
 
 import com.discoodle.api.security.mailConfirmation.MailSender;
@@ -19,7 +18,7 @@ public class RegistrationService {
     private final ConfirmationTokenService confirmationTokenService;
     private final MailSender mailSender;
 
-    public String register(RegistrationRequest request) {
+    public String register(User.RegistrationRequest request) {
         if (request.getPassword().matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}")) {
             if (request.getMail().matches("^(.+)@(.+)$")) {
                 String token = userService.signUpUser(
@@ -28,7 +27,7 @@ public class RegistrationService {
                                 request.getUsername(),
                                 request.getPassword(),
                                 request.getName(),
-                                request.getLastName(),
+                                request.getLast_name(),
                                 User.Role.STUDENT
                         )
                 );
@@ -39,17 +38,19 @@ public class RegistrationService {
             }
             return "Votre mail n'est pas valide.\n";
         }
-        return "Votre mot de passe doit contenir :\n" +
-                "- au moins 8 caractères\n" +
-                "- un chiffre\n" +
-                "- une minuscule\n" +
-                "- une majuscule\n" +
-                "- un caractère spécial\n" +
-                "- pas d'espace, retour à la ligne...\n";
+        return """
+              Votre mot de passe doit contenir :
+              - au moins 8 caractères
+              - un chiffre
+              - une minuscule
+              - une majuscule
+              - un caractère spécial
+              - pas d'espace, retour à la ligne, etc
+              """;
     }
 
-    public Boolean login(RegistrationRequest request) {
-        return (userService.login(request.getUsername(), request.getPassword()));
+    public String login(User.RegistrationRequest request) {
+        return userService.login(request.getUsername(), request.getPassword());
     }
 
     @Transactional

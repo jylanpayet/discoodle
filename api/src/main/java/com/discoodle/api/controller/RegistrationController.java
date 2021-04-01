@@ -1,6 +1,6 @@
 package com.discoodle.api.controller;
 
-import com.discoodle.api.request.RegistrationRequest;
+import com.discoodle.api.model.User;
 import com.discoodle.api.service.RegistrationService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -13,12 +13,12 @@ public class RegistrationController {
     private final RegistrationService registrationService;
 
     @PostMapping
-    public String register(@RequestBody RegistrationRequest request) {
+    public String register(@RequestBody User.RegistrationRequest request) {
         return registrationService.register(request);
     }
 
     @PostMapping(path="/login")
-    public Boolean login(@RequestBody RegistrationRequest request) {
+    public String login(@RequestBody User.RegistrationRequest request) {
         return registrationService.login(request);
     }
 

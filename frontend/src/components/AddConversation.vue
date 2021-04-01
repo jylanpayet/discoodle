@@ -1,5 +1,5 @@
 <template>
-   <div class="AddConversation">
+   <div class="AddConversation" @click="clickEvent">
       <div class="add-conv-box">
          Créer une nouvelle discussion ici :
 
@@ -31,20 +31,36 @@ export default {
       isEnter(event) {
          let inputValue = document.querySelector("input[name=name_room]").value;
          if (event.keyCode === 13 && inputValue.value !== "") {
-             axios.post(`http://localhost:8080/api/room/addNewRoom`, {
-               name: inputValue,
-               admin: this.getUser.id
-             }).catch(error => {
-               console.log(error.response);
-             });
+            this.addRoom(name);
          }
       },
+      clickEvent(event) {
+         if (event.target.className === "AddConversation")
+            this.$emit('desactivatePopUp');
+      },
+      addRoom(event, name=document.querySelector('.add-conv-box > div > input').value) {
+         axios.post(`http://localhost:8080/api/room/addNewRoom`, {
+            room_name: name,
+            room_members: [this.getUser.id],
+            link_picture: null
+         }).then(response => {
+            this.$emit('groupAdded', response.data);
+            this.$emit('desactivatePopUp');
+         }).catch(error => {
+            console.log(error.response);
+            this.$emit('desactivatePopUp');
+         });
+      }
    }
 }
 </script>
 
 <style scoped>
 .AddConversation {
+   z-index: 1001;
+   position: fixed;
+   top: 0;
+   left: 0;
    display: flex;
    align-items: center;
    justify-content: center;
@@ -53,7 +69,17 @@ export default {
    height: 100%;
 }
 
+.AddConversation:before {
+   z-index: 1000;
+   position: absolute;
+   content: "";
+   width: 100%;
+   height: 100%;
+   background-image: url("../assets/pop-up-background.png");
+}
+
 .add-conv-box {
+   z-index: 1002;
    border-radius: 12px;
    background-color: #F4F4F4;
 

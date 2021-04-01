@@ -4,8 +4,8 @@
          <div class="login" v-if="showLogin">
             <div style="display: flex; flex-direction: column; align-items: flex-start; justify-content: center; width: 100%;">
                <span style="color: #F4F4F4; font-size: 30px; font-weight: 600">Se connecter</span>
-               <input type="text" placeholder="Pseudo" name="userlog" autocomplete="false" required spellcheck="false">
-               <input type="password" placeholder="Mot de passe" name="passwordlog" required spellcheck="false">
+               <input type="text" placeholder="Pseudo" name="userlog" autocomplete="false" required spellcheck="false" @keypress="actionInputLogin">
+               <input type="password" placeholder="Mot de passe" name="passwordlog" required spellcheck="false" @keypress="actionInputLogin">
                <a href="" style="font-size: 12px; color: #909090">Mot de passe oublié ?</a>
                <label>
                   <input type="checkbox">
@@ -19,11 +19,11 @@
          <div class="register" v-else>
             <span style="margin-bottom: 15px; color: #F4F4F4; font-size: 30px; font-weight: 600">Créer mon compte</span>
 
-            <input type="text" placeholder="Pseudo" name="username" required>
-            <input type="text" placeholder="Prénom" name="name" required>
-            <input type="text" placeholder="Nom" name="lastname" required>
-            <input type="email" placeholder="Mail" name="mailReg" required>
-            <input type="password" placeholder="Mot de passe" name="passwordReg" required>
+            <input type="text" placeholder="Pseudo" name="username" required @keypress="actionInputRegister">
+            <input type="text" placeholder="Prénom" name="name" required @keypress="actionInputRegister">
+            <input type="text" placeholder="Nom" name="lastname" required @keypress="actionInputRegister">
+            <input type="email" placeholder="Mail" name="mailReg" required @keypress="actionInputRegister">
+            <input type="password" placeholder="Mot de passe" name="passwordReg" required @keypress="actionInputRegister">
             <button @click="userRegistration" style="align-self: center; margin-top: 15px;" class="submit">C'est parti !</button>
 
 
@@ -51,6 +51,7 @@
             </div>
          </div>
       </div>
+      <w-alert class="error-alert size--md" error round plain v-if="showError">{{ errorMessage }}</w-alert>
    </div>
 </template>
 
@@ -62,7 +63,9 @@ import {mapActions} from 'vuex'
 export default {
    data() {
       return {
-         showLogin: true
+         showLogin: true,
+         errorMessage: "",
+         showError: false,
       }
    },
    methods: {
@@ -74,8 +77,10 @@ export default {
             name: document.querySelector("input[name=name]").value,
             username: document.querySelector("input[name=username]").value,
          }).then(response => {
-            console.log(response);
-            this.showLogin = true;
+            if (response.data.match("([a-z0-9]+-)+[a-z0-9]+"))
+               this.showLogin = true;
+            else
+               this.updateError(response.data);
          }).catch(error => {
             console.log(error.response);
          });
@@ -85,20 +90,39 @@ export default {
             username: document.querySelector("input[name=userlog]").value,
             password: document.querySelector("input[name=passwordlog]").value,
          }).then(response => {
-            console.log(response)
-            if (response.data) {
+            if (response.data === "") {
                if (document.querySelector(".login > div > label > input[type=checkbox]").checked)
                   vueCookie.set("username", document.querySelector("input[name=userlog]").value, {expires: '1Y'});
 
                axios.get(`http://localhost:8080/api/users/${document.querySelector("input[name=userlog]").value}`).then(response => {
                   this.setUser(response.data);
+                  this.$emit("logSuccess")
+               }).catch(error => {
+                  console.log(error);
                })
-
-               this.$emit("logSuccess")
+            } else {
+               this.updateError(response.data);
             }
          }).catch(error => {
             console.log(error.response);
          });
+      },
+      actionInputLogin(event) {
+         event.keyCode === 13
+            ? this.login()
+            : ""
+      },
+      actionInputRegister(event) {
+         event.keyCode === 13
+               ? this.userRegistration()
+               : ""
+      },
+      updateError(message) {
+         this.errorMessage = message;
+         this.showError = true;
+         setTimeout(() => {
+            this.showError = false;
+         }, 4000);
       },
       ...mapActions(['setUser'])
    }
@@ -107,6 +131,7 @@ export default {
 
 <style scoped>
 .Authentification {
+   position: relative;
    width: 100%;
    height: 100%;
 
@@ -245,4 +270,25 @@ input[type="checkbox"] {
    cursor: pointer;
 }
 
+.error-alert {
+   position: absolute;
+   bottom: 50px;
+
+   animation: opacity ease-in-out 4s;
+}
+
+@keyframes opacity {
+   0% {
+      opacity: 0;
+   }
+   10% {
+      opacity: 1;
+   }
+   90% {
+      opacity: 1;
+   }
+   100% {
+      opacity: 0;
+   }
+}
 </style>

@@ -28,7 +28,7 @@
       </div>
    </div>
    <div class="Account" v-else>
-      <Authentication @logSuccess="isAuthentificated = true" />
+      <Authentication @logSuccess="isAuthentificated = true; $emit('logSuccess')" />
    </div>
 </template>
 

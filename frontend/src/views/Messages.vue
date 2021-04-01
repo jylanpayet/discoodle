@@ -3,22 +3,24 @@
       <div class="left-pannel">
          <div class="settings-box">
             <div>
-               <div class="add-conversation" @click="$emit('activatePopUp')">
+               <div class="add-conversation" @click="showPopUp = true">
                   +
                </div>
+               <AddConversation v-if="showPopUp" @groupAdded="addNewGroup" @desactivatePopUp="showPopUp = false" />
                <div class="settings"><img src="../assets/settings.png" alt="Settings"
                                           style="height: 100%; width: 100%;"></div>
             </div>
          </div>
          <div class="convs-list">
-            <router-link :key="convs.uuid" v-for="convs in convList" :to="`/messages/${convs.uuid}?name=${convs.name}`"
-                         @click="setConvUUID(convs.uuid)">
+            <router-link :key="convs.room_id" v-for="convs in convList" :to="`/messages/${convs.room_id}?name=${convs.room_name}`"
+                         @click="setConvUUID(convs.room_id)">
                <div class="link-content">
                   <div class="user-logo">
-                     {{ convs.name.charAt(0).toUpperCase() }}
+                     <img v-if="convs.link_picture !== null" :src="convs.link_picture" alt="">
+                     <span>{{ convs.room_name.charAt(0).toUpperCase() }}</span>
                   </div>
                   <div class="conv-name">
-                     {{ convs.name }}
+                     {{ convs.room_name }}
                   </div>
                </div>
             </router-link>
@@ -28,17 +30,18 @@
          <router-view/>
       </div>
    </div>
-   <Account v-else />
+   <Account @logSuccess="getRoomsFromDB" v-else />
 </template>
 
 <script>
 import {mapActions, mapGetters} from "vuex";
 import axios from 'axios';
 import Account from "@/views/Account";
+import AddConversation from "@/components/AddConversation";
 
 export default {
    name: "Messages",
-   components: {Account},
+   components: {AddConversation, Account},
    computed: {
       ...mapGetters(['getColors', 'getTheme', 'getUser']),
    },
@@ -49,23 +52,26 @@ export default {
             this.convList = response.data
          });
       },
-      addConversation() {
-         axios.post(`http://localhost:8080/api/room/addNewRoom`, {
-            name: "Discoodle",
-            admin: this.getUser.id
-         }).catch(error => {
-            console.log(error.response);
-         });
+      addNewGroup(group) {
+         console.log(group);
+         this.convList.unshift({
+            link_picture: group.link_picture,
+            room_name: group.room_name,
+            room_id: group.room_id,
+            users: group.users
+         })
       }
    },
    data() {
       return {
          convList: [],
-         displayConversationPopUp: false
+         displayConversationPopUp: false,
+         showPopUp: false
       }
    },
    mounted() {
-      this.getRoomsFromDB()
+      if (!(JSON.stringify(this.getUser) === JSON.stringify({})))
+         this.getRoomsFromDB()
    }
 }
 </script>
@@ -85,7 +91,7 @@ export default {
 .left-pannel {
    height: 100%;
    width: 22%;
-
+   background-color: #15131c;
    display: flex;
    flex-direction: column;
    align-items: center;

@@ -5,12 +5,13 @@
          <div>
             <span style="font-size: 23px; font-weight: 500; color: #F4F4F4">{{ $route.query.name }}</span>
             <div class="top-right-buttons">
-               <button style="height: 100%;" @click="switchPinDisplay">
+               <button :style="pinAdd ? { animation: '' } : { animation: 'none' }" style="height: 100%;" @click="switchPinDisplay">
                   <img src="../assets/pin.png" alt="" style="height: 60%;">
                </button>
-               <button style="color: #F4F4F4; font-size: 33px; font-weight: 500; height: 100%">
+               <button style="color: #F4F4F4; font-size: 33px; font-weight: 500; height: 100%" @click="showAddUser = true">
                   +
                </button>
+               <AddUserInConv v-if="showAddUser" @addUsers="addUsers" @desactivatePopUp="showAddUser = false" />
             </div>
 
             <div class="pinned-message" v-if="showPinned">
@@ -20,6 +21,9 @@
                      {{ messages.sender }} : <br>
                      {{ messages.content }} <br>
                      {{ messages.messageDate }}
+                     <button class="unpin-message" @click="unpinMessage(messages.id)">
+                        X
+                     </button>
                   </div>
                </div>
             </div>
@@ -27,25 +31,35 @@
          </div>
       </div>
       <div class="conv-messages">
-         <span v-if="messages.length === 0" style="align-self: center; font-size: 15px; font-weight: 500; color: #F4F4F4"> Soyez le premier à envoyer un message à {{ $route.query.name }}</span>
+         <span v-if="messages.length === 0"
+               style="align-self: center; font-size: 15px; font-weight: 500; color: #F4F4F4"> Soyez le premier à envoyer un message à {{
+               $route.query.name
+            }}</span>
          <Message :key="message" v-for="message in messages"
                   :content="message.content"
                   :user-logo="message.sender.charAt(0).toUpperCase()"
                   :belong-to-myself="message.sender === user"
                   :message-date="message.messageDate"
-                  :message-i-d="message.id"/>
+                  :message-i-d="message.id"
+                  :is-edited="message.edited"
+                  @pinnedMessage="pinnedMessage"
+                  @deletedMessage="deletedMessage"
+                  @editedMessage="editedMessage"
+         />
       </div>
       <div class="conv-input">
          <span>
             {{ getWritersAsText() }}
          </span>
          <div>
-            <input type="text" autocomplete="off" :placeholder="`Envoyer un message à ${ $route.query.name }`" @keypress="actionInput">
+            <input type="text" autocomplete="off" :placeholder="`Envoyer un message à ${ $route.query.name }`"
+                   @keydown="actionInput">
             <div class="right-side-input">
-               <button style="height: 32px; width: 32px;">
+               <EmojiPicker @selected-emoji="insertEmoji" @closeEmoji="showEmoji = false" v-if="showEmoji" class="emojiPicker" />
+               <button style="height: 32px; width: 32px;" @click="showEmoji = !showEmoji">
                   <img src="../assets/happy.svg" alt="Smiley">
                </button>
-               <button class="submit-file" @click="user = 'Bob'">
+               <button class="submit-file">
                   +
                </button>
             </div>
@@ -59,25 +73,35 @@ import SockJS from "sockjs-client";
 import Stomp from "stompjs";
 import {mapGetters} from "vuex";
 import axios from 'axios';
+import marked from "marked";
 import Message from "@/components/common/Message";
+import emojis from "@/assets/emojis_uncathegorized";
+import EmojiPicker from "@/components/common/EmojiPicker";
+import AddUserInConv from "@/components/AddUserInConv";
 
 let stompClient = null;
 
 export default {
    name: "ChatContent",
    components: {
+      AddUserInConv,
+      EmojiPicker,
       Message
    },
    data() {
       return {
          messages: [],
          pinned: [],
-         user: "Alice",
+         user: "",
          writers: [],
          showPinned: false,
+         showEmoji: false,
+         pinAdd: false,
+         showAddUser: false
       }
    },
    mounted() {
+      this.user = this.getUser.username;
       this.getMessagesFromJSON();
       this.connect();
    },
@@ -109,11 +133,13 @@ export default {
             this.writers.pop(this.user);
          } else if (event.keyCode !== 13) {
             this.writing();
+            const inputContent = document.querySelector(".conv-input > div > input");
+            inputContent.value = this.displayMessage(inputContent.value, false, true, false);
          }
       },
       writing() {
          if (!this.writers.includes(this.user)) {
-            stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {  }, JSON.stringify({
+            stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify({
                sender: this.user,
                type: "WRITING"
             }));
@@ -154,6 +180,7 @@ export default {
                   sender: message.sender,
                   messageDate: message.messageDate,
                   pinned: message.pinned,
+                  edited: false,
                   // TODO : Add messageReactions implementation.
                   // messageReactions: message.messageReactions
                })
@@ -165,6 +192,29 @@ export default {
                      this.writers.pop(message.sender)
                   }, 5000)
                }
+            } else if (message.type === "PINNED") {
+               this.messages.forEach(elt => {
+                  if (elt.id === message.id && !this.pinned.includes(elt))
+                     this.pinned.push(elt);
+               });
+            } else if (message.type === "UNPINNED") {
+               this.pinned = this.pinned.filter(elt => elt.id !== message.id);
+            } else if (message.type === "DELETED") {
+               this.messages = this.messages.filter(elt => elt.id !== message.id);
+               this.pinned = this.pinned.filter(elt => elt.id !== message.id);
+            } else if (message.type === "EDITED") {
+               this.messages.forEach(elt => {
+                  if (elt.id === message.id) {
+                     elt.content = message.content;
+                     elt.edited = true;
+                  }
+               });
+               this.pinned.forEach(elt => {
+                  if (elt.id === message.id) {
+                     elt.content = message.content;
+                     elt.edited = true;
+                  }
+               });
             }
          }
       },
@@ -182,6 +232,7 @@ export default {
                sender: this.user,
                messageDate: date,
                pinned: false,
+               edited: false,
                convUUID: this.getCurrentConv,
                // messageReactions: []
 
@@ -189,7 +240,7 @@ export default {
             };
 
             this.messages.unshift(chatMessage);
-            stompClient.send(`/conversationListener/${this.getCurrentConv}/room.send`, { }, JSON.stringify(chatMessage));
+            stompClient.send(`/conversationListener/${this.getCurrentConv}/room.send`, {}, JSON.stringify(chatMessage));
             messageContent.value = '';
          }
       },
@@ -198,10 +249,91 @@ export default {
             this.messages = response.data.messages;
             this.pinned = this.messages.filter(elt => (elt.pinned === true));
          });
+
       },
       switchPinDisplay() {
          this.showPinned = !this.showPinned;
       },
+      unpinMessage(messageID) {
+         axios.put(`http://localhost:8080/api/room/unpinMessage/${this.getCurrentConv}?messageID=${messageID}`).then(() => {
+            let c = 0;
+            this.pinned.forEach(elt => {
+               if (elt.id === messageID)
+                  this.pinned.splice(c, 1);
+               c++;
+            })
+            stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify({
+               id: messageID,
+               type: "UNPINNED"
+            }));
+         })
+      },
+      pinnedMessage(messageID) {
+         this.messages.forEach(elt => {
+            if (elt.id === messageID && !this.pinned.includes(elt)) {
+               stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify({
+                  id: messageID,
+                  type: "PINNED"
+               }));
+               this.pinned.push(elt);
+            }
+         })
+      },
+      deletedMessage(messageID) {
+         stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify({
+            id: messageID,
+            type: "DELETED"
+         }));
+      },
+      editedMessage(messageID, content) {
+         stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify({
+            id: messageID,
+            content: content,
+            type: "EDITED"
+         }));
+      },
+
+      filterEmoji(content){
+         // Regex to match with the emoji string encode ( ':xxxxx_xxx_xxx_xxx:' where '_' is optionnal )
+         const regex = ":[a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*:";
+         const emoji = [...content.matchAll(regex)];
+         if(emoji && emoji.length > 0) {
+            emoji.forEach(elt => {
+               if (emojis[elt[0].replaceAll(":", "")])
+                  content = content.replace(elt[0], emojis[elt[0].replaceAll(":", "")]);
+            })
+         }
+         return content;
+      },
+      filterMarkdown(content){
+         return marked(content);
+      },
+      filterPing(content) {
+         if (content.includes(`@${this.getUser.username}`)) {
+            this.mention = true;
+            return content.replaceAll(`@${this.getUser.username}`, `@${this.getUser.name}`);
+         }
+         return content;
+      },
+      displayMessage(content, mardkdown, emojis, ping) {
+         if (ping)
+            content = this.filterPing(content);
+         if (emojis)
+            content = this.filterEmoji(content);
+         if (mardkdown)
+            content = this.filterMarkdown(content);
+         return content;
+      },
+
+      insertEmoji(emoji) {
+         document.querySelector(".conv-input > div > input").value += emoji;
+      },
+
+      addUsers(users) {
+         if (users.length > 0) {
+            console.log(users);
+         }
+      }
    },
    computed: {
       ...mapGetters(['getColors', 'getTheme', 'getCurrentConv', 'getUser'])
@@ -238,16 +370,19 @@ button {
 }
 
 .conv-info > div {
+   position: relative;
    display: flex;
    flex-direction: row;
    align-items: center;
    justify-content: space-between;
+   margin: auto;
 
    width: 95%;
    height: 60px;
 }
 
 .top-right-buttons {
+   position: relative;
    display: flex;
    align-items: center;
    justify-content: space-between;
@@ -304,6 +439,7 @@ button {
 }
 
 .right-side-input {
+   position: relative;
    display: flex;
    flex-direction: row;
    align-items: center;
@@ -358,27 +494,22 @@ button {
 
    z-index: 500;
 
+   padding: 10px 10px 0 10px;
    border-radius: 12px;
-   right: 50px;
-   max-width: 350px;
+   right: 36px;
+   top: 70px;
    min-width: 350px;
-   transform: translateY(35px);
-
-   min-height: 50px;
    background-color: #909090;
 }
 
 .pinned-message > div {
    position: relative;
-   width: calc(100% - 20px);
+   width: 100%;
 
    display: flex;
    flex-direction: column;
    align-items: center;
    justify-content: flex-start;
-
-   margin: 10px 10px 0 10px;
-
 }
 
 .pinned-message > div::before {
@@ -393,14 +524,13 @@ button {
 }
 
 .pinned-message-content {
+   position: relative;
    padding: 10px;
    margin-bottom: 10px;
-   width: calc(100% - 20px);
+   width: 100%;
    background-color: #C4C4C4;
    color: #454150;
    border-radius: 12px;
-
-   cursor: pointer;
 }
 
 #pin > img {
@@ -420,54 +550,27 @@ button {
    transform: scale(1.1) rotate(-10deg);
 }
 
-.pinned-message {
-   animation: appear-opacity ease-in-out 0.5s;
-
+.unpin-message {
    position: absolute;
-
-   border-radius: 12px;
-   right: 50px;
-   max-width: 350px;
-   min-width: 350px;
-   transform: translateY(35px);
-
-   min-height: 50px;
-   background-color: #909090;
-}
-
-.pinned-message > div {
-   position: relative;
-   width: calc(100% - 20px);
-
-   display: flex;
-   flex-direction: column;
-   align-items: center;
-   justify-content: flex-start;
-
-   margin: 10px 10px 0 10px;
-
-}
-
-.pinned-message > div::before {
-   content: "";
-   position: absolute;
-   right: 0;
-   top: 0;
-   width: 13px;
-   height: 13px;
-   background-color: #909090;
-   transform: rotate(45deg) translateY(-9px) translateX(-15px);
-}
-
-.pinned-message-content {
-   padding: 10px;
-   margin-bottom: 10px;
-   width: calc(100% - 20px);
-   background-color: #C4C4C4;
-   color: #454150;
-   border-radius: 12px;
-
+   right: 5px;
+   top: 5px;
+   height: 20px;
+   width: 20px;
+   border-radius: 29px;
+   background-color: #454150;
+   color: #f4f4f4;
    cursor: pointer;
+}
+
+.unpin-message:hover {
+   transform: scale(1.1);
+}
+
+.emojiPicker {
+   position: absolute;
+   top: -10px;
+   left: 32px;
+   transform: translateX(-100%) translateY(-100%);
 }
 
 @keyframes appear-opacity {
