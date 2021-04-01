@@ -10,7 +10,11 @@ import com.discoodle.api.repository.GroupRightsRepository;
 import com.discoodle.api.repository.GroupsRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+
 import java.io.File;
+import java.io.FileWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 
 @Service
@@ -35,13 +39,13 @@ public class GroupsService {
 
         if (finalGroup.getType().equals(Groups.TypeOfGroup.SUBJECTS)) {
             try {
-                File dossier = new File((String.format("%sstatic/common/groups/%d", ApiApplication.RESSOURCES,finalGroup.getGroups_id())));
+                File dossier = new File((String.format("%sstatic/common/groups/%d", ApiApplication.RESSOURCES, finalGroup.getGroups_id())));
                 dossier.mkdirs();
-                if(dossier.exists() && dossier.isDirectory()) {
+                if (dossier.exists() && dossier.isDirectory()) {
                     File fichier = new File((String.format("%sstatic/common/groups/%d/%d.json", ApiApplication.RESSOURCES, finalGroup.getGroups_id(), finalGroup.getGroups_id())));
                     fichier.createNewFile();
                 }
-            } catch (Exception e){
+            } catch (Exception e) {
                 System.out.println("Dossier du groups non crée !");
             }
         }
@@ -71,6 +75,17 @@ public class GroupsService {
             return false;
         }
         return true;
+    }
+
+    public void editFileGroup(String text, Long groups_id) {
+        try {
+            File path = new File(String.format("%sstatic/common/groups/%d/%d.json", ApiApplication.RESSOURCES, groups_id, groups_id));
+            Files.writeString(Paths.get(String.valueOf(path)), text+"[\n]");
+        } catch (Exception e) {
+            System.out.println("erreur, fichier non édité");
+            e.printStackTrace();
+        }
+
     }
 
     public void deleteGroupByID(Integer groups_ID) {
