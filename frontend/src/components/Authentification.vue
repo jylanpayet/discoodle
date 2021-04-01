@@ -51,6 +51,7 @@
             </div>
          </div>
       </div>
+      <w-alert class="error-alert size--md" error round plain v-if="showError">{{ errorMessage }}</w-alert>
    </div>
 </template>
 
@@ -62,7 +63,9 @@ import {mapActions} from 'vuex'
 export default {
    data() {
       return {
-         showLogin: true
+         showLogin: true,
+         errorMessage: "",
+         showError: false,
       }
    },
    methods: {
@@ -76,6 +79,8 @@ export default {
          }).then(response => {
             if (response.data.match("([a-z0-9]+-)+[a-z0-9]+"))
                this.showLogin = true;
+            else
+               this.updateError(response.data);
          }).catch(error => {
             console.log(error.response);
          });
@@ -85,8 +90,7 @@ export default {
             username: document.querySelector("input[name=userlog]").value,
             password: document.querySelector("input[name=passwordlog]").value,
          }).then(response => {
-            console.log(response.data);
-            if (response.data) {
+            if (response.data === "") {
                if (document.querySelector(".login > div > label > input[type=checkbox]").checked)
                   vueCookie.set("username", document.querySelector("input[name=userlog]").value, {expires: '1Y'});
 
@@ -96,6 +100,8 @@ export default {
                }).catch(error => {
                   console.log(error);
                })
+            } else {
+               this.updateError(response.data);
             }
          }).catch(error => {
             console.log(error.response);
@@ -111,6 +117,13 @@ export default {
                ? this.userRegistration()
                : ""
       },
+      updateError(message) {
+         this.errorMessage = message;
+         this.showError = true;
+         setTimeout(() => {
+            this.showError = false;
+         }, 4000);
+      },
       ...mapActions(['setUser'])
    }
 }
@@ -118,6 +131,7 @@ export default {
 
 <style scoped>
 .Authentification {
+   position: relative;
    width: 100%;
    height: 100%;
 
@@ -256,4 +270,25 @@ input[type="checkbox"] {
    cursor: pointer;
 }
 
+.error-alert {
+   position: absolute;
+   bottom: 50px;
+
+   animation: opacity ease-in-out 4s;
+}
+
+@keyframes opacity {
+   0% {
+      opacity: 0;
+   }
+   10% {
+      opacity: 1;
+   }
+   90% {
+      opacity: 1;
+   }
+   100% {
+      opacity: 0;
+   }
+}
 </style>

@@ -45,12 +45,12 @@ public class RegistrationService {
               - une minuscule
               - une majuscule
               - un caractère spécial
-              - pas d'espace, retour à la ligne...
+              - pas d'espace, retour à la ligne, etc
               """;
     }
 
-    public Boolean login(User.RegistrationRequest request) {
-        return (userService.login(request.getUsername(), request.getPassword()));
+    public String login(User.RegistrationRequest request) {
+        return userService.login(request.getUsername(), request.getPassword());
     }
 
     @Transactional

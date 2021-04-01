@@ -18,7 +18,7 @@ public class RegistrationController {
     }
 
     @PostMapping(path="/login")
-    public Boolean login(@RequestBody User.RegistrationRequest request) {
+    public String login(@RequestBody User.RegistrationRequest request) {
         return registrationService.login(request);
     }
 

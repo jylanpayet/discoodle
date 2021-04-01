@@ -90,11 +90,14 @@ public class UserService implements UserDetailsService {
             return token;
     }
 
-    public Boolean login(String username, String password) {
+    public String login(String username, String password) {
         if(userRepository.findUserByUserName(username).isPresent() /*&& userRepository.findUserByUserName(username).get().isEnabled()*/) {
-            return bCryptPasswordEncoder.matches(password, userRepository.findUserByUserName(username).get().getPassword());
+            if (!bCryptPasswordEncoder.matches(password, userRepository.findUserByUserName(username).get().getPassword()))
+                return "Mot de passe ou nom d'utilisateur incorrect";
+            else
+                return "";
         }
-        return false;
+        return "Mot de passe ou nom d'utilisateur incorrect";
     }
 
     public int enableUser(String mail) {

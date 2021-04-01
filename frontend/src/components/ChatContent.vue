@@ -8,9 +8,10 @@
                <button :style="pinAdd ? { animation: '' } : { animation: 'none' }" style="height: 100%;" @click="switchPinDisplay">
                   <img src="../assets/pin.png" alt="" style="height: 60%;">
                </button>
-               <button style="color: #F4F4F4; font-size: 33px; font-weight: 500; height: 100%">
+               <button style="color: #F4F4F4; font-size: 33px; font-weight: 500; height: 100%" @click="showAddUser = true">
                   +
                </button>
+               <AddUserInConv v-if="showAddUser" @addUsers="addUsers" @desactivatePopUp="showAddUser = false" />
             </div>
 
             <div class="pinned-message" v-if="showPinned">
@@ -76,12 +77,14 @@ import marked from "marked";
 import Message from "@/components/common/Message";
 import emojis from "@/assets/emojis_uncathegorized";
 import EmojiPicker from "@/components/common/EmojiPicker";
+import AddUserInConv from "@/components/AddUserInConv";
 
 let stompClient = null;
 
 export default {
    name: "ChatContent",
    components: {
+      AddUserInConv,
       EmojiPicker,
       Message
    },
@@ -94,6 +97,7 @@ export default {
          showPinned: false,
          showEmoji: false,
          pinAdd: false,
+         showAddUser: false
       }
    },
    mounted() {
@@ -323,6 +327,12 @@ export default {
 
       insertEmoji(emoji) {
          document.querySelector(".conv-input > div > input").value += emoji;
+      },
+
+      addUsers(users) {
+         if (users.length > 0) {
+            console.log(users);
+         }
       }
    },
    computed: {
@@ -372,6 +382,7 @@ button {
 }
 
 .top-right-buttons {
+   position: relative;
    display: flex;
    align-items: center;
    justify-content: space-between;

@@ -16,7 +16,8 @@
                          @click="setConvUUID(convs.room_id)">
                <div class="link-content">
                   <div class="user-logo">
-                     {{ convs.room_name.charAt(0).toUpperCase() }}
+                     <img v-if="convs.link_picture !== null" :src="convs.link_picture" alt="">
+                     <span>{{ convs.room_name.charAt(0).toUpperCase() }}</span>
                   </div>
                   <div class="conv-name">
                      {{ convs.room_name }}
@@ -49,14 +50,15 @@ export default {
       getRoomsFromDB() {
          axios.get(`http://localhost:8080/api/users/seeAllRooms/${this.getUser.id}`).then(response => {
             this.convList = response.data
-            console.log(this.convList);
          });
       },
       addNewGroup(group) {
+         console.log(group);
          this.convList.unshift({
             link_picture: group.link_picture,
             room_name: group.room_name,
-            room_id: group.room_id
+            room_id: group.room_id,
+            users: group.users
          })
       }
    },
