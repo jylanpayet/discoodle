@@ -46,7 +46,7 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
-    public void deleteUser(Integer userId) {
+    public void deleteUser(Long userId) {
         boolean exists = userRepository.existsById(userId);
         if (!exists) {
             throw new IllegalStateException("L'étudiant avec l'id : " + userId + "n'existe pas.");
@@ -139,6 +139,13 @@ public class UserService implements UserDetailsService {
             if(userRepository.changeLastName(user_id, last_name) == 1) {
                 return userRepository.findUserByID(user_id);
             }
+        return null;
+    }
+
+    public Optional<User> addFriends(Long user_id, String link_to_avatar) {
+        if(userRepository.changeLinkToAvar(user_id, link_to_avatar) == 1) {
+            return userRepository.findUserByID(user_id);
+        }
         return null;
     }
 

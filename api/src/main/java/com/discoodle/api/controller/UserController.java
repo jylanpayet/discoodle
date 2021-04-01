@@ -43,7 +43,7 @@ public class UserController {
     }
 
     @DeleteMapping(path = "{user_id}")
-    public void deleteUser(@PathVariable("user_id") Integer userId) {
+    public void deleteUser(@PathVariable("user_id") Long userId) {
         userService.deleteUser(userId);
     }
 
@@ -51,6 +51,12 @@ public class UserController {
     @ResponseBody
     public List<Room> findAllRoomsByUserID(@PathVariable Long user_id) {
         return userService.getUserByID(user_id).get().getRooms();
+    }
+
+    @GetMapping(path = "/seeAllFriends/{user_id}")
+    @ResponseBody
+    public List<User> findAllFriendsByUserID(@PathVariable Long user_id) {
+        return userService.getUserByID(user_id).get().getFriends();
     }
 
     @PostMapping(path = "changeUsername/{user_id}")

@@ -12,7 +12,7 @@ import java.util.Optional;
 
 
 @Repository
-public interface RoomRepository extends JpaRepository<Room, Integer> {
+public interface RoomRepository extends JpaRepository<Room, String> {
 
     @Query("SELECT room FROM Room room where room.room_id = ?1")
     Optional<Room> findRoomByUUID(String room_id);

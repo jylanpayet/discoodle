@@ -11,7 +11,7 @@ import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Integer> {
+public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT user FROM User user where user.username = ?1")
     Optional<User> findUserByUserName(String username);
 
