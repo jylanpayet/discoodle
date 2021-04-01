@@ -46,6 +46,11 @@ public class RoomController {
 		return roomService.changeLinkPicture(room_id, request.getLink_picture());
 	}
 
+	@PostMapping(path = "/api/room/changeAdmin/{room_id}")
+	public Optional<Room> changeAdmin(@PathVariable String room_id, @RequestBody Room.RoomRequest request){
+		return roomService.changeAdmin(room_id, request.getRoom_admin());
+	}
+
 	@MessageMapping("/{roomUUID}/room.send")
 	@SendTo("/conversations/rooms/{roomUUID}")
 	public Message sendMessage(@DestinationVariable String roomUUID, @Payload Message message) {

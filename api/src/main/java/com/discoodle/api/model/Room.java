@@ -16,7 +16,7 @@ import java.util.List;
 @Table(name = "room")
 public class Room {
 
-    public Room(String room_name, Integer room_admin) {
+    public Room(String room_name, Long room_admin) {
         this.room_name = room_name;
         this.room_admin = room_admin;
     }
@@ -29,7 +29,7 @@ public class Room {
     @Column(name = "room_name")
     private String room_name;
     @Column(name = "room_admin")
-    private Integer room_admin;
+    private Long room_admin;
     @Column(name = "link_picture")
     private String link_picture;
 
@@ -46,6 +46,7 @@ public class Room {
     public static class RoomRequest {
         private final String room_name;
         private final String link_picture;
-        private final List<Integer> room_members;
+        private final List<Long> room_members;
+        private final Long room_admin;
     }
 }

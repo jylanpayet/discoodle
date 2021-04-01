@@ -13,20 +13,20 @@ import java.util.Optional;
 public class RoomService {
     private final RoomRepository roomRepository;
 
-    public Room createNewRoom(String room_name, List<Integer> room_members) {
+    public Room createNewRoom(String room_name, List<Long> room_members) {
         Room room = new Room(
                 room_name,
                 room_members.get(0)
         );
         Room finalRoom = roomRepository.save(room);
-        for (Integer room_member : room_members) {
+        for (Long room_member : room_members) {
             roomRepository.addNewMembers(room_member, finalRoom.getRoom_id());
         }
         return finalRoom;
     }
 
-    public Optional<Room> addNewMembers(String room_id, List<Integer> room_members) {
-        for (Integer room_member : room_members) {
+    public Optional<Room> addNewMembers(String room_id, List<Long> room_members) {
+        for (Long room_member : room_members) {
             roomRepository.addNewMembers(room_member, room_id);
         }
         return roomRepository.findRoomByUUID(room_id);
@@ -34,6 +34,13 @@ public class RoomService {
 
     public Optional<Room> changeLinkPicture(String room_id, String link_to_avatar) {
         if(roomRepository.changeLinkPicture(room_id, link_to_avatar) == 1) {
+            return roomRepository.findRoomByUUID(room_id);
+        }
+        return null;
+    }
+
+    public Optional<Room> changeAdmin(String room_id, Long room_admin) {
+        if(roomRepository.changeAdmin(room_id, room_admin) == 1) {
             return roomRepository.findRoomByUUID(room_id);
         }
         return null;

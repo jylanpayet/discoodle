@@ -20,10 +20,15 @@ public interface RoomRepository extends JpaRepository<Room, String> {
     @Modifying
     @Query(value = "insert into link_rooms_users (user_id, room_id) VALUES (:user_id,:room_id)", nativeQuery = true)
     @Transactional
-    void addNewMembers(@Param("user_id") Integer user_id, @Param("room_id") String room_id);
+    void addNewMembers(@Param("user_id") Long user_id, @Param("room_id") String room_id);
 
     @Transactional
     @Modifying
     @Query("UPDATE Room room SET room.link_picture = :link_picture WHERE room.room_id = :room_id")
     int changeLinkPicture(@Param("room_id") String room_id, @Param("link_picture") String link_picture);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE Room room SET room.room_admin = :room_admin WHERE room.room_id = :room_id")
+    int changeAdmin(@Param("room_id") String room_id, @Param("room_admin") Long room_admin);
 }
