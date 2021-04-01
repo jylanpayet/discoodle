@@ -38,6 +38,10 @@ public class UserController {
         return userService.getUserByID(user_id);
     }
 
+    @RequestMapping(value = "/info/{role}", method = GET)
+    @ResponseBody
+    public Optional<User.Role> findUserByRole(@PathVariable User.Role role){ return userService.findUserByRole(role); }
+
     @PostMapping
     public void registerNewUser(@RequestBody User user) {
         userService.addNewUser(user);

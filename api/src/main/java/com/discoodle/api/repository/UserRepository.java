@@ -20,6 +20,9 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("SELECT user FROM User user where user.mail = ?1")
     Optional<User> findUserByMail(String mail);
 
+    @Query("SELECT user FROM User user where user.role= ?1")
+    Optional<User.Role> findUserByRole(User.Role role);
+
     @Transactional
     @Modifying
     @Query("UPDATE User user SET user.enabled = true WHERE user.mail = ?1")
