@@ -25,6 +25,10 @@ public class RoomService {
         return finalRoom;
     }
 
+    public void addNewMember(String room_id, Long user_id) {
+        roomRepository.addNewMember(room_id, user_id);
+    }
+
     public Optional<Room> addNewMembers(String room_id, List<Long> room_members) {
         for (Long room_member : room_members) {
             roomRepository.addNewMembers(room_member, room_id);

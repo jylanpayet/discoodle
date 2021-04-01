@@ -1,5 +1,6 @@
 package com.discoodle.api.controller;
 
+import com.discoodle.api.ApiApplication;
 import com.discoodle.api.configuration.DiscoodleJsonFileWriter;
 import com.discoodle.api.model.*;
 import com.discoodle.api.service.RoomService;
