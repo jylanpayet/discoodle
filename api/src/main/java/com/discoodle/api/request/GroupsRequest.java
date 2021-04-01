@@ -17,4 +17,5 @@ public class GroupsRequest {
     private final String name;
     private final String description;
     private final Groups.TypeOfGroup type;
+    private final String text;
 }
