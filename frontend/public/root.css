@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@600&display=swap');
 
 * {
     margin: 0;
@@ -31,9 +32,15 @@ a {
     border-radius: 15px;
 }
 
+code {
+    background-color: #454150;
+    border: #2d2d2d;
+    color: #f4f4f4;
+    border-radius: 5px;
+    padding: 10px;
+    font-family: 'Inconsolata', monospace;
+}
 
 del {
     text-decoration: line-through;
 }
-
-

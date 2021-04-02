@@ -329,14 +329,30 @@ export default {
          document.querySelector(".conv-input > div > input").value += emoji;
       },
 
+      containUsername(username) {
+         let bool = false;
+         this.getFriends.forEach(elt => {
+            if (elt.username === username)
+               bool = true;
+         })
+         return bool;
+      },
+
       addUsers(users) {
          if (users.length > 0) {
-            console.log(users);
+            users.forEach(user => {
+               if (this.containUsername(user)) {
+                  axios.get(`http://localhost:8080/api/users/${user}`).then(response => {
+                     axios.post(`http://localhost:8080/api/room/${this.getCurrentConv}/room.add?user_id=${response.data.id}`)
+                  })
+               }
+            })
          }
+
       }
    },
    computed: {
-      ...mapGetters(['getColors', 'getTheme', 'getCurrentConv', 'getUser'])
+      ...mapGetters(['getColors', 'getTheme', 'getCurrentConv', 'getUser', 'getFriends'])
    }
 }
 </script>

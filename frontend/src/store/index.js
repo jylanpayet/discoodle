@@ -30,7 +30,10 @@ export default createStore({
                 type: String,
             }
         },
-        user: {  }
+        user: {  },
+        friends: [
+
+        ]
     },
     mutations: {
         SWITCH_THEME(state) {
@@ -41,6 +44,9 @@ export default createStore({
         },
         SET_USER(state, user) {
             state.user = user;
+        },
+        ADD_FRIEND(state, user) {
+            state.friends.push(user);
         }
     },
     actions: {
@@ -52,6 +58,9 @@ export default createStore({
         },
         setUser(context, user) {
             context.commit('SET_USER', user);
+        },
+        addUser(context, user) {
+            context.commit('ADD_FRIEND', user);
         }
     },
     getters: {
@@ -69,6 +78,9 @@ export default createStore({
         },
         getUser: state => {
             return state.user;
+        },
+        getFriends: state => {
+            return state.friends;
         }
     },
     modules: {

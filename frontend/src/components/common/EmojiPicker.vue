@@ -49,7 +49,7 @@
          </div>
       </div>
       <div class="filtered-emojis" v-else>
-         <span :key="emojis" v-for="emojis in searchedEmoji">
+         <span :key="emojis" v-for="emojis in searchedEmoji" @click="$emit('selected-emoji', emojis.emoji)">
             {{ emojis.emoji }}
          </span>
       </div>
@@ -228,6 +228,10 @@ export default {
 
 .filtered-emojis {
    width: 100%;
+}
+
+.filtered-emojis > span {
+   cursor: pointer;
 }
 
 
