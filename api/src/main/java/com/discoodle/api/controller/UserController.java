@@ -97,13 +97,13 @@ public class UserController {
 
     @GetMapping(path = "/seeAllGroups/{user_ID}")
     @ResponseBody
-    public List<Groups> findAllGroupsByUserID(@PathVariable Integer user_ID) {
+    public List<Groups> findAllGroupsByUserID(@PathVariable Long user_ID) {
         return userService.getUserByID(user_ID).get().getGroups();
     }
 
     @GetMapping(path = "/seeAllSubjects/{user_ID}")
     @ResponseBody
-    public List<Groups> findAllSubjectsByUserID(@PathVariable Integer user_ID) {
+    public List<Groups> findAllSubjectsByUserID(@PathVariable Long user_ID) {
         List<Groups> AllSubjects = userService.getUserByID(user_ID).get().getGroups();
         List<Groups> UserSubjects = new ArrayList<>();
         for (int i = 0; i < AllSubjects.size(); i++) {

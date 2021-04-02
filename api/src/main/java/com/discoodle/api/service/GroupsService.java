@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
 
 @Service
@@ -40,8 +41,8 @@ public class GroupsService {
         groupsRepository.addNewMemberInGroup(request.getUser_id(), finalGroup.getGroups_id());
 
         if (finalGroup.getType().equals(Groups.TypeOfGroup.SUBJECTS)) {
-            Room r=roomService.createNewRoom(new RoomRequest(request.getName(),request.getUser_id()));
-            groupsRepository.addNewRoomsInGroup(finalGroup.getGroups_id(),r.getUuid());
+            Room r=roomService.createNewRoom(request.getName(), List.of(request.getUser_id()));
+            groupsRepository.addNewRoomsInGroup(finalGroup.getGroups_id(),r.getRoom_id());
             try {
                 File dossier = new File((String.format("%sstatic/common/groups/%d", ApiApplication.RESSOURCES, finalGroup.getGroups_id())));
                 dossier.mkdirs();
