@@ -2,7 +2,7 @@ package com.discoodle.api.service;
 
 import com.discoodle.api.ApiApplication;
 import com.discoodle.api.model.GroupRights;
-import com.discoodle.api.model.Room;
+import com.discoodle.api.model.Server;
 import com.discoodle.api.request.*;
 import com.discoodle.api.model.Groups;
 import com.discoodle.api.repository.GroupRightsRepository;
@@ -21,7 +21,7 @@ import java.util.List;
 public class GroupsService {
     private final GroupsRepository groupsRepository;
     private final GroupRightsRepository rightsRepository;
-    private final RoomService roomService;
+    private final ServerService serverService;
 
     public Groups createNewGroup(GroupsRequest request) {
         GroupRights rights = new GroupRights(false, false, false);
@@ -39,8 +39,8 @@ public class GroupsService {
         groupsRepository.addNewMemberInGroup(request.getUser_id(), finalGroup.getGroups_id());
 
         if (finalGroup.getType().equals(Groups.TypeOfGroup.SUBJECTS)) {
-            Room r=roomService.createNewRoom(request.getName(), List.of(request.getUser_id()));
-            groupsRepository.addNewRoomsInGroup(finalGroup.getGroups_id(),r.getRoom_id());
+            Server server=serverService.createNewServ("Serveur de "+finalGroup.getName(),List.of(request.getUser_id()));
+            groupsRepository.addNewServInGroup(finalGroup.getGroups_id(),server.getServer_id());
             try {
                 File dossier = new File((String.format("%sstatic/common/groups/%d", ApiApplication.RESSOURCES, finalGroup.getGroups_id())));
                 dossier.mkdirs();
@@ -90,7 +90,7 @@ public class GroupsService {
         }
     }
 
-    public void deleteGroupByID(Integer groups_ID) {
+    public void deleteGroupByID(Long groups_ID) {
         groupsRepository.deleteById(groups_ID);
     }
 
