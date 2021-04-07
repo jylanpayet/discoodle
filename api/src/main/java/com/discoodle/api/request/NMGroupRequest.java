@@ -9,9 +9,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class GroupRightsRequest {
-    private final Long groupId;
-    private final boolean addUser;
-    private final boolean deleteUser;
-    private final boolean modify;
+public class NMGroupRequest {
+    public final Long group_id;
+    public final Long user_id;
 }

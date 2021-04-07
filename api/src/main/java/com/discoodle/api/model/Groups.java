@@ -18,7 +18,8 @@ import java.util.List;
 @Table(name = "groups")
 public class Groups {
 
-    public Groups(Integer depth, String name,String description, TypeOfGroup type) {
+    public Groups(Long parent_id, Integer depth, String name,String description, TypeOfGroup type) {
+        this.parent_id=parent_id;
         this.depth = depth;
         this.name = name;
         this.description=description;
@@ -28,7 +29,10 @@ public class Groups {
     @Id
     @GeneratedValue
     @Column(name = "groups_id", unique = true, nullable = false)
-    private Integer groups_id;
+    private Long groups_id;
+
+    @Column(name = "parent_id")
+    private Long parent_id;
 
     @Column(name = "depth")
     private Integer depth;
@@ -57,7 +61,6 @@ public class Groups {
             inverseJoinColumns = @JoinColumn( name = "user_id" ) )
     private List<User> users = new ArrayList<>();
 
-    @JsonIgnore
     @OneToOne
     @JoinColumn(name="groups_rights_id")
     private GroupRights groupRights;

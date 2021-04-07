@@ -16,15 +16,15 @@ public interface GroupRightsRepository extends JpaRepository<GroupRights,Integer
     @Transactional
     @Modifying
     @Query(value = "UPDATE group_rights r SET r.can_delete_user=?2 WHERE r.rights_id=?1", nativeQuery = true)
-    void updateRightsDelete(@Param("rights_id") Integer id,@Param("can_delete_user") Boolean value);
+    void updateRightsDelete(@Param("rights_id") Long id,@Param("can_delete_user") Boolean value);
 
     @Transactional
     @Modifying
     @Query(value = "UPDATE group_rights r SET r.can_add_user=?2 WHERE r.rights_id=?1", nativeQuery = true)
-    void updateRightsAdd(@Param("rights_id") Integer id,@Param("can_add_user") Boolean value);
+    void updateRightsAdd(@Param("rights_id") Long id,@Param("can_add_user") Boolean value);
 
     @Transactional
     @Modifying
     @Query(value = "UPDATE group_rights r SET r.can_modify=?2 WHERE r.rights_id=?1", nativeQuery = true)
-    void updateRightsModify(@Param("rights_id") Integer id,@Param("can_modify") Boolean value);
+    void updateRightsModify(@Param("rights_id") Long id,@Param("can_modify") Boolean value);
 }

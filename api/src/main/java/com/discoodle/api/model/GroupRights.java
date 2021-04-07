@@ -27,7 +27,7 @@ public class GroupRights {
     @Id
     @GeneratedValue
     @Column(name = "rights_id", unique = true, nullable = false)
-    private Integer rightsId;
+    private Long rightsId;
 
     @Column(name = "can_delete_user")
     private boolean canDeleteUser;

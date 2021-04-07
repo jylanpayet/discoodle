@@ -11,5 +11,5 @@ import lombok.ToString;
 @ToString
 public class RoomRequest {
     private final String name;
-    private final Integer admin;
+    private final Long admin;
 }

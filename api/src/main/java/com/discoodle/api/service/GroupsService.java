@@ -3,13 +3,10 @@ package com.discoodle.api.service;
 import com.discoodle.api.ApiApplication;
 import com.discoodle.api.model.GroupRights;
 import com.discoodle.api.model.Room;
-import com.discoodle.api.request.EditGroupRequest;
-import com.discoodle.api.request.GroupRightsRequest;
+import com.discoodle.api.request.*;
 import com.discoodle.api.model.Groups;
-import com.discoodle.api.request.GroupsRequest;
 import com.discoodle.api.repository.GroupRightsRepository;
 import com.discoodle.api.repository.GroupsRepository;
-import com.discoodle.api.request.RoomRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +27,7 @@ public class GroupsService {
         GroupRights rights = new GroupRights(false, false, false);
         rights = rightsRepository.save(rights);
         Groups group = new Groups(
+                request.getParent_id(),
                 request.getDepth(),
                 request.getName(),
                 request.getDescription(),
@@ -60,7 +58,7 @@ public class GroupsService {
     public boolean editRights(GroupRightsRequest request) {
         try {
             GroupRights ofParent = groupsRepository.findById(groupsRepository.findParentOfGroup(request.getGroupId())).get().getGroupRights();
-            GroupRights r = groupsRepository.findById(request.getGroupId()).get().getGroupRights();
+            GroupRights r = groupsRepository.findGroupsByID(request.getGroupId()).get().getGroupRights();
             if (ofParent.isCanAddUser())
                 rightsRepository.updateRightsAdd(r.getRightsId(), request.isAddUser());
             if (ofParent.isCanDeleteUser())
@@ -94,5 +92,9 @@ public class GroupsService {
 
     public void deleteGroupByID(Integer groups_ID) {
         groupsRepository.deleteById(groups_ID);
+    }
+
+    public void addNewMemberInGroup(NMGroupRequest request){
+        groupsRepository.addNewMemberInGroup(request.getUser_id(), request.getGroup_id());
     }
 }
