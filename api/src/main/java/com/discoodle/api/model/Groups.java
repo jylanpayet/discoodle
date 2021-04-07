@@ -66,11 +66,11 @@ public class Groups {
     private GroupRights groupRights;
 
     @JsonIgnore
-    @ManyToMany
-    @JoinTable( name = "link_groups_to_room",
+    @OneToOne
+    @JoinTable( name = "link_groups_to_server",
             joinColumns = @JoinColumn( name ="groups_id"),
-            inverseJoinColumns = @JoinColumn( name ="room_id" ))
-    private List<Room> rooms= new ArrayList<>();
+            inverseJoinColumns = @JoinColumn( name ="server_id" ))
+    private Server server;
 
     public enum TypeOfGroup{
         DISCOODLE,

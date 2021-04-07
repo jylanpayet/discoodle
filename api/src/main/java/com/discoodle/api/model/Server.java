@@ -1,8 +1,6 @@
 package com.discoodle.api.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
-
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,10 +26,22 @@ public class Server {
     @Column(name = "name")
     private String name;
 
+    @JsonIgnore
+    @OneToOne
+    @JoinTable( name = "link_groups_to_server",
+            joinColumns = @JoinColumn( name ="server_id"),
+            inverseJoinColumns = @JoinColumn( name ="groups_id" ))
+    private Groups group;
+
     @OneToMany
     @JoinTable( name = "link_server_room",
             joinColumns = @JoinColumn( name = "server_id" ),
             inverseJoinColumns = @JoinColumn( name = "room_id" ) )
     private List<Room> rooms = new ArrayList<>();
 
+    @ManyToMany
+    @JoinTable( name = "link_server_users",
+            joinColumns = @JoinColumn( name = "server_id" ),
+            inverseJoinColumns = @JoinColumn( name = "user_id" ) )
+    private List<User> users = new ArrayList<>();
 }

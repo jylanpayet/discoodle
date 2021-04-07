@@ -24,7 +24,7 @@ public class GroupsController {
     }
 
     @DeleteMapping(path = "/api/groups/deleteGroupById/{groups_id}")
-    public void deleteGroupByID(@PathVariable("groups_id") Integer groups_ID) {
+    public void deleteGroupByID(@PathVariable("groups_id") Long groups_ID) {
         groupsService.deleteGroupByID(groups_ID);
     }
 
