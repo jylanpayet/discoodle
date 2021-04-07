@@ -58,6 +58,28 @@ public class UserController {
     public List<Room> findAllRoomsByUserID(@PathVariable Long user_id) {
         return userService.getUserByID(user_id).get().getRooms();
     }
+    @GetMapping(path = "/seeAllRooms0/{user_id}")
+    @ResponseBody
+    public List<Room> findAllRooms0ByUserID(@PathVariable Long user_id) {
+        List<Room> all = userService.getUserByID(user_id).get().getRooms();
+        List<Room> rooms = new ArrayList<>();
+        for (Room room : all ) {
+            if (!room.getRoom_link())
+                rooms.add(room);
+        }
+        return rooms;
+    }
+    @GetMapping(path = "/seeAllRooms1/{user_id}")
+    @ResponseBody
+    public List<Room> findAllRooms1ByUserID(@PathVariable Long user_id) {
+        List<Room> all = userService.getUserByID(user_id).get().getRooms();
+        List<Room> rooms = new ArrayList<>();
+        for (Room room : all ) {
+            if (room.getRoom_link())
+                rooms.add(room);
+        }
+        return rooms;
+    }
 
     @GetMapping(path = "/seeAllFriends/{user_id}")
     @ResponseBody

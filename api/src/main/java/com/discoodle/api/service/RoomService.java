@@ -16,7 +16,8 @@ public class RoomService {
     public Room createNewRoom(String room_name, List<Long> room_members) {
         Room room = new Room(
                 room_name,
-                room_members.get(0)
+                room_members.get(0),
+                false
         );
         Room finalRoom = roomRepository.save(room);
         for (Long room_member : room_members) {

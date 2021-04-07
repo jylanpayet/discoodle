@@ -16,9 +16,10 @@ import java.util.List;
 @Table(name = "room")
 public class Room {
 
-    public Room(String room_name, Long room_admin) {
+    public Room(String room_name, Long room_admin,Boolean room_link) {
         this.room_name = room_name;
         this.room_admin = room_admin;
+        this.room_link=room_link;
     }
 
     @Id
@@ -32,6 +33,8 @@ public class Room {
     private Long room_admin;
     @Column(name = "link_picture")
     private String link_picture;
+    @Column(name="room_link")
+    private Boolean room_link;
 
     @ManyToMany
     @JoinTable( name = "link_rooms_users",

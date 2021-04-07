@@ -24,7 +24,10 @@ public class ServerService {
         for(Long server_member : server_members) {
             serverRepository.addNewMember(finalServ.getServer_id(), server_member);
         }
-        roomService.createNewRoom("Géneral",server_members);
+        Room room = roomService.createNewRoom("Géneral",server_members);
+        room.setRoom_link(true);
+        serverRepository.addNewRoomInServ(finalServ.getServer_id(), room.getRoom_id());
+
         return finalServ;
     }
     public void addNewMember(Long server_id, Long user_id){
@@ -41,6 +44,7 @@ public class ServerService {
             users_id.add(user.getId());
         }
         Room newRoom= roomService.createNewRoom(name,users_id);
+        newRoom.setRoom_link(true);
         serverRepository.addNewRoomInServ(server_id,newRoom.getRoom_id());
     }
 }
