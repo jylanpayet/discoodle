@@ -46,6 +46,12 @@ public class Room {
             inverseJoinColumns = @JoinColumn( name ="groups_id" ))
     private List<Groups> groups= new ArrayList<>();
 
+    @ManyToOne
+    @JoinTable( name = "link_server_room",
+            joinColumns = @JoinColumn( name = "room_id" ),
+            inverseJoinColumns = @JoinColumn( name = "server_id" ) )
+    private Server server;
+
 
     @Getter
     @AllArgsConstructor
