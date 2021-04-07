@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import javax.transaction.Transactional;
 
 @Repository
-public interface GroupRightsRepository extends JpaRepository<GroupRights,Integer> {
+public interface GroupRightsRepository extends JpaRepository<GroupRights,Long> {
 
     @Transactional
     @Modifying

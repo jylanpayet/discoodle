@@ -13,7 +13,7 @@ import java.util.Optional;
 
 
 @Repository
-public interface GroupsRepository extends JpaRepository<Groups, Integer> {
+public interface GroupsRepository extends JpaRepository<Groups, Long> {
 
 
     @Query("SELECT group FROM Groups group where group.groups_id = ?1")
@@ -34,7 +34,7 @@ public interface GroupsRepository extends JpaRepository<Groups, Integer> {
     Optional<Groups> updateNameAndDescGroup(@Param("groups_id") Long id,@Param("name") String name,@Param("description") String description);
 
     @Query(value = "SELECT groups_id FROM link_groups_to_group g where g.son_id=?1", nativeQuery = true)
-    Integer findParentOfGroup(Long son_id);
+    Long findParentOfGroup(Long son_id);
 
     @Modifying
     @Query(value = "insert into link_groups_to_user (user_id, groups_id) VALUES (:user_id,:groups_id)", nativeQuery = true)
@@ -52,8 +52,7 @@ public interface GroupsRepository extends JpaRepository<Groups, Integer> {
     void addNewRightsInGroup(@Param("groups_id") Long groups_ID, @Param("rights_id") Long right_ID);
 
     @Modifying
-    @Query(value = "insert into link_groups_to_room (groups_id, room_id) VALUES (:groups_id,:room_id)", nativeQuery = true)
+    @Query(value = "insert into link_groups_to_server (groups_id, server_id) VALUES (:groups_id,:server_id)", nativeQuery = true)
     @Transactional
-    void addNewRoomsInGroup(@Param("groups_id") Long groups_ID, @Param("room_id") String room_ID);
-
+    void addNewServInGroup(@Param("groups_id") Long groups_id, @Param("server_id") Long server_id);
 }

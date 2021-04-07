@@ -1,15 +1,16 @@
 package com.discoodle.api.repository;
 
 import com.discoodle.api.model.Friendships;
-import com.discoodle.api.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
 import java.util.List;
 
+@Repository
 public interface FriendshipsRepository extends JpaRepository<Friendships, Long> {
     @Query("SELECT friendships FROM Friendships friendships where friendships.receiver_id = ?1 AND friendships.status = false")
     List<Friendships> getAllInvitations(Long user_id);
