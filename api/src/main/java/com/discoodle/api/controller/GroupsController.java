@@ -1,5 +1,6 @@
 package com.discoodle.api.controller;
 
+import com.discoodle.api.model.Groups;
 import com.discoodle.api.model.Server;
 import com.discoodle.api.request.EditGroupRequest;
 import com.discoodle.api.request.GroupRightsRequest;
@@ -7,6 +8,8 @@ import com.discoodle.api.request.GroupsRequest;
 import com.discoodle.api.service.GroupsService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @AllArgsConstructor
 @RestController
@@ -31,6 +34,11 @@ public class GroupsController {
     @PostMapping(path = "/api/groups/editGroup")
     public void editGroup(@RequestBody EditGroupRequest request){
         groupsService.editGroup(request);
+    }
+
+    @GetMapping(path ="/api/groups/getGroupByID/{group_id}")
+    public Optional<Groups> getGroupByID(@PathVariable("group_id") Long group_id){
+        return groupsService.findGroupsByID(group_id);
     }
 
     @PostMapping(path = "/api/groups/editFileGroup/{groups_id}")

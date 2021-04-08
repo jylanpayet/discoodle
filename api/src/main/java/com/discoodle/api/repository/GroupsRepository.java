@@ -17,7 +17,7 @@ public interface GroupsRepository extends JpaRepository<Groups, Long> {
 
 
     @Query("SELECT group FROM Groups group where group.groups_id = ?1")
-    Optional<Groups> findGroupsByID(Long user_ID);
+    Optional<Groups> findGroupsByID(Long group_ID);
 
     @Query(value = "SELECT groups FROM Groups groups where groups.depth=?1")
     Optional<Groups> findAllGroupsByDepth(Integer depth);
@@ -55,4 +55,5 @@ public interface GroupsRepository extends JpaRepository<Groups, Long> {
     @Query(value = "insert into link_groups_to_server (groups_id, server_id) VALUES (:groups_id,:server_id)", nativeQuery = true)
     @Transactional
     void addNewServInGroup(@Param("groups_id") Long groups_id, @Param("server_id") Long server_id);
+
 }
