@@ -72,6 +72,7 @@ public class User {
             inverseJoinColumns = @JoinColumn( name = "groups_id" ) )
     private List<Groups> groups = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable( name = "link_server_users",
             joinColumns = @JoinColumn( name = "user_id" ),
