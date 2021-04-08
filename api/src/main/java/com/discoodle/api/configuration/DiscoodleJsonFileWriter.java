@@ -3,6 +3,7 @@ package com.discoodle.api.configuration;
 import com.discoodle.api.ApiApplication;
 import com.discoodle.api.model.Message;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.*;
@@ -14,7 +15,6 @@ import java.util.LinkedList;
 import java.util.Scanner;
 
 public class DiscoodleJsonFileWriter {
-
 
     public static void runWriter(Message msg, String roomUUID) {
         LinkedList<Message> message;
@@ -29,7 +29,7 @@ public class DiscoodleJsonFileWriter {
                 writer.close();
             }
             Path path = Paths.get(String.format("%sstatic/common/json/%s.json", ApiApplication.RESSOURCES, roomUUID));
-            Gson gson = new Gson();
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
             Scanner myReader = new Scanner(myObj);
             while (myReader.hasNextLine()) {
