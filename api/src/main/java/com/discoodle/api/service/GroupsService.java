@@ -94,8 +94,8 @@ public class GroupsService {
         groupsRepository.deleteById(groups_ID);
     }
 
-    public void addNewMemberInGroup(NMGroupRequest request){
-        groupsRepository.addNewMemberInGroup(request.getUser_id(), request.getGroup_id());
+    public void addNewMemberInGroup(Long groups_id, Long user_id){
+        groupsRepository.addNewMemberInGroup(user_id, groups_id);
     }
 
     public Server serverOfGroup(Long groups_id) {
