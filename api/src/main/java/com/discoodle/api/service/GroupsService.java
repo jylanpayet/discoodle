@@ -14,6 +14,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -39,8 +40,8 @@ public class GroupsService {
         groupsRepository.addNewMemberInGroup(request.getUser_id(), finalGroup.getGroups_id());
 
         if (finalGroup.getType().equals(Groups.TypeOfGroup.SUBJECTS)) {
-            Server server=serverService.createNewServ("Serveur de "+finalGroup.getName(),List.of(request.getUser_id()));
-            groupsRepository.addNewServInGroup(finalGroup.getGroups_id(),server.getServer_id());
+            Server server = serverService.createNewServ("Serveur de " + finalGroup.getName(), List.of(request.getUser_id()));
+            groupsRepository.addNewServInGroup(finalGroup.getGroups_id(), server.getServer_id());
             try {
                 File dossier = new File((String.format("%sstatic/common/groups/%d", ApiApplication.RESSOURCES, finalGroup.getGroups_id())));
                 dossier.mkdirs();
@@ -80,10 +81,10 @@ public class GroupsService {
         return true;
     }
 
-    public void editFileGroup(Long groups_id,String text) {
+    public void editFileGroup(Long groups_id, String text) {
         try {
             File path = new File(String.format("%sstatic/common/groups/%d/%d.json", ApiApplication.RESSOURCES, groups_id, groups_id));
-            Files.writeString(Paths.get(String.valueOf(path)), text+"\n");
+            Files.writeString(Paths.get(String.valueOf(path)), text + "\n");
         } catch (Exception e) {
             System.out.println("erreur, fichier non édité");
             e.printStackTrace();
@@ -94,12 +95,16 @@ public class GroupsService {
         groupsRepository.deleteById(groups_ID);
     }
 
-    public void addNewMemberInGroup(Long groups_id, Long user_id){
+    public void addNewMemberInGroup(Long groups_id, Long user_id) {
         groupsRepository.addNewMemberInGroup(user_id, groups_id);
     }
 
     public Server serverOfGroup(Long groups_id) {
-        Groups group=groupsRepository.findGroupsByID(groups_id).get();
+        Groups group = groupsRepository.findGroupsByID(groups_id).get();
         return group.getServer();
+    }
+
+    public Optional<Groups> findGroupsByID(Long groups_ID) {
+       return groupsRepository.findGroupsByID(groups_ID);
     }
 }
