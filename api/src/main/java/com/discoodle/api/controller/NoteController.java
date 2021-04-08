@@ -40,7 +40,8 @@ public class NoteController {
                 writer.close();
             }
             JsonReader reader = new JsonReader(new FileReader(String.format("%sstatic/common/groups/%d/Notes_%d.json", ApiApplication.RESSOURCES, group_id, group_id)));
-            LinkedList<Note> noteLinkedList = gson.fromJson(reader, new TypeToken<LinkedList<Note>>() {}.getType());
+            LinkedList<Note> noteLinkedList = gson.fromJson(reader, new TypeToken<LinkedList<Note>>() {
+            }.getType());
             noteLinkedList.add(note);
             Path path = Paths.get(String.format("%sstatic/common/groups/%d/Notes_%d.json", ApiApplication.RESSOURCES, group_id, group_id));
             try (Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
@@ -53,6 +54,34 @@ public class NoteController {
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("fichier non éditier");
+        }
+    }
+
+    @PostMapping(path = "/api/DeleteNote/{group_id}/{user_id}")
+    public void DeleteNote( @PathVariable(name = "group_id") Long group_id, @PathVariable(name = "user_id") Long user_id) {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+        try {
+            JsonReader reader = new JsonReader(new FileReader(String.format("%sstatic/common/groups/%d/Notes_%d.json", ApiApplication.RESSOURCES, group_id, group_id)));
+            LinkedList<Note> noteLinkedList = gson.fromJson(reader, new TypeToken<LinkedList<Note>>() {
+            }.getType());
+
+            for (Note n : noteLinkedList) {
+                if (n.getUser_id() == user_id) {
+                    noteLinkedList.remove(n);
+                    System.out.println(n);
+                    Path path = Paths.get(String.format("%sstatic/common/groups/%d/Notes_%d.json", ApiApplication.RESSOURCES, group_id, group_id));
+                    try (Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
+                        gson.toJson(gson.toJsonTree(noteLinkedList), writer);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        System.err.println("note non supprimé");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("note non supprimé");
         }
     }
 }
