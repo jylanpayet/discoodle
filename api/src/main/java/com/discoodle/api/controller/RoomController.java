@@ -5,6 +5,7 @@ import com.discoodle.api.configuration.DiscoodleJsonFileWriter;
 import com.discoodle.api.model.*;
 import com.discoodle.api.service.RoomService;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import lombok.AllArgsConstructor;
@@ -23,7 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
-import java.util.List;
+
 
 @AllArgsConstructor
 @RestController
@@ -69,7 +70,7 @@ public class RoomController {
 
     @PutMapping(path = "/api/room/pinMessage/{roomUUID}")
     public void pinMessage(@RequestParam(value = "messageID") Integer messageID, @PathVariable String roomUUID) {
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try {
             JsonReader reader = new JsonReader(new FileReader(ApiApplication.RESSOURCES + "static/common/json/" + roomUUID + ".json"));
             LinkedList<Message> messages = gson.fromJson(reader, new TypeToken<LinkedList<Message>>() {
@@ -91,7 +92,7 @@ public class RoomController {
 
     @PutMapping(path = "/api/room/unpinMessage/{roomUUID}")
     public void unpinMessage(@RequestParam(value = "messageID") Integer messageID, @PathVariable String roomUUID) {
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try {
             JsonReader reader = new JsonReader(new FileReader(ApiApplication.RESSOURCES + "static/common/json/" + roomUUID + ".json"));
             LinkedList<Message> messages = gson.fromJson(reader, new TypeToken<LinkedList<Message>>() {
@@ -113,7 +114,7 @@ public class RoomController {
 
     @PutMapping(path = "/api/room/deleteMessage/{roomUUID}")
     public void deleteMessage(@RequestParam(value = "messageID") Integer messageID, @PathVariable String roomUUID) {
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try {
             JsonReader reader = new JsonReader(new FileReader(ApiApplication.RESSOURCES + "static/common/json/" + roomUUID + ".json"));
             LinkedList<Message> messages = gson.fromJson(reader, new TypeToken<LinkedList<Message>>() {
@@ -143,7 +144,7 @@ public class RoomController {
 
     @PutMapping(path = "/api/room/editMessage/{roomUUID}")
     public void editMessage(@PathVariable String roomUUID, @RequestBody EditMessageRequest messageRequest) {
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try {
             JsonReader reader = new JsonReader(new FileReader(ApiApplication.RESSOURCES + "static/common/json/" + roomUUID + ".json"));
             LinkedList<Message> messages = gson.fromJson(reader, new TypeToken<LinkedList<Message>>() {
