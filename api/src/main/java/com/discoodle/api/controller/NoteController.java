@@ -42,6 +42,7 @@ public class NoteController {
             JsonReader reader = new JsonReader(new FileReader(String.format("%sstatic/common/groups/%d/Notes_%d.json", ApiApplication.RESSOURCES, group_id, group_id)));
             LinkedList<Note> noteLinkedList = gson.fromJson(reader, new TypeToken<LinkedList<Note>>() {
             }.getType());
+            note.setNote_id((long) noteLinkedList.size());
             noteLinkedList.add(note);
             Path path = Paths.get(String.format("%sstatic/common/groups/%d/Notes_%d.json", ApiApplication.RESSOURCES, group_id, group_id));
             try (Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
@@ -53,12 +54,12 @@ public class NoteController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("fichier non éditier");
+            System.err.println("addNewNote error");
         }
     }
 
-    @PostMapping(path = "/api/DeleteNote/{group_id}/{user_id}")
-    public void DeleteNote( @PathVariable(name = "group_id") Long group_id, @PathVariable(name = "user_id") Long user_id) {
+    @PostMapping(path = "/api/deleteNote/{group_id}/{note_id}")
+    public void deleteNote(@PathVariable(name = "group_id") Long group_id, @PathVariable(name = "note_id") Long note_id) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
         try {
@@ -67,7 +68,7 @@ public class NoteController {
             }.getType());
 
             for (Note n : noteLinkedList) {
-                if (n.getUser_id() == user_id) {
+                if (n.getNote_id() == (note_id)) {
                     noteLinkedList.remove(n);
                     System.out.println(n);
                     Path path = Paths.get(String.format("%sstatic/common/groups/%d/Notes_%d.json", ApiApplication.RESSOURCES, group_id, group_id));
@@ -81,7 +82,36 @@ public class NoteController {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("note non supprimé");
+            System.err.println("deleteNote error");
+        }
+    }
+
+    @PostMapping(path = "/api/editNote/{group_id}/{note_id}/{new_note}")
+    public void editNote(@PathVariable(name = "group_id") Long group_id,
+                         @PathVariable(name = "note_id") Long note_id,
+                         @PathVariable(name = "new_note") Long new_note) {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+        try {
+            JsonReader reader = new JsonReader(new FileReader(String.format("%sstatic/common/groups/%d/Notes_%d.json", ApiApplication.RESSOURCES, group_id, group_id)));
+            LinkedList<Note> noteLinkedList = gson.fromJson(reader, new TypeToken<LinkedList<Note>>() {
+            }.getType());
+            for (Note n : noteLinkedList){
+                if(n.getNote_id() == (note_id)){
+                    n.setNote(new_note);
+                    System.out.println(n);
+                    Path path = Paths.get(String.format("%sstatic/common/groups/%d/Notes_%d.json", ApiApplication.RESSOURCES, group_id, group_id));
+                    try (Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
+                        gson.toJson(gson.toJsonTree(noteLinkedList), writer);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        System.err.println("note non modifié");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("editNote file error");
         }
     }
 }
