@@ -3,6 +3,7 @@ package com.discoodle.api.controller;
 import com.discoodle.api.ApiApplication;
 import com.discoodle.api.model.Message;
 import com.discoodle.api.model.Note;
+import com.discoodle.api.request.NoteRequest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -86,10 +87,10 @@ public class NoteController {
         }
     }
 
-    @PostMapping(path = "/api/editNote/{group_id}/{note_id}/{new_note}")
+    @PostMapping(path = "/api/editNote/{group_id}/{note_id}")
     public void editNote(@PathVariable(name = "group_id") Long group_id,
                          @PathVariable(name = "note_id") Long note_id,
-                         @PathVariable(name = "new_note") Long new_note) {
+                         @RequestBody NoteRequest note) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
         try {
@@ -98,7 +99,7 @@ public class NoteController {
             }.getType());
             for (Note n : noteLinkedList){
                 if(n.getNote_id() == (note_id)){
-                    n.setNote(new_note);
+                    n.setNote(note.getNote());
                     System.out.println(n);
                     Path path = Paths.get(String.format("%sstatic/common/groups/%d/Notes_%d.json", ApiApplication.RESSOURCES, group_id, group_id));
                     try (Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
