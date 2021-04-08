@@ -10,7 +10,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public class GroupRightsRequest {
-    private final Integer groupId;
+    private final Long groupId;
     private final boolean addUser;
     private final boolean deleteUser;
     private final boolean modify;

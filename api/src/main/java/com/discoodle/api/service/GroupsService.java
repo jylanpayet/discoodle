@@ -2,14 +2,11 @@ package com.discoodle.api.service;
 
 import com.discoodle.api.ApiApplication;
 import com.discoodle.api.model.GroupRights;
-import com.discoodle.api.model.Room;
-import com.discoodle.api.request.EditGroupRequest;
-import com.discoodle.api.request.GroupRightsRequest;
+import com.discoodle.api.model.Server;
+import com.discoodle.api.request.*;
 import com.discoodle.api.model.Groups;
-import com.discoodle.api.request.GroupsRequest;
 import com.discoodle.api.repository.GroupRightsRepository;
 import com.discoodle.api.repository.GroupsRepository;
-import com.discoodle.api.request.RoomRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,12 +21,13 @@ import java.util.List;
 public class GroupsService {
     private final GroupsRepository groupsRepository;
     private final GroupRightsRepository rightsRepository;
-    private final RoomService roomService;
+    private final ServerService serverService;
 
     public Groups createNewGroup(GroupsRequest request) {
         GroupRights rights = new GroupRights(false, false, false);
         rights = rightsRepository.save(rights);
         Groups group = new Groups(
+                request.getParent_id(),
                 request.getDepth(),
                 request.getName(),
                 request.getDescription(),
@@ -41,8 +39,8 @@ public class GroupsService {
         groupsRepository.addNewMemberInGroup(request.getUser_id(), finalGroup.getGroups_id());
 
         if (finalGroup.getType().equals(Groups.TypeOfGroup.SUBJECTS)) {
-            Room r=roomService.createNewRoom(request.getName(), List.of(request.getUser_id()));
-            groupsRepository.addNewRoomsInGroup(finalGroup.getGroups_id(),r.getRoom_id());
+            Server server=serverService.createNewServ("Serveur de "+finalGroup.getName(),List.of(request.getUser_id()));
+            groupsRepository.addNewServInGroup(finalGroup.getGroups_id(),server.getServer_id());
             try {
                 File dossier = new File((String.format("%sstatic/common/groups/%d", ApiApplication.RESSOURCES, finalGroup.getGroups_id())));
                 dossier.mkdirs();
@@ -60,7 +58,7 @@ public class GroupsService {
     public boolean editRights(GroupRightsRequest request) {
         try {
             GroupRights ofParent = groupsRepository.findById(groupsRepository.findParentOfGroup(request.getGroupId())).get().getGroupRights();
-            GroupRights r = groupsRepository.findById(request.getGroupId()).get().getGroupRights();
+            GroupRights r = groupsRepository.findGroupsByID(request.getGroupId()).get().getGroupRights();
             if (ofParent.isCanAddUser())
                 rightsRepository.updateRightsAdd(r.getRightsId(), request.isAddUser());
             if (ofParent.isCanDeleteUser())
@@ -92,7 +90,16 @@ public class GroupsService {
         }
     }
 
-    public void deleteGroupByID(Integer groups_ID) {
+    public void deleteGroupByID(Long groups_ID) {
         groupsRepository.deleteById(groups_ID);
+    }
+
+    public void addNewMemberInGroup(Long groups_id, Long user_id){
+        groupsRepository.addNewMemberInGroup(user_id, groups_id);
+    }
+
+    public Server serverOfGroup(Long groups_id) {
+        Groups group=groupsRepository.findGroupsByID(groups_id).get();
+        return group.getServer();
     }
 }

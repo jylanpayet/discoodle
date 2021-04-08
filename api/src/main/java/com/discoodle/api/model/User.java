@@ -72,6 +72,12 @@ public class User {
             inverseJoinColumns = @JoinColumn( name = "groups_id" ) )
     private List<Groups> groups = new ArrayList<>();
 
+    @ManyToMany
+    @JoinTable( name = "link_server_users",
+            joinColumns = @JoinColumn( name = "user_id" ),
+            inverseJoinColumns = @JoinColumn( name = "server_id" ) )
+    private List<Server> serv = new ArrayList<>();
+
     public enum Role {
         STUDENT,
         TEACHER,

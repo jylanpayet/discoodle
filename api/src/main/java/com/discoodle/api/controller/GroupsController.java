@@ -1,5 +1,6 @@
 package com.discoodle.api.controller;
 
+import com.discoodle.api.model.Server;
 import com.discoodle.api.request.EditGroupRequest;
 import com.discoodle.api.request.GroupRightsRequest;
 import com.discoodle.api.request.GroupsRequest;
@@ -23,7 +24,7 @@ public class GroupsController {
     }
 
     @DeleteMapping(path = "/api/groups/deleteGroupById/{groups_id}")
-    public void deleteGroupByID(@PathVariable("groups_id") Integer groups_ID) {
+    public void deleteGroupByID(@PathVariable("groups_id") Long groups_ID) {
         groupsService.deleteGroupByID(groups_ID);
     }
 
@@ -34,4 +35,13 @@ public class GroupsController {
 
     @PostMapping(path = "/api/groups/editFileGroup/{groups_id}")
     public void editFileGroup(@PathVariable("groups_id") Long groups_ID, @RequestBody GroupsRequest request){ groupsService.editFileGroup(groups_ID, request.getText()); }
+
+    @GetMapping(path = "/api/groups/addNewMemberInGroup/{groups_id}")
+    public void addNewMemberInGroup(@PathVariable Long groups_id, @RequestParam(value = "user_id") Long user_id){ groupsService.addNewMemberInGroup(groups_id, user_id);}
+
+
+    @GetMapping(path = "/api/groups/serverGroup/{groups_id}")
+    public Server serverOfGroup(@PathVariable("groups_id") Long groups_ID) {
+        return groupsService.serverOfGroup(groups_ID);
+    }
 }

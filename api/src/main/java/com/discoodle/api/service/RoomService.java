@@ -16,11 +16,12 @@ public class RoomService {
     public Room createNewRoom(String room_name, List<Long> room_members) {
         Room room = new Room(
                 room_name,
-                room_members.get(0)
+                room_members.get(0),
+                false
         );
         Room finalRoom = roomRepository.save(room);
         for (Long room_member : room_members) {
-            roomRepository.addNewMembers(room_member, finalRoom.getRoom_id());
+            roomRepository.addNewMember(finalRoom.getRoom_id(),room_member);
         }
         return finalRoom;
     }
@@ -31,7 +32,7 @@ public class RoomService {
 
     public Optional<Room> addNewMembers(String room_id, List<Long> room_members) {
         for (Long room_member : room_members) {
-            roomRepository.addNewMembers(room_member, room_id);
+            roomRepository.addNewMember(room_id,room_member);
         }
         return roomRepository.findRoomByUUID(room_id);
     }

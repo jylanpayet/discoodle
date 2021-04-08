@@ -73,7 +73,7 @@ export default {
          axios.post(`http://localhost:8080/api/registration`, {
             mail: document.querySelector("input[name=mailReg]").value,
             password: document.querySelector("input[name=passwordReg]").value,
-            lastName: document.querySelector("input[name=lastname]").value,
+            last_name: document.querySelector("input[name=lastname]").value,
             name: document.querySelector("input[name=name]").value,
             username: document.querySelector("input[name=username]").value,
          }).then(response => {
