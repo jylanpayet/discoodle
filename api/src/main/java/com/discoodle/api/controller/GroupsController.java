@@ -1,5 +1,6 @@
 package com.discoodle.api.controller;
 
+import com.discoodle.api.model.Server;
 import com.discoodle.api.request.EditGroupRequest;
 import com.discoodle.api.request.GroupRightsRequest;
 import com.discoodle.api.request.GroupsRequest;
@@ -39,4 +40,8 @@ public class GroupsController {
     @PostMapping(path = "/api/groups/addNewMemberInGroup")
     public void AddNewMemberInGroup(@RequestBody NMGroupRequest request){ groupsService.addNewMemberInGroup(request);}
 
+    @PostMapping(path = "/api/groups/serverGroup/{groups_id}")
+    public Server serverOfGroup(@PathVariable("groups_id") Long groups_ID) {
+        return groupsService.serverOfGroup(groups_ID);
+    }
 }

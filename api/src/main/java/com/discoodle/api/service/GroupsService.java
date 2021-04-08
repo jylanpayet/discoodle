@@ -97,4 +97,9 @@ public class GroupsService {
     public void addNewMemberInGroup(NMGroupRequest request){
         groupsRepository.addNewMemberInGroup(request.getUser_id(), request.getGroup_id());
     }
+
+    public Server serverOfGroup(Long groups_id) {
+        Groups group=groupsRepository.findGroupsByID(groups_id).get();
+        return group.getServer();
+    }
 }
