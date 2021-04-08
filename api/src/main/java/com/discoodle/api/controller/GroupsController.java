@@ -40,7 +40,7 @@ public class GroupsController {
     public void addNewMemberInGroup(@PathVariable Long groups_id, @RequestParam(value = "user_id") Long user_id){ groupsService.addNewMemberInGroup(groups_id, user_id);}
 
 
-    @PostMapping(path = "/api/groups/serverGroup/{groups_id}")
+    @GetMapping(path = "/api/groups/serverGroup/{groups_id}")
     public Server serverOfGroup(@PathVariable("groups_id") Long groups_ID) {
         return groupsService.serverOfGroup(groups_ID);
     }
