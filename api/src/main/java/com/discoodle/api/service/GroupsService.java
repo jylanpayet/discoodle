@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 
 @Service
@@ -27,12 +28,15 @@ public class GroupsService {
     public Groups createNewGroup(GroupsRequest request) {
         GroupRights rights = new GroupRights(false, false, false);
         rights = rightsRepository.save(rights);
+        String key = UUID.randomUUID().toString().replace("-", "").substring(0,8);
         Groups group = new Groups(
                 request.getParent_id(),
                 request.getDepth(),
                 request.getName(),
                 request.getDescription(),
-                request.getType()
+                request.getType(),
+                key
+
         );
         Groups finalGroup = groupsRepository.save(group);
         groupsRepository.addNewRightsInGroup(finalGroup.getGroups_id(), rights.getRightsId());

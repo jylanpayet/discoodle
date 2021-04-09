@@ -5,7 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.GenericGenerator;
 
+import javax.annotation.processing.Generated;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,12 +20,13 @@ import java.util.List;
 @Table(name = "groups")
 public class Groups {
 
-    public Groups(Long parent_id, Integer depth, String name,String description, TypeOfGroup type) {
+    public Groups(Long parent_id, Integer depth, String name,String description, TypeOfGroup type, String key) {
         this.parent_id=parent_id;
         this.depth = depth;
         this.name = name;
         this.description=description;
         this.type = type;
+        this.key = key;
     }
 
     @Id
@@ -42,6 +45,9 @@ public class Groups {
 
     @Column(name = "description")
     private String description;
+
+    @Column(name = "key")
+    private String key;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type_of_group")
