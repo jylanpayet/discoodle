@@ -3,6 +3,7 @@ package com.discoodle.api.service;
 import com.discoodle.api.ApiApplication;
 import com.discoodle.api.model.GroupRights;
 import com.discoodle.api.model.Server;
+import com.discoodle.api.model.User;
 import com.discoodle.api.request.*;
 import com.discoodle.api.model.Groups;
 import com.discoodle.api.repository.GroupRightsRepository;
@@ -24,6 +25,7 @@ public class GroupsService {
     private final GroupsRepository groupsRepository;
     private final GroupRightsRepository rightsRepository;
     private final ServerService serverService;
+    private final UserService userService;
 
     public Optional<Groups> createNewGroup(GroupsRequest request) {
         GroupRights rights = new GroupRights(false, false, false);
@@ -100,10 +102,11 @@ public class GroupsService {
     }
 
     public Optional<Groups> addNewMemberInGroup(Long groups_id, Long user_id, String token) {
-        Optional<Groups> temp = groupsRepository.findGroupsByID(groups_id);
-        if (temp.isPresent() && (temp.get().getToken().equals(token)) && groupsRepository.addNewMemberInGroup(user_id,groups_id)==1){
+        Optional<Groups> tempGroup = groupsRepository.findGroupsByID(groups_id);
+        Optional<User> tempUser = userService.getUserByID(user_id);
+        if (tempGroup.isPresent() && tempUser.isPresent() && (tempGroup.get().getToken().equals(token)) && groupsRepository.addNewMemberInGroup(user_id,groups_id)==1){
            return groupsRepository.findGroupsByID(groups_id);
-        } else if(!(temp.get().getToken().equals(token))){
+        } else if(!(tempGroup.get().getToken().equals(token))){
             return Optional.empty();
         }
         return Optional.empty();
