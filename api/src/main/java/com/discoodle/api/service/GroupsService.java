@@ -25,7 +25,7 @@ public class GroupsService {
     private final GroupRightsRepository rightsRepository;
     private final ServerService serverService;
 
-    public Groups createNewGroup(GroupsRequest request) {
+    public Optional<Groups> createNewGroup(GroupsRequest request) {
         GroupRights rights = new GroupRights(false, false, false);
         rights = rightsRepository.save(rights);
         String token = UUID.randomUUID().toString().replaceAll("-", "").substring(0, 8);
@@ -57,7 +57,7 @@ public class GroupsService {
                 System.out.println("Dossier du groups non crée !");
             }
         }
-        return finalGroup;
+        return Optional.of(finalGroup);
     }
 
     public boolean editRights(GroupRightsRequest request) {
@@ -99,10 +99,12 @@ public class GroupsService {
         groupsRepository.deleteById(groups_ID);
     }
 
-    public void addNewMemberInGroup(Long groups_id, Long user_id, String token) {
+    public Optional<Groups> addNewMemberInGroup(Long groups_id, Long user_id, String token) {
         Optional<Groups> temp = groupsRepository.findGroupsByID(groups_id);
-        if (temp.isPresent() && (temp.get().getToken().equals(token)))
-            groupsRepository.addNewMemberInGroup(user_id, groups_id);
+        if (temp.isPresent() && (temp.get().getToken().equals(token)) && groupsRepository.addNewMemberInGroup(user_id,groups_id)==1){
+           return groupsRepository.findGroupsByID(groups_id);
+        }
+        return temp;
     }
 
     public Server serverOfGroup(Long groups_id) {
