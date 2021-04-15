@@ -44,8 +44,8 @@ public class GroupsController {
     @PostMapping(path = "/api/groups/editFileGroup/{groups_id}")
     public void editFileGroup(@PathVariable("groups_id") Long groups_ID, @RequestBody GroupsRequest request){ groupsService.editFileGroup(groups_ID, request.getText()); }
 
-    @GetMapping(path = "/api/groups/addNewMemberInGroup/{groups_id}")
-    public void addNewMemberInGroup(@PathVariable Long groups_id, @RequestParam(value = "user_id") Long user_id){ groupsService.addNewMemberInGroup(groups_id, user_id);}
+    @PostMapping(path = "/api/groups/addNewMemberInGroup/{groups_id}")
+    public void addNewMemberInGroup(@PathVariable Long groups_id, @RequestParam(value = "user_id") Long user_id, @RequestParam(value ="token" ) String token){ groupsService.addNewMemberInGroup(groups_id, user_id, token);}
 
 
     @GetMapping(path = "/api/groups/serverGroup/{groups_id}")

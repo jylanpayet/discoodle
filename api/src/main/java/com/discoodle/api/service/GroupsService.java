@@ -28,14 +28,14 @@ public class GroupsService {
     public Groups createNewGroup(GroupsRequest request) {
         GroupRights rights = new GroupRights(false, false, false);
         rights = rightsRepository.save(rights);
-        String key = UUID.randomUUID().toString().replace("-", "").substring(0,8);
+        String token = UUID.randomUUID().toString().replaceAll("-", "").substring(0, 8);
         Groups group = new Groups(
                 request.getParent_id(),
                 request.getDepth(),
                 request.getName(),
                 request.getDescription(),
                 request.getType(),
-                key
+                token
 
         );
         Groups finalGroup = groupsRepository.save(group);
@@ -99,8 +99,10 @@ public class GroupsService {
         groupsRepository.deleteById(groups_ID);
     }
 
-    public void addNewMemberInGroup(Long groups_id, Long user_id) {
-        groupsRepository.addNewMemberInGroup(user_id, groups_id);
+    public void addNewMemberInGroup(Long groups_id, Long user_id, String token) {
+        Optional<Groups> temp = groupsRepository.findGroupsByID(groups_id);
+        if (temp.isPresent() && (temp.get().getToken().equals(token)))
+            groupsRepository.addNewMemberInGroup(user_id, groups_id);
     }
 
     public Server serverOfGroup(Long groups_id) {
@@ -109,6 +111,6 @@ public class GroupsService {
     }
 
     public Optional<Groups> findGroupsByID(Long groups_ID) {
-       return groupsRepository.findGroupsByID(groups_ID);
+        return groupsRepository.findGroupsByID(groups_ID);
     }
 }
