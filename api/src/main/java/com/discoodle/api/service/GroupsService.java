@@ -103,8 +103,10 @@ public class GroupsService {
         Optional<Groups> temp = groupsRepository.findGroupsByID(groups_id);
         if (temp.isPresent() && (temp.get().getToken().equals(token)) && groupsRepository.addNewMemberInGroup(user_id,groups_id)==1){
            return groupsRepository.findGroupsByID(groups_id);
+        } else if(!(temp.get().getToken().equals(token))){
+            return Optional.empty();
         }
-        return temp;
+        return Optional.empty();
     }
 
     public Server serverOfGroup(Long groups_id) {

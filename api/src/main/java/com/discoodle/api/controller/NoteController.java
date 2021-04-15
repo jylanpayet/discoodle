@@ -1,7 +1,6 @@
 package com.discoodle.api.controller;
 
 import com.discoodle.api.ApiApplication;
-import com.discoodle.api.model.Message;
 import com.discoodle.api.model.Note;
 import com.discoodle.api.request.NoteRequest;
 import com.google.gson.Gson;
