@@ -40,7 +40,7 @@ export default {
 <style scoped>
 .Group {
    width: 100%;
-   min-height: 100%;
+   min-height: 100vh;
 
    display: flex;
    flex-direction: column;
@@ -50,7 +50,7 @@ export default {
 
 .navbar {
    width: 100%;
-   height: 120px;
+   height: 100px;
    display: flex;
    align-items: center;
    justify-content: center;
@@ -68,7 +68,7 @@ export default {
 .navbar-links {
    display: flex;
    align-items: center;
-   justify-content: flex-start;
+   justify-content: center;
    width: 120px;
    height: 40px;
 }

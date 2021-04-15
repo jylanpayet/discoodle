@@ -11,5 +11,8 @@ export default {
 </script>
 
 <style scoped>
-
+.SubjectChat {
+   height: calc(100vh - 100px);
+   width: 100%;
+}
 </style>
