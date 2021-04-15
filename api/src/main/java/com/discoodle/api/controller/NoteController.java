@@ -1,5 +1,4 @@
 package com.discoodle.api.controller;
-
 import com.discoodle.api.ApiApplication;
 import com.discoodle.api.model.Note;
 import com.discoodle.api.request.NoteRequest;
@@ -31,29 +30,29 @@ public class NoteController {
     public void addNewNote(@RequestBody Note note, @PathVariable Long group_id) {
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String link=String.format("%sstatic/common/groups/%d/%d.json", ApiApplication.RESSOURCES, group_id, group_id);
 
         try {
-            File file = new File(String.format("%sstatic/common/groups/%d/%d.json", ApiApplication.RESSOURCES, group_id, group_id));
+            File file = new File(link);
             if (!file.exists()) {
                 file.createNewFile();
                 PrintWriter writer = new PrintWriter(file);
                 writer.write("[\n\n]");
                 writer.close();
             }
-            JsonReader reader = new JsonReader(new FileReader(String.format("%sstatic/common/groups/%d/%d.json", ApiApplication.RESSOURCES, group_id, group_id)));
+            JsonReader reader = new JsonReader(new FileReader(link));
             LinkedList<Note> noteLinkedList = gson.fromJson(reader, new TypeToken<LinkedList<Note>>() {
             }.getType());
             String id = UUID.randomUUID().toString().replaceAll("-", "");
             note.setNote_id(id);
             noteLinkedList.add(note);
-            Path path = Paths.get(String.format("%sstatic/common/groups/%d/%d.json", ApiApplication.RESSOURCES, group_id, group_id));
+            Path path = Paths.get(link);
             try (Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
                 gson.toJson(gson.toJsonTree(noteLinkedList), writer);
             } catch (Exception e) {
                 e.printStackTrace();
-                System.err.println("fichier json non mis à jour");
+                System.err.println("Fichier Json non mis à jour.");
             }
-
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("addNewNote error");
@@ -62,23 +61,24 @@ public class NoteController {
 
     @PostMapping(path = "/api/deleteNote/{group_id}/{note_id}")
     public void deleteNote(@PathVariable(name = "group_id") Long group_id, @PathVariable(name = "note_id") String note_id) {
+
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String link=String.format("%sstatic/common/groups/%d/%d.json", ApiApplication.RESSOURCES, group_id, group_id);
 
         try {
-            JsonReader reader = new JsonReader(new FileReader(String.format("%sstatic/common/groups/%d/%d.json", ApiApplication.RESSOURCES, group_id, group_id)));
+            JsonReader reader = new JsonReader(new FileReader(link));
             LinkedList<Note> noteLinkedList = gson.fromJson(reader, new TypeToken<LinkedList<Note>>() {
             }.getType());
 
             for (Note n : noteLinkedList) {
                 if (n.getNote_id().equals(note_id)) {
                     noteLinkedList.remove(n);
-                    System.out.println(n);
-                    Path path = Paths.get(String.format("%sstatic/common/groups/%d/%d.json", ApiApplication.RESSOURCES, group_id, group_id));
+                    Path path = Paths.get(link);
                     try (Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
                         gson.toJson(gson.toJsonTree(noteLinkedList), writer);
                     } catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("note non supprimé");
+                        System.err.println("Note non supprimée.");
                     }
                 }
             }
@@ -92,22 +92,23 @@ public class NoteController {
     public void editNote(@PathVariable(name = "group_id") Long group_id,
                          @PathVariable(name = "note_id") String note_id,
                          @RequestBody NoteRequest note) {
+
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String link=String.format("%sstatic/common/groups/%d/%d.json", ApiApplication.RESSOURCES, group_id, group_id);
 
         try {
-            JsonReader reader = new JsonReader(new FileReader(String.format("%sstatic/common/groups/%d/%d.json", ApiApplication.RESSOURCES, group_id, group_id)));
-            LinkedList<Note> noteLinkedList = gson.fromJson(reader, new TypeToken<LinkedList<Note>>() {
-            }.getType());
+            JsonReader reader = new JsonReader(new FileReader(link));
+            LinkedList<Note> noteLinkedList = gson.fromJson(reader, new TypeToken<LinkedList<Note>>() {}.getType());
+
             for (Note n : noteLinkedList){
                 if(n.getNote_id().equals(note_id)){
                     n.setNote(note.getNote());
-                    System.out.println(n);
-                    Path path = Paths.get(String.format("%sstatic/common/groups/%d/%d.json", ApiApplication.RESSOURCES, group_id, group_id));
+                    Path path = Paths.get(link);
                     try (Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
                         gson.toJson(gson.toJsonTree(noteLinkedList), writer);
                     } catch (Exception e) {
                         e.printStackTrace();
-                        System.err.println("note non modifié");
+                        System.err.println("Note non modifiée.");
                     }
                 }
             }
