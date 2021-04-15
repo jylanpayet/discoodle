@@ -1,7 +1,6 @@
 package com.discoodle.api.repository;
 
 import com.discoodle.api.model.Groups;
-import com.discoodle.api.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -39,7 +38,7 @@ public interface GroupsRepository extends JpaRepository<Groups, Long> {
     @Modifying
     @Query(value = "insert into link_groups_to_user (user_id, groups_id) VALUES (:user_id,:groups_id)", nativeQuery = true)
     @Transactional
-    void addNewMemberInGroup(@Param("user_id") Long user_id, @Param("groups_id") Long groups_id);
+    int addNewMemberInGroup(@Param("user_id") Long user_id, @Param("groups_id") Long groups_id);
 
     @Modifying
     @Query(value = "insert into link_groups_to_group (groups_id, son_id) VALUES (:groups_id,:son_id)", nativeQuery = true)

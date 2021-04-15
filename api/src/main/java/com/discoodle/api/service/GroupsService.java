@@ -3,6 +3,7 @@ package com.discoodle.api.service;
 import com.discoodle.api.ApiApplication;
 import com.discoodle.api.model.GroupRights;
 import com.discoodle.api.model.Server;
+import com.discoodle.api.model.User;
 import com.discoodle.api.request.*;
 import com.discoodle.api.model.Groups;
 import com.discoodle.api.repository.GroupRightsRepository;
@@ -15,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 
 @Service
@@ -23,16 +25,20 @@ public class GroupsService {
     private final GroupsRepository groupsRepository;
     private final GroupRightsRepository rightsRepository;
     private final ServerService serverService;
+    private final UserService userService;
 
-    public Groups createNewGroup(GroupsRequest request) {
+    public Optional<Groups> createNewGroup(GroupsRequest request) {
         GroupRights rights = new GroupRights(false, false, false);
         rights = rightsRepository.save(rights);
+        String token = UUID.randomUUID().toString().replaceAll("-", "").substring(0, 8);
         Groups group = new Groups(
                 request.getParent_id(),
                 request.getDepth(),
                 request.getName(),
                 request.getDescription(),
-                request.getType()
+                request.getType(),
+                token
+
         );
         Groups finalGroup = groupsRepository.save(group);
         groupsRepository.addNewRightsInGroup(finalGroup.getGroups_id(), rights.getRightsId());
@@ -53,7 +59,7 @@ public class GroupsService {
                 System.out.println("Dossier du groups non crée !");
             }
         }
-        return finalGroup;
+        return Optional.of(finalGroup);
     }
 
     public boolean editRights(GroupRightsRequest request) {
@@ -95,8 +101,15 @@ public class GroupsService {
         groupsRepository.deleteById(groups_ID);
     }
 
-    public void addNewMemberInGroup(Long groups_id, Long user_id) {
-        groupsRepository.addNewMemberInGroup(user_id, groups_id);
+    public Optional<Groups> addNewMemberInGroup(Long groups_id, Long user_id, String token) {
+        Optional<Groups> tempGroup = groupsRepository.findGroupsByID(groups_id);
+        Optional<User> tempUser = userService.getUserByID(user_id);
+        if (tempGroup.isPresent() && tempUser.isPresent() && (tempGroup.get().getToken().equals(token)) && groupsRepository.addNewMemberInGroup(user_id,groups_id)==1){
+           return groupsRepository.findGroupsByID(groups_id);
+        } else if(tempGroup.isPresent() && !tempGroup.get().getToken().equals(token)){
+            return Optional.empty();
+        }
+        return Optional.empty();
     }
 
     public Server serverOfGroup(Long groups_id) {
@@ -105,6 +118,6 @@ public class GroupsService {
     }
 
     public Optional<Groups> findGroupsByID(Long groups_ID) {
-       return groupsRepository.findGroupsByID(groups_ID);
+        return groupsRepository.findGroupsByID(groups_ID);
     }
 }

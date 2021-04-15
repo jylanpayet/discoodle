@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,12 +17,13 @@ import java.util.List;
 @Table(name = "groups")
 public class Groups {
 
-    public Groups(Long parent_id, Integer depth, String name,String description, TypeOfGroup type) {
-        this.parent_id=parent_id;
+    public Groups(Long parent_id, Integer depth, String name, String description, TypeOfGroup type, String token) {
+        this.parent_id = parent_id;
         this.depth = depth;
         this.name = name;
-        this.description=description;
+        this.description = description;
         this.type = type;
+        this.token = token;
     }
 
     @Id
@@ -43,36 +43,39 @@ public class Groups {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "token")
+    private String token;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "type_of_group")
     private TypeOfGroup type;
 
     @JsonIgnore
     @OneToMany
-    @JoinTable( name = "link_groups_to_group",
-            joinColumns = @JoinColumn( name = "groups_id"),
-            inverseJoinColumns = @JoinColumn( name = "son_id", referencedColumnName = "groups_id"))
+    @JoinTable(name = "link_groups_to_group",
+            joinColumns = @JoinColumn(name = "groups_id"),
+            inverseJoinColumns = @JoinColumn(name = "son_id", referencedColumnName = "groups_id"))
     private List<Groups> underGroups = new ArrayList<>();
 
     @JsonIgnore
     @ManyToMany
-    @JoinTable( name = "link_groups_to_user",
-            joinColumns = @JoinColumn( name = "groups_id" ),
-            inverseJoinColumns = @JoinColumn( name = "user_id" ) )
+    @JoinTable(name = "link_groups_to_user",
+            joinColumns = @JoinColumn(name = "groups_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<User> users = new ArrayList<>();
 
     @OneToOne
-    @JoinColumn(name="groups_rights_id")
+    @JoinColumn(name = "groups_rights_id")
     private GroupRights groupRights;
 
     @JsonIgnore
     @OneToOne
-    @JoinTable( name = "link_groups_to_server",
-            joinColumns = @JoinColumn( name ="groups_id"),
-            inverseJoinColumns = @JoinColumn( name ="server_id" ))
+    @JoinTable(name = "link_groups_to_server",
+            joinColumns = @JoinColumn(name = "groups_id"),
+            inverseJoinColumns = @JoinColumn(name = "server_id"))
     private Server server;
 
-    public enum TypeOfGroup{
+    public enum TypeOfGroup {
         DISCOODLE,
         ESTABLISHMENT,
         FACULTY,
