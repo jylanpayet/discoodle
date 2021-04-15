@@ -11,18 +11,16 @@ import lombok.Setter;
 public class Note {
 
     private Long user_id;
-    private String user_firstName;
-    private String user_lastName;
+    private String userName;
     private Long group_id;
     private double note;
     private double coef;
     private String titre;
-    private Long note_id;
+    private String note_id;
 
-    public Note(Long user_id, String user_firstName, String user_lastName, Long group_id, double note, double coef, String titre, Long note_id) {
+    public Note(Long user_id, String userName, Long group_id, double note, double coef, String titre, String note_id) {
         this.user_id = user_id;
-        this.user_firstName = user_firstName;
-        this.user_lastName = user_lastName;
+        this.userName = userName;
         this.group_id = group_id;
         this.note = note;
         this.coef = coef;

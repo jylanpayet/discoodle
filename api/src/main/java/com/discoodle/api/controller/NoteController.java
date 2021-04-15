@@ -1,7 +1,6 @@
 package com.discoodle.api.controller;
 
 import com.discoodle.api.ApiApplication;
-import com.discoodle.api.model.Message;
 import com.discoodle.api.model.Note;
 import com.discoodle.api.request.NoteRequest;
 import com.google.gson.Gson;
@@ -20,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
+import java.util.UUID;
 
 
 @AllArgsConstructor
@@ -43,7 +43,8 @@ public class NoteController {
             JsonReader reader = new JsonReader(new FileReader(String.format("%sstatic/common/groups/%d/Notes_%d.json", ApiApplication.RESSOURCES, group_id, group_id)));
             LinkedList<Note> noteLinkedList = gson.fromJson(reader, new TypeToken<LinkedList<Note>>() {
             }.getType());
-            note.setNote_id((long) noteLinkedList.size());
+            String id = UUID.randomUUID().toString().replaceAll("-", "");
+            note.setNote_id(id);
             noteLinkedList.add(note);
             Path path = Paths.get(String.format("%sstatic/common/groups/%d/Notes_%d.json", ApiApplication.RESSOURCES, group_id, group_id));
             try (Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
@@ -60,7 +61,7 @@ public class NoteController {
     }
 
     @PostMapping(path = "/api/deleteNote/{group_id}/{note_id}")
-    public void deleteNote(@PathVariable(name = "group_id") Long group_id, @PathVariable(name = "note_id") Long note_id) {
+    public void deleteNote(@PathVariable(name = "group_id") Long group_id, @PathVariable(name = "note_id") String note_id) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
         try {
@@ -69,7 +70,7 @@ public class NoteController {
             }.getType());
 
             for (Note n : noteLinkedList) {
-                if (n.getNote_id() == (note_id)) {
+                if (n.getNote_id().equals(note_id)) {
                     noteLinkedList.remove(n);
                     System.out.println(n);
                     Path path = Paths.get(String.format("%sstatic/common/groups/%d/Notes_%d.json", ApiApplication.RESSOURCES, group_id, group_id));
@@ -89,7 +90,7 @@ public class NoteController {
 
     @PostMapping(path = "/api/editNote/{group_id}/{note_id}")
     public void editNote(@PathVariable(name = "group_id") Long group_id,
-                         @PathVariable(name = "note_id") Long note_id,
+                         @PathVariable(name = "note_id") String note_id,
                          @RequestBody NoteRequest note) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
@@ -98,7 +99,7 @@ public class NoteController {
             LinkedList<Note> noteLinkedList = gson.fromJson(reader, new TypeToken<LinkedList<Note>>() {
             }.getType());
             for (Note n : noteLinkedList){
-                if(n.getNote_id() == (note_id)){
+                if(n.getNote_id().equals(note_id)){
                     n.setNote(note.getNote());
                     System.out.println(n);
                     Path path = Paths.get(String.format("%sstatic/common/groups/%d/Notes_%d.json", ApiApplication.RESSOURCES, group_id, group_id));
