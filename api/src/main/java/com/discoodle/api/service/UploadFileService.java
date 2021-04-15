@@ -20,15 +20,19 @@ public class UploadFileService {
         String path = String.format("%sstatic/common/groups/%d/" + file.getOriginalFilename(), ApiApplication.RESSOURCES, group_id);
         File add = new File(path);
         try {
-            if (!add.exists()) {
-                add.createNewFile();
-            } else {
-                //Ajouter des fichiers avec le même nom sans pouvoir les confondre => mettre des index dans les fichiers au même nom.
+            int i=1;
+            while(add.exists()){
+                String index= FilenameUtils.removeExtension(file.getOriginalFilename())+"("+i+")."+FilenameUtils.getExtension(file.getOriginalFilename());
+                path = String.format("%sstatic/common/groups/%d/" +index, ApiApplication.RESSOURCES, group_id);
+                add=new File(path);
+                i++;
             }
+            add.createNewFile();
             Files.write(Path.of(path), file.getBytes());
         } catch (IOException e) {
             System.out.println(e);
         }
+
         return "Fichier upload avec succès !";
     }
     public String uploadSubject(MultipartFile file, Long group_id) {
