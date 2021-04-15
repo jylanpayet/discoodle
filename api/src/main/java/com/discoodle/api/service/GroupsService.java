@@ -106,7 +106,7 @@ public class GroupsService {
         Optional<User> tempUser = userService.getUserByID(user_id);
         if (tempGroup.isPresent() && tempUser.isPresent() && (tempGroup.get().getToken().equals(token)) && groupsRepository.addNewMemberInGroup(user_id,groups_id)==1){
            return groupsRepository.findGroupsByID(groups_id);
-        } else if(!(tempGroup.get().getToken().equals(token))){
+        } else if(tempGroup.isPresent() && !tempGroup.get().getToken().equals(token)){
             return Optional.empty();
         }
         return Optional.empty();
