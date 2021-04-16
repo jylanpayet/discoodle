@@ -44,3 +44,7 @@ code {
 del {
     text-decoration: line-through;
 }
+
+.w-menu {
+    z-index: 500 !important;
+}
