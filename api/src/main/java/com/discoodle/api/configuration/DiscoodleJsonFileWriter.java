@@ -37,7 +37,8 @@ public class DiscoodleJsonFileWriter {
                 jsonContent.append(data);
             }
             myReader.close();
-            message = gson.fromJson(String.valueOf(jsonContent), new TypeToken<LinkedList<Message>>() {}.getType());
+            message = gson.fromJson(String.valueOf(jsonContent), new TypeToken<LinkedList<Message>>() {
+            }.getType());
 
             if (message == null)
                 message = new LinkedList<>();

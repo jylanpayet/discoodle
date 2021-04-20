@@ -28,6 +28,7 @@ import java.util.LinkedList;
 @AllArgsConstructor
 @RestController
 public class RoomController {
+
     private final RoomService roomService;
 
 
@@ -39,6 +40,11 @@ public class RoomController {
     @PostMapping(path = "/api/room/{room_id}/room.add")
     public void addNewMember(@PathVariable String room_id, @RequestParam(value = "user_id") Long user_id) {
         roomService.addNewMember(room_id, user_id);
+    }
+
+    @DeleteMapping(path = "/api/room/{room_id}/room.delete")
+    public Optional<Room> deleteMember(@PathVariable String room_id, @RequestParam(value = "user_id") Long user_id) {
+        return roomService.deleteMember(room_id, user_id);
     }
 
     @PostMapping(path = "/api/room/changeLinkPicture/{room_id}")

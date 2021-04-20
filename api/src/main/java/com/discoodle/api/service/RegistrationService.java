@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @Service
 @AllArgsConstructor
 public class RegistrationService {
+
     private final UserService userService;
     private final ConfirmationTokenService confirmationTokenService;
     private final MailSender mailSender;
@@ -39,14 +40,14 @@ public class RegistrationService {
             return "Votre mail n'est pas valide.\n";
         }
         return """
-              Votre mot de passe doit contenir :
-              - au moins 8 caractères
-              - un chiffre
-              - une minuscule
-              - une majuscule
-              - un caractère spécial
-              - pas d'espace, retour à la ligne, etc
-              """;
+                Votre mot de passe doit contenir :
+                - au moins 8 caractères
+                - un chiffre
+                - une minuscule
+                - une majuscule
+                - un caractère spécial
+                - pas d'espace, retour à la ligne, etc
+                """;
     }
 
     public String login(User.RegistrationRequest request) {
@@ -144,4 +145,5 @@ public class RegistrationService {
                 "\n" +
                 "</div></div>";
     }
+
 }

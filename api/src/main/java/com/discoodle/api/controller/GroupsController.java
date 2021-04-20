@@ -1,29 +1,26 @@
 package com.discoodle.api.controller;
 
 import com.discoodle.api.model.Groups;
+import com.discoodle.api.model.Roles;
 import com.discoodle.api.model.Server;
 import com.discoodle.api.request.EditGroupRequest;
-import com.discoodle.api.request.GroupRightsRequest;
 import com.discoodle.api.request.GroupsRequest;
 import com.discoodle.api.service.GroupsService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @AllArgsConstructor
 @RestController
 public class GroupsController {
+
     private final GroupsService groupsService;
 
     @PostMapping(path = "/api/groups/addNewGroup")
     public Optional<Groups> addNewGroup(@RequestBody GroupsRequest request) {
         return groupsService.createNewGroup(request);
-    }
-
-    @PutMapping(path = "/api/groups/editRights")
-    public void editGroupRights(@RequestBody GroupRightsRequest request) {
-        groupsService.editRights(request);
     }
 
     @DeleteMapping(path = "/api/groups/deleteGroupById/{groups_id}")
@@ -32,24 +29,59 @@ public class GroupsController {
     }
 
     @PostMapping(path = "/api/groups/editGroup")
-    public void editGroup(@RequestBody EditGroupRequest request){
+    public void editGroup(@RequestBody EditGroupRequest request) {
         groupsService.editGroup(request);
     }
 
-    @GetMapping(path ="/api/groups/getGroupByID/{group_id}")
-    public Optional<Groups> getGroupByID(@PathVariable("group_id") Long group_id){
+    @GetMapping(path = "/api/groups/getGroupByID/{group_id}")
+    public Optional<Groups> getGroupByID(@PathVariable("group_id") Long group_id) {
         return groupsService.findGroupsByID(group_id);
     }
 
     @PostMapping(path = "/api/groups/editFileGroup/{groups_id}")
-    public void editFileGroup(@PathVariable("groups_id") Long groups_ID, @RequestBody GroupsRequest request){ groupsService.editFileGroup(groups_ID, request.getText()); }
+    public void editFileGroup(@PathVariable("groups_id") Long groups_ID, @RequestBody GroupsRequest request) {
+        groupsService.editFileGroup(groups_ID, request.getText());
+    }
 
     @PostMapping(path = "/api/groups/addNewMemberInGroup/{groups_id}")
-    public Optional<Groups> addNewMemberInGroup(@PathVariable Long groups_id, @RequestParam(value = "user_id") Long user_id, @RequestParam(value ="token" ) String token){ return groupsService.addNewMemberInGroup(groups_id, user_id, token);}
+    public Optional<Groups> addNewMemberInGroup(@PathVariable Long groups_id, @RequestParam(value = "user_id") Long user_id, @RequestParam(value = "token") String token) {
+        return groupsService.addNewMemberInGroup(groups_id, user_id, token);
+    }
 
 
     @GetMapping(path = "/api/groups/serverGroup/{groups_id}")
     public Server serverOfGroup(@PathVariable("groups_id") Long groups_ID) {
         return groupsService.serverOfGroup(groups_ID);
     }
+
+    @GetMapping("/getAllRolesByGroup/{group_id}")
+    public List<Roles> getAllRolesByGroup(@PathVariable Long group_id) {
+        return groupsService.findGroupsByID(group_id).get().getRoles();
+    }
+
+    @GetMapping("/getRoleByGroupAndUser/{group_id}/{user_id}")
+    public List<Roles> getRoleByGroupAndUser(@PathVariable Long group_id, @PathVariable Long user_id) {
+        return groupsService.getRoleByGroupAndUser(group_id, user_id);
+    }
+
+    @PostMapping("/addRoleForGroup/{group_id}")
+    public Optional<Roles> addRoleForGroup(@PathVariable Long group_id, @RequestBody GroupsRequest request) {
+        return groupsService.addRoleForGroup(group_id, request);
+    }
+
+    @PostMapping("/addRoleForUser/")
+    public Optional<Roles> addRoleForUsers(@RequestParam(value = "users") List<Long> user_id, @RequestParam Long role_id) {
+        return groupsService.addRoleForUsers(user_id, role_id);
+    }
+
+    @PutMapping("/modifyRightsForRole/{role_id}")
+    public Optional<Roles> modifyRightsForRole(@PathVariable Long role_id, @RequestParam(value = "rights") String rights) {
+        return groupsService.modifyRightsForRole(role_id, rights);
+    }
+
+    @DeleteMapping("/deleteRole/{role_id}")
+    public Boolean deleteRole(@PathVariable Long role_id) {
+        return groupsService.deleteRole(role_id);
+    }
+
 }

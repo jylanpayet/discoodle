@@ -51,7 +51,7 @@ empêchait toutes les interactions sociales, les professeurs ne pouvaient assure
 conditions et devaient se creuser la tête afin de pouvoir réunir diverses outils pour communiquer facilement 
 avec les élèves tout en ayant une plateforme qui leur permettait de mettre à disposition de tous les éléments 
 essentiels au bon déroulement du cursus d'apprentissage... Le soucis c'est que chacun ne procédait pas de la 
-même façon et nous pouvions passer d'une plateforme à une autre entre le cours de d'AAL et celui de POO.  
+même façon et nous pouvions passer d'une plateforme à une autre entre le cours de d'AAL et celui de POO, par exemple.  
 Heureusement, une équipe de développeurs hors du commun se mit à réaliser une application révolutionnaire : Discoodle !_
 
 Pourquoi Discoodle ?
@@ -67,6 +67,7 @@ Pourquoi Discoodle ?
 * [Vue.js](https://vuejs.org/) - Le framework web utilisé
 * [Spring](https://spring.io/) - Le framework backend utilisé
 * [Maven](https://maven.apache.org/) - L'outil de gestion des dépendances utilisé
+* [JUnit](https://junit.org/junit5/) - Le framework de test unitaire pour le backend
 
 ## <div id="commencer">Pour commencer</div>
 
@@ -103,7 +104,7 @@ npm install
 npm run serve 
 ```
 
-Pour customiser la configuration : [here](https://cli.vuejs.org/config/).
+Pour customiser la configuration : [ici](https://cli.vuejs.org/config/).
 
 #### <ins>_Uniquement le backend_</ins> :
 
@@ -127,9 +128,9 @@ ainsi que des problèmes rencontrés.
 ## <div id="auteurs">Auteurs</div>
 
 * **SOMON Bastian** - [@somon](https://gaufre.informatique.univ-paris-diderot.fr/somon)
+* **ALEXANDRE Dylan** - [@alexandr](https://gaufre.informatique.univ-paris-diderot.fr/alexandr)
 * **PAYET Jylan** - [@payetj](https://gaufre.informatique.univ-paris-diderot.fr/payetj)
 * **CLIPAL Moïse** - [@clipal](https://gaufre.informatique.univ-paris-diderot.fr/clipal)
-* **ALEXANDRE Dylan** - [@alexandr](https://gaufre.informatique.univ-paris-diderot.fr/alexandr)
 
 <!-- REMERCIEMENTS -->
 ## <div id="remerciements">Remerciements</div>

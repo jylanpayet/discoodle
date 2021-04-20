@@ -37,5 +37,6 @@ public class MailService implements MailSender {
             throw new IllegalStateException("L'envoie du mail de confirmation n'a pas pu se faire.");
         }
     }
+
 }
 

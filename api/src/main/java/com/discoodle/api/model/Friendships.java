@@ -20,7 +20,7 @@ public class Friendships {
     }
 
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "friendships_id", unique = true, nullable = false)
     private Long friendships_id;
 

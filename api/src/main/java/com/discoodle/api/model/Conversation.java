@@ -10,14 +10,16 @@ import java.util.LinkedList;
 @Setter
 @ToString
 
-public class Conversation{
-   private LinkedList<Message> messages;
+public class Conversation {
 
-   public Conversation(LinkedList<Message> messages) {
-      this.messages = messages;
-   }
+    private LinkedList<Message> messages;
 
-   public Conversation() {
-      this(new LinkedList<>());
-   }
+    public Conversation(LinkedList<Message> messages) {
+        this.messages = messages;
+    }
+
+    public Conversation() {
+        this(new LinkedList<>());
+    }
+
 }

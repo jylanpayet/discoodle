@@ -59,24 +59,24 @@ public class User {
 
     @JsonIgnore
     @ManyToMany
-    @JoinTable( name = "link_rooms_users",
-            joinColumns = @JoinColumn( name = "user_id" ),
-            inverseJoinColumns = @JoinColumn( name = "room_id" )
+    @JoinTable(name = "link_rooms_users",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "room_id")
     )
     private List<Room> rooms = new ArrayList<>();
 
     @JsonIgnore
     @ManyToMany
-    @JoinTable( name = "link_groups_to_user",
-            joinColumns = @JoinColumn( name = "user_id" ),
-            inverseJoinColumns = @JoinColumn( name = "groups_id" ) )
+    @JoinTable(name = "link_groups_to_user",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "groups_id"))
     private List<Groups> groups = new ArrayList<>();
 
     @JsonIgnore
     @ManyToMany
-    @JoinTable( name = "link_server_users",
-            joinColumns = @JoinColumn( name = "user_id" ),
-            inverseJoinColumns = @JoinColumn( name = "server_id" ) )
+    @JoinTable(name = "link_server_users",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "server_id"))
     private List<Server> serv = new ArrayList<>();
 
     public enum Role {
@@ -105,4 +105,5 @@ public class User {
 
         private final User.Role role;
     }
+
 }

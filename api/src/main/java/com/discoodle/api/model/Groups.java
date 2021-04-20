@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,16 +65,20 @@ public class Groups {
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<User> users = new ArrayList<>();
 
-    @OneToOne
-    @JoinColumn(name = "groups_rights_id")
-    private GroupRights groupRights;
-
     @JsonIgnore
     @OneToOne
     @JoinTable(name = "link_groups_to_server",
             joinColumns = @JoinColumn(name = "groups_id"),
             inverseJoinColumns = @JoinColumn(name = "server_id"))
     private Server server;
+
+    @JsonIgnore
+    @OneToMany
+    @JoinTable(name = "link_group_to_roles",
+            joinColumns = @JoinColumn(name = "groups_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private List<Roles> roles = new ArrayList<>();
+
 
     public enum TypeOfGroup {
         DISCOODLE,

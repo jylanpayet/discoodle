@@ -15,16 +15,15 @@ import java.nio.file.Path;
 @AllArgsConstructor
 public class UploadFileService {
 
-
     public String uploadFile(MultipartFile file, Long group_id) {
         String path = String.format("%sstatic/common/groups/%d/" + file.getOriginalFilename(), ApiApplication.RESSOURCES, group_id);
         File add = new File(path);
         try {
-            int i=1;
-            while(add.exists()){
-                String index= FilenameUtils.removeExtension(file.getOriginalFilename())+"("+i+")."+FilenameUtils.getExtension(file.getOriginalFilename());
-                path = String.format("%sstatic/common/groups/%d/" +index, ApiApplication.RESSOURCES, group_id);
-                add=new File(path);
+            int i = 1;
+            while (add.exists()) {
+                String index = FilenameUtils.removeExtension(file.getOriginalFilename()) + "(" + i + ")." + FilenameUtils.getExtension(file.getOriginalFilename());
+                path = String.format("%sstatic/common/groups/%d/" + index, ApiApplication.RESSOURCES, group_id);
+                add = new File(path);
                 i++;
             }
             add.createNewFile();
@@ -35,6 +34,7 @@ public class UploadFileService {
 
         return "Fichier upload avec succès !";
     }
+
     public String uploadSubject(MultipartFile file, Long group_id) {
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
         if (!extension.equals("md")) {
@@ -52,4 +52,5 @@ public class UploadFileService {
         }
         return "Fichier upload avec succès !";
     }
+
 }

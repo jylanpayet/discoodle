@@ -12,6 +12,7 @@ import java.util.List;
 
 @Repository
 public interface FriendshipsRepository extends JpaRepository<Friendships, Long> {
+
     @Query("SELECT friendships FROM Friendships friendships where friendships.receiver_id = ?1 AND friendships.status = false")
     List<Friendships> getAllInvitations(Long user_id);
 
@@ -24,4 +25,5 @@ public interface FriendshipsRepository extends JpaRepository<Friendships, Long> 
     @Modifying
     @Query("DELETE FROM Friendships friendships WHERE friendships.sender_id = :sender_id AND friendships.receiver_id = :receiver_id")
     void refuseInvitation(@Param("sender_id") Long sender_id, @Param("receiver_id") Long receiver_id);
+
 }

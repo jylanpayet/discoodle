@@ -14,6 +14,7 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+
     @Query("SELECT user FROM User user where user.username = ?1")
     Optional<User> findUserByUserName(String username);
 
@@ -66,4 +67,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Modifying
     @Query("UPDATE User user SET user.link_to_avatar = :link_to_avatar WHERE user.id = :user_id")
     int changeLinkToAvar(@Param("user_id") Long user_id, @Param("link_to_avatar") String link_to_avatar);
+
 }

@@ -49,4 +49,5 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         provider.setUserDetailsService(userService);
         return provider;
     }
+
 }

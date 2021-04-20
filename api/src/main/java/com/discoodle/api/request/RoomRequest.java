@@ -10,6 +10,9 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public class RoomRequest {
+
     private final String name;
+
     private final Long admin;
+
 }

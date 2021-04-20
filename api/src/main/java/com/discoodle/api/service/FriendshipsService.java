@@ -27,7 +27,7 @@ public class FriendshipsService {
     }
 
     public String inviteMembers(Long user_id, List<Long> friends_id) {
-        for(int i = 0; i < friends_id.size(); i++) {
+        for (int i = 0; i < friends_id.size(); i++) {
             Friendships friendships = new Friendships(
                     user_id,
                     friends_id.get(i)

@@ -25,12 +25,11 @@ import java.util.LinkedList;
 @RestController
 public class NoteController {
 
-
     @PostMapping(path = "/api/addNewNote/{group_id}")
     public void addNewNote(@RequestBody Note note, @PathVariable Long group_id) {
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String link=String.format("%sstatic/common/groups/%d/%d.json", ApiApplication.RESSOURCES, group_id, group_id);
+        String link = String.format("%sstatic/common/groups/%d/%d.json", ApiApplication.RESSOURCES, group_id, group_id);
 
         try {
             File file = new File(link);
@@ -42,7 +41,8 @@ public class NoteController {
             }
 
             JsonReader reader = new JsonReader(new FileReader(link));
-            LinkedList<Note> noteLinkedList = gson.fromJson(reader, new TypeToken<LinkedList<Note>>() {}.getType());
+            LinkedList<Note> noteLinkedList = gson.fromJson(reader, new TypeToken<LinkedList<Note>>() {
+            }.getType());
             note.setNote_id((long) noteLinkedList.size());
             noteLinkedList.add(note);
             Path path = Paths.get(link);
@@ -63,11 +63,12 @@ public class NoteController {
     public void deleteNote(@PathVariable(name = "group_id") Long group_id, @PathVariable(name = "note_id") Long note_id) {
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String link=String.format("%sstatic/common/groups/%d/%d.json", ApiApplication.RESSOURCES, group_id, group_id);
+        String link = String.format("%sstatic/common/groups/%d/%d.json", ApiApplication.RESSOURCES, group_id, group_id);
 
         try {
             JsonReader reader = new JsonReader(new FileReader(link));
-            LinkedList<Note> noteLinkedList = gson.fromJson(reader, new TypeToken<LinkedList<Note>>() {}.getType());
+            LinkedList<Note> noteLinkedList = gson.fromJson(reader, new TypeToken<LinkedList<Note>>() {
+            }.getType());
 
             for (Note n : noteLinkedList) {
                 if (n.getNote_id() == (note_id)) {
@@ -93,13 +94,14 @@ public class NoteController {
     public void editNote(@PathVariable(name = "group_id") Long group_id, @PathVariable(name = "note_id") Long note_id, @RequestBody NoteRequest note) {
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String link=String.format("%sstatic/common/groups/%d/%d.json", ApiApplication.RESSOURCES, group_id, group_id);
+        String link = String.format("%sstatic/common/groups/%d/%d.json", ApiApplication.RESSOURCES, group_id, group_id);
 
         try {
             JsonReader reader = new JsonReader(new FileReader(link));
-            LinkedList<Note> noteLinkedList = gson.fromJson(reader, new TypeToken<LinkedList<Note>>() {}.getType());
-            for (Note n : noteLinkedList){
-                if(n.getNote_id() == (note_id)){
+            LinkedList<Note> noteLinkedList = gson.fromJson(reader, new TypeToken<LinkedList<Note>>() {
+            }.getType());
+            for (Note n : noteLinkedList) {
+                if (n.getNote_id() == (note_id)) {
                     n.setNote(note.getNote());
                     System.out.println(n);
                     Path path = Paths.get(link);
@@ -117,4 +119,5 @@ public class NoteController {
             System.err.println("editNote file error");
         }
     }
+
 }

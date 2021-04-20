@@ -21,6 +21,7 @@ import java.util.UUID;
 @Service
 @AllArgsConstructor
 public class UserService implements UserDetailsService {
+
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final ConfirmationTokenService confirmationTokenService;
@@ -37,7 +38,9 @@ public class UserService implements UserDetailsService {
         return userRepository.findUserByID(user_id);
     }
 
-    public Optional<User.Role> findUserByRole(User.Role role){return userRepository.findUserByRole(role); }
+    public Optional<User.Role> findUserByRole(User.Role role) {
+        return userRepository.findUserByRole(role);
+    }
 
     public void addNewUser(User user) {
         Optional<User> TestPseudo = userRepository.findUserByUserName(user.getUsername());
@@ -64,37 +67,37 @@ public class UserService implements UserDetailsService {
     }
 
     public String signUpUser(User user) {
-            boolean userExist = userRepository.findUserByMail(user.getMail()).isPresent();
+        boolean userExist = userRepository.findUserByMail(user.getMail()).isPresent();
 
-            if (userExist) {
-                return "L'email est déjà utilisé.";
-            }
+        if (userExist) {
+            return "L'email est déjà utilisé.";
+        }
 
-            userExist = userRepository.findUserByUserName(user.getUsername()).isPresent();
+        userExist = userRepository.findUserByUserName(user.getUsername()).isPresent();
 
-            if (userExist) {
-                return "Le nom d'utilisateur est déjà utilisé.";
-            }
+        if (userExist) {
+            return "Le nom d'utilisateur est déjà utilisé.";
+        }
 
-            String passwordEncoded = bCryptPasswordEncoder.encode(user.getPassword());
-            user.setPassword(passwordEncoded);
+        String passwordEncoded = bCryptPasswordEncoder.encode(user.getPassword());
+        user.setPassword(passwordEncoded);
 
-            userRepository.save(user);
+        userRepository.save(user);
 
-            String token = UUID.randomUUID().toString();
-            ConfirmationToken confirmationToken = new ConfirmationToken(
-                    token,
-                    LocalDateTime.now(),
-                    LocalDateTime.now().plusMinutes(15),
-                    user
-            );
+        String token = UUID.randomUUID().toString();
+        ConfirmationToken confirmationToken = new ConfirmationToken(
+                token,
+                LocalDateTime.now(),
+                LocalDateTime.now().plusMinutes(15),
+                user
+        );
 
-            confirmationTokenService.saveConfirmationToken(confirmationToken);
-            return token;
+        confirmationTokenService.saveConfirmationToken(confirmationToken);
+        return token;
     }
 
     public String login(String username, String password) {
-        if(userRepository.findUserByUserName(username).isPresent() /*&& userRepository.findUserByUserName(username).get().isEnabled()*/) {
+        if (userRepository.findUserByUserName(username).isPresent() /*&& userRepository.findUserByUserName(username).get().isEnabled()*/) {
             if (!bCryptPasswordEncoder.matches(password, userRepository.findUserByUserName(username).get().getPassword()))
                 return "Mot de passe ou nom d'utilisateur incorrect";
             else
@@ -119,23 +122,23 @@ public class UserService implements UserDetailsService {
     }
 
     public Optional<User> changeUsername(Long user_id, String username) {
-        if(!userRepository.findUserByUserName(username).isPresent() && userRepository.changeUsername(user_id, username) == 1) {
+        if (!userRepository.findUserByUserName(username).isPresent() && userRepository.changeUsername(user_id, username) == 1) {
             return userRepository.findUserByID(user_id);
         }
         return null;
     }
 
     public Optional<User> changeMail(Long user_id, String mail) {
-        if(mail.matches("^(.+)@(.+)$") && !userRepository.findUserByMail(mail).isPresent() && userRepository.changeMail(user_id, mail) == 1) {
-         return userRepository.findUserByID(user_id);
+        if (mail.matches("^(.+)@(.+)$") && !userRepository.findUserByMail(mail).isPresent() && userRepository.changeMail(user_id, mail) == 1) {
+            return userRepository.findUserByID(user_id);
         }
         return null;
     }
 
     public Optional<User> changePassword(Long user_id, String password) {
-        if(password.matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}")) {
+        if (password.matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}")) {
             String passwordEncoded = bCryptPasswordEncoder.encode(password);
-            if(userRepository.changePassword(user_id, passwordEncoded) == 1) {
+            if (userRepository.changePassword(user_id, passwordEncoded) == 1) {
                 return userRepository.findUserByID(user_id);
             }
         }
@@ -143,30 +146,31 @@ public class UserService implements UserDetailsService {
     }
 
     public Optional<User> changeName(Long user_id, String name) {
-        if(userRepository.changeName(user_id, name) == 1) {
+        if (userRepository.changeName(user_id, name) == 1) {
             return userRepository.findUserByID(user_id);
         }
         return null;
     }
 
     public Optional<User> changeLastName(Long user_id, String last_name) {
-            if(userRepository.changeLastName(user_id, last_name) == 1) {
-                return userRepository.findUserByID(user_id);
-            }
+        if (userRepository.changeLastName(user_id, last_name) == 1) {
+            return userRepository.findUserByID(user_id);
+        }
         return null;
     }
 
     public Optional<User> addFriends(Long user_id, String link_to_avatar) {
-        if(userRepository.changeLinkToAvar(user_id, link_to_avatar) == 1) {
+        if (userRepository.changeLinkToAvar(user_id, link_to_avatar) == 1) {
             return userRepository.findUserByID(user_id);
         }
         return null;
     }
 
     public Optional<User> changeLinkToAvatar(Long user_id, String link_to_avatar) {
-        if(userRepository.changeLinkToAvar(user_id, link_to_avatar) == 1) {
+        if (userRepository.changeLinkToAvar(user_id, link_to_avatar) == 1) {
             return userRepository.findUserByID(user_id);
         }
         return null;
     }
+
 }

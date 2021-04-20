@@ -14,7 +14,6 @@ import java.util.Optional;
 @Repository
 public interface GroupsRepository extends JpaRepository<Groups, Long> {
 
-
     @Query("SELECT group FROM Groups group where group.groups_id = ?1")
     Optional<Groups> findGroupsByID(Long group_ID);
 
@@ -30,7 +29,7 @@ public interface GroupsRepository extends JpaRepository<Groups, Long> {
     @Transactional
     @Modifying
     @Query(value = "UPDATE groups g SET g.name=?2,g.description=?3 WHERE g.groups_id=?1", nativeQuery = true)
-    Optional<Groups> updateNameAndDescGroup(@Param("groups_id") Long id,@Param("name") String name,@Param("description") String description);
+    Optional<Groups> updateNameAndDescGroup(@Param("groups_id") Long id, @Param("name") String name, @Param("description") String description);
 
     @Query(value = "SELECT groups_id FROM link_groups_to_group g where g.son_id=?1", nativeQuery = true)
     Long findParentOfGroup(Long son_id);
@@ -55,4 +54,18 @@ public interface GroupsRepository extends JpaRepository<Groups, Long> {
     @Transactional
     void addNewServInGroup(@Param("groups_id") Long groups_id, @Param("server_id") Long server_id);
 
+    @Modifying
+    @Query(value = "insert into link_group_to_roles (groups_id, role_id) VALUES (:group_id,:role_id)", nativeQuery = true)
+    @Transactional
+    void addRoleForGroup(@Param("group_id") Long groups_id, @Param("role_id") Long role_id);
+
+    @Modifying
+    @Query(value = "insert into link_role_to_users (user_id, role_id) VALUES (:user_id,:role_id)", nativeQuery = true)
+    @Transactional
+    void addRoleForUser(@Param("user_id") Long user_id, @Param("role_id") Long role_id);
+
+    @Transactional
+    @Modifying
+    @Query(value = "UPDATE roles r SET r.rights=?2 WHERE r.role_id=?1", nativeQuery = true)
+    int modifyRightsForRole(@Param("role_id") Long role_id, @Param("rights") String rights);
 }

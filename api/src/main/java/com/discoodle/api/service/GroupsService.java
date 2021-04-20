@@ -1,12 +1,10 @@
 package com.discoodle.api.service;
 
 import com.discoodle.api.ApiApplication;
-import com.discoodle.api.model.GroupRights;
-import com.discoodle.api.model.Server;
-import com.discoodle.api.model.User;
+import com.discoodle.api.model.*;
+import com.discoodle.api.repository.RolesRepository;
+import com.discoodle.api.repository.UserRepository;
 import com.discoodle.api.request.*;
-import com.discoodle.api.model.Groups;
-import com.discoodle.api.repository.GroupRightsRepository;
 import com.discoodle.api.repository.GroupsRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,14 +20,14 @@ import java.util.UUID;
 @Service
 @AllArgsConstructor
 public class GroupsService {
+
     private final GroupsRepository groupsRepository;
-    private final GroupRightsRepository rightsRepository;
+    private final UserRepository userRepository;
     private final ServerService serverService;
     private final UserService userService;
+    private final RolesRepository rolesRepository;
 
     public Optional<Groups> createNewGroup(GroupsRequest request) {
-        GroupRights rights = new GroupRights(false, false, false);
-        rights = rightsRepository.save(rights);
         String token = UUID.randomUUID().toString().replaceAll("-", "").substring(0, 8);
         Groups group = new Groups(
                 request.getParent_id(),
@@ -38,10 +36,8 @@ public class GroupsService {
                 request.getDescription(),
                 request.getType(),
                 token
-
         );
         Groups finalGroup = groupsRepository.save(group);
-        groupsRepository.addNewRightsInGroup(finalGroup.getGroups_id(), rights.getRightsId());
         groupsRepository.addNewGroupsInGroup(request.getParent_id(), finalGroup.getGroups_id());
         groupsRepository.addNewMemberInGroup(request.getUser_id(), finalGroup.getGroups_id());
 
@@ -60,22 +56,6 @@ public class GroupsService {
             }
         }
         return Optional.of(finalGroup);
-    }
-
-    public boolean editRights(GroupRightsRequest request) {
-        try {
-            GroupRights ofParent = groupsRepository.findById(groupsRepository.findParentOfGroup(request.getGroupId())).get().getGroupRights();
-            GroupRights r = groupsRepository.findGroupsByID(request.getGroupId()).get().getGroupRights();
-            if (ofParent.isCanAddUser())
-                rightsRepository.updateRightsAdd(r.getRightsId(), request.isAddUser());
-            if (ofParent.isCanDeleteUser())
-                rightsRepository.updateRightsDelete(r.getRightsId(), request.isDeleteUser());
-            if (ofParent.isCanModify())
-                rightsRepository.updateRightsModify(r.getRightsId(), request.isModify());
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
     }
 
     public boolean editGroup(EditGroupRequest request) {
@@ -104,9 +84,9 @@ public class GroupsService {
     public Optional<Groups> addNewMemberInGroup(Long groups_id, Long user_id, String token) {
         Optional<Groups> tempGroup = groupsRepository.findGroupsByID(groups_id);
         Optional<User> tempUser = userService.getUserByID(user_id);
-        if (tempGroup.isPresent() && tempUser.isPresent() && (tempGroup.get().getToken().equals(token)) && groupsRepository.addNewMemberInGroup(user_id,groups_id)==1){
-           return groupsRepository.findGroupsByID(groups_id);
-        } else if(tempGroup.isPresent() && !tempGroup.get().getToken().equals(token)){
+        if (tempGroup.isPresent() && tempUser.isPresent() && (tempGroup.get().getToken().equals(token)) && groupsRepository.addNewMemberInGroup(user_id, groups_id) == 1) {
+            return groupsRepository.findGroupsByID(groups_id);
+        } else if (tempGroup.isPresent() && !tempGroup.get().getToken().equals(token)) {
             return Optional.empty();
         }
         return Optional.empty();
@@ -120,4 +100,49 @@ public class GroupsService {
     public Optional<Groups> findGroupsByID(Long groups_ID) {
         return groupsRepository.findGroupsByID(groups_ID);
     }
+
+    public Optional<Roles> addRoleForGroup(Long group_id, GroupsRequest request) {
+        Roles role = new Roles(
+                request.getRole_name(),
+                request.getRights()
+        );
+        rolesRepository.save(role);
+        groupsRepository.addRoleForGroup(group_id, role.getRole_id());
+        return Optional.of(role);
+    }
+
+    public Optional<Roles> addRoleForUsers(List<Long> user_id, Long role_id) {
+        if (rolesRepository.findById(role_id).isPresent()) {
+            for (Long user : user_id) {
+                groupsRepository.addRoleForUser(user, role_id);
+            }
+            return rolesRepository.findById(role_id);
+        }
+        return Optional.empty();
+    }
+
+    public List<Roles> getRoleByGroupAndUser(Long group_id, Long user_id) {
+        List<Roles> roles = userRepository.findUserByID(user_id).get().getRoles();
+        List<Roles> res = new java.util.ArrayList<>();
+        for (Roles user : roles) {
+            List<Roles> rolesGroups = groupsRepository.findGroupsByID(group_id).get().getRoles();
+            for (Roles group : rolesGroups) {
+                if (user == group) {
+                    res.add(group);
+                }
+            }
+        }
+        return res;
+    }
+
+    public Optional<Roles> modifyRightsForRole(Long role_id, String rights) {
+        groupsRepository.modifyRightsForRole(role_id, rights);
+        return rolesRepository.findById(role_id);
+    }
+
+    public Boolean deleteRole(Long role_id) {
+        rolesRepository.deleteById(role_id);
+        return (rolesRepository.findById(role_id).isPresent()) ? false : true;
+    }
+
 }

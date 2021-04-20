@@ -11,6 +11,7 @@ import java.util.Optional;
 @Service
 @AllArgsConstructor
 public class RoomService {
+
     private final RoomRepository roomRepository;
 
     public Room createNewRoom(String room_name, List<Long> room_members) {
@@ -21,9 +22,15 @@ public class RoomService {
         );
         Room finalRoom = roomRepository.save(room);
         for (Long room_member : room_members) {
-            roomRepository.addNewMember(finalRoom.getRoom_id(),room_member);
+            roomRepository.addNewMember(finalRoom.getRoom_id(), room_member);
         }
         return finalRoom;
+    }
+
+    public Optional<Room> deleteMember(String room_id, Long user_id) {
+        Optional<Room> room = roomRepository.findRoomByUUID(room_id);
+        roomRepository.deleteMember(room_id, user_id);
+        return room;
     }
 
     public void addNewMember(String room_id, Long user_id) {
@@ -32,22 +39,23 @@ public class RoomService {
 
     public Optional<Room> addNewMembers(String room_id, List<Long> room_members) {
         for (Long room_member : room_members) {
-            roomRepository.addNewMember(room_id,room_member);
+            roomRepository.addNewMember(room_id, room_member);
         }
         return roomRepository.findRoomByUUID(room_id);
     }
 
     public Optional<Room> changeLinkPicture(String room_id, String link_to_avatar) {
-        if(roomRepository.changeLinkPicture(room_id, link_to_avatar) == 1) {
+        if (roomRepository.changeLinkPicture(room_id, link_to_avatar) == 1) {
             return roomRepository.findRoomByUUID(room_id);
         }
         return null;
     }
 
     public Optional<Room> changeAdmin(String room_id, Long room_admin) {
-        if(roomRepository.changeAdmin(room_id, room_admin) == 1) {
+        if (roomRepository.changeAdmin(room_id, room_admin) == 1) {
             return roomRepository.findRoomByUUID(room_id);
         }
         return null;
     }
+
 }
