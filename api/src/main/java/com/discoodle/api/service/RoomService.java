@@ -33,21 +33,14 @@ public class RoomService {
         return finalRoom;
     }
 
-    public Optional<Room> deleteMember(String room_id, Long user_id) {
+    public Optional<Room> removeMember(String room_id, Long user_id) {
         Optional<Room> room = roomRepository.findRoomByUUID(room_id);
-        roomRepository.deleteMember(room_id, user_id);
+        roomRepository.removeMember(room_id, user_id);
         return room;
     }
 
     public void addNewMember(String room_id, Long user_id) {
         roomRepository.addNewMember(room_id, user_id);
-    }
-
-    public Optional<Room> addNewMembers(String room_id, List<Long> room_members) {
-        for (Long room_member : room_members) {
-            roomRepository.addNewMember(room_id, room_member);
-        }
-        return roomRepository.findById(room_id);
     }
 
     public Optional<Room> changeLinkPicture(String room_id, String link_to_avatar) {

@@ -12,7 +12,7 @@ import java.util.*;
 @NoArgsConstructor
 @Entity
 @ToString
-@Table(name = "user")
+@Table(name = "users")
 public class User {
 
     public User(String mail, String username, String password, String name, String last_name, Role role) {
@@ -25,7 +25,8 @@ public class User {
     }
 
     @Id
-    @GeneratedValue
+    @SequenceGenerator(name="seq",sequenceName="users_seq")
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
     @Column(name = "user_id", unique = true, nullable = false)
     private Long id;
 
@@ -99,11 +100,19 @@ public class User {
     public static class RegistrationRequest {
 
         private final String mail;
+
         private final String username;
+
         private final String password;
+
         private final String name;
+
         private final String last_name;
+
         private final String link_to_avatar;
+
         private final User.Role role;
+
     }
+
 }

@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @ToString
-@Table(name = "room")
+@Table(name = "rooms")
 public class Room {
 
     public Room(String room_name, Long room_admin, Boolean room_link) {
