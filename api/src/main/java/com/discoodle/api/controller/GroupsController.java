@@ -38,11 +38,6 @@ public class GroupsController {
         return groupsService.findGroupsByID(group_id);
     }
 
-    @PostMapping(path = "/api/groups/editFileGroup/{groups_id}")
-    public void editFileGroup(@PathVariable("groups_id") Long groups_ID, @RequestBody GroupsRequest request) {
-        groupsService.editFileGroup(groups_ID, request.getText());
-    }
-
     @PostMapping(path = "/api/groups/addNewMemberInGroup/{groups_id}")
     public Optional<Groups> addNewMemberInGroup(@PathVariable Long groups_id, @RequestParam(value = "user_id") Long user_id, @RequestParam(value = "token") String token) {
         return groupsService.addNewMemberInGroup(groups_id, user_id, token);
@@ -50,7 +45,7 @@ public class GroupsController {
 
 
     @GetMapping(path = "/api/groups/serverGroup/{groups_id}")
-    public Server serverOfGroup(@PathVariable("groups_id") Long groups_ID) {
+    public Optional<Server> serverOfGroup(@PathVariable("groups_id") Long groups_ID) {
         return groupsService.serverOfGroup(groups_ID);
     }
 

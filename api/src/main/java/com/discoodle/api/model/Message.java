@@ -9,15 +9,14 @@ import java.util.UUID;
 @Setter
 public class Message {
 
-    private final UUID convUUID;
-    private final Integer id;
-    private String content;
-    private String sender;
-    private String messageDate;
-    private boolean pinned;
-    private boolean edited;
-
-    private final String type;
+	private final UUID convUUID;
+	private final Integer id;
+	private String content;
+	private String sender;
+	private String messageDate;
+	private boolean pinned;
+	private boolean edited;
+	private final String type;
 
 
     public Message(Integer id, String content, String sender, String messageDate, boolean pinned, UUID convUUID) {

@@ -52,7 +52,7 @@ public class Groups {
     private TypeOfGroup type;
 
     @JsonIgnore
-    @OneToMany
+    @OneToMany(cascade = CascadeType.REMOVE)
     @JoinTable(name = "link_groups_to_group",
             joinColumns = @JoinColumn(name = "groups_id"),
             inverseJoinColumns = @JoinColumn(name = "son_id", referencedColumnName = "groups_id"))
@@ -66,14 +66,14 @@ public class Groups {
     private List<User> users = new ArrayList<>();
 
     @JsonIgnore
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE)
     @JoinTable(name = "link_groups_to_server",
             joinColumns = @JoinColumn(name = "groups_id"),
             inverseJoinColumns = @JoinColumn(name = "server_id"))
     private Server server;
 
     @JsonIgnore
-    @OneToMany
+    @OneToMany(cascade = CascadeType.REMOVE)
     @JoinTable(name = "link_group_to_roles",
             joinColumns = @JoinColumn(name = "groups_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))

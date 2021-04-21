@@ -35,7 +35,7 @@ public class Server {
             inverseJoinColumns = @JoinColumn(name = "groups_id"))
     private Groups group;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.REMOVE)
     @JoinTable(name = "link_server_room",
             joinColumns = @JoinColumn(name = "server_id"),
             inverseJoinColumns = @JoinColumn(name = "room_id"))

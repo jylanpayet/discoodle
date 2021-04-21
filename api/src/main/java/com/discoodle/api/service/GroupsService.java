@@ -38,7 +38,8 @@ public class GroupsService {
                 token
         );
         Groups finalGroup = groupsRepository.save(group);
-        groupsRepository.addNewGroupsInGroup(request.getParent_id(), finalGroup.getGroups_id());
+        if(request.getParent_id()!=null)
+            groupsRepository.addNewGroupsInGroup(request.getParent_id(), finalGroup.getGroups_id());
         groupsRepository.addNewMemberInGroup(request.getUser_id(), finalGroup.getGroups_id());
 
         if (finalGroup.getType().equals(Groups.TypeOfGroup.SUBJECTS)) {
@@ -67,16 +68,6 @@ public class GroupsService {
         return true;
     }
 
-    public void editFileGroup(Long groups_id, String text) {
-        try {
-            File path = new File(String.format("%sstatic/common/groups/%d/%d.json", ApiApplication.RESSOURCES, groups_id, groups_id));
-            Files.writeString(Paths.get(String.valueOf(path)), text + "\n");
-        } catch (Exception e) {
-            System.out.println("erreur, fichier non édité");
-            e.printStackTrace();
-        }
-    }
-
     public void deleteGroupByID(Long groups_ID) {
         groupsRepository.deleteById(groups_ID);
     }
@@ -84,17 +75,17 @@ public class GroupsService {
     public Optional<Groups> addNewMemberInGroup(Long groups_id, Long user_id, String token) {
         Optional<Groups> tempGroup = groupsRepository.findGroupsByID(groups_id);
         Optional<User> tempUser = userService.getUserByID(user_id);
-        if (tempGroup.isPresent() && tempUser.isPresent() && (tempGroup.get().getToken().equals(token)) && groupsRepository.addNewMemberInGroup(user_id, groups_id) == 1) {
-            return groupsRepository.findGroupsByID(groups_id);
-        } else if (tempGroup.isPresent() && !tempGroup.get().getToken().equals(token)) {
-            return Optional.empty();
+        if (tempGroup.isPresent() && tempUser.isPresent() && (tempGroup.get().getToken().equals(token)) && groupsRepository.addNewMemberInGroup(user_id,groups_id)==1){
+           return tempGroup;
         }
         return Optional.empty();
     }
 
-    public Server serverOfGroup(Long groups_id) {
-        Groups group = groupsRepository.findGroupsByID(groups_id).get();
-        return group.getServer();
+    public Optional<Server> serverOfGroup(Long groups_id) {
+        Optional<Groups> tempGroup = groupsRepository.findGroupsByID(groups_id);
+        if(tempGroup.isPresent())
+            return Optional.of(tempGroup.get().getServer());
+        return Optional.empty();
     }
 
     public Optional<Groups> findGroupsByID(Long groups_ID) {
@@ -142,7 +133,7 @@ public class GroupsService {
 
     public Boolean deleteRole(Long role_id) {
         rolesRepository.deleteById(role_id);
-        return (rolesRepository.findById(role_id).isPresent()) ? false : true;
+        return rolesRepository.findById(role_id).isEmpty();
     }
 
 }

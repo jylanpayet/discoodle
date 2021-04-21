@@ -79,6 +79,13 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "server_id"))
     private List<Server> serv = new ArrayList<>();
 
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(name = "link_role_to_users",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private List<Roles> roles = new ArrayList<>();
+
     public enum Role {
         STUDENT,
         TEACHER,
@@ -92,18 +99,11 @@ public class User {
     public static class RegistrationRequest {
 
         private final String mail;
-
         private final String username;
-
         private final String password;
-
         private final String name;
-
         private final String last_name;
-
         private final String link_to_avatar;
-
         private final User.Role role;
     }
-
 }
