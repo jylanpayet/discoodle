@@ -15,6 +15,8 @@ import java.nio.file.Path;
 @AllArgsConstructor
 public class UploadFileService {
 
+    private UserService userService;
+
     public String uploadFile(MultipartFile file, Long group_id) {
         String path = String.format("%sstatic/common/groups/%d/" + file.getOriginalFilename(), ApiApplication.RESSOURCES, group_id);
         File add = new File(path);
@@ -53,4 +55,22 @@ public class UploadFileService {
         return "Fichier upload avec succès !";
     }
 
+    public String uploadAvatar(MultipartFile file, Long user_id) {
+        String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+        if(!extension.equals("jpg") && !extension.equals("png")){
+            return "Une erreur est survenue lors du téléchargements !";
+        }
+        String path = String.format("%sstatic/common/avatar/%d.%s", ApiApplication.RESSOURCES, user_id,extension);
+        File add = new File(path);
+        try {
+            if (!add.exists()) {
+                add.createNewFile();
+            }
+            userService.changeLinkToAvatar(user_id,path);
+            Files.write(Path.of(path), file.getBytes());
+        } catch (Exception e) {
+            return "Erreur lors du téléchargement du fichier !";
+        }
+        return "Fichier upload avec succès !";
+    }
 }

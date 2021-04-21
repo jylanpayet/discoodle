@@ -46,10 +46,6 @@ public class GroupsService {
             try {
                 File dossier = new File((String.format("%sstatic/common/groups/%d", ApiApplication.RESSOURCES, finalGroup.getGroups_id())));
                 dossier.mkdirs();
-                if (dossier.exists() && dossier.isDirectory()) {
-                    File fichier = new File((String.format("%sstatic/common/groups/%d/%d.json", ApiApplication.RESSOURCES, finalGroup.getGroups_id(), finalGroup.getGroups_id())));
-                    fichier.createNewFile();
-                }
             } catch (Exception e) {
                 System.out.println("Dossier du groups non crée !");
             }
