@@ -18,33 +18,33 @@ public class GroupsController {
 
     private final GroupsService groupsService;
 
-    @PostMapping(path = "/api/groups/addNewGroup")
+    @PostMapping("/api/groups/addNewGroup")
     public Optional<Groups> addNewGroup(@RequestBody GroupsRequest request) {
         return groupsService.createNewGroup(request);
     }
 
-    @DeleteMapping(path = "/api/groups/deleteGroupById/{groups_id}")
+    @DeleteMapping("/api/groups/deleteGroupById/{groups_id}")
     public void deleteGroupByID(@PathVariable("groups_id") Long groups_ID) {
         groupsService.deleteGroupByID(groups_ID);
     }
 
-    @PostMapping(path = "/api/groups/editGroup")
+    @PostMapping("/api/groups/editGroup")
     public void editGroup(@RequestBody EditGroupRequest request) {
         groupsService.editGroup(request);
     }
 
-    @GetMapping(path = "/api/groups/getGroupByID/{group_id}")
+    @GetMapping( "/api/groups/getGroupByID/{group_id}")
     public Optional<Groups> getGroupByID(@PathVariable("group_id") Long group_id) {
         return groupsService.findGroupsByID(group_id);
     }
 
-    @PostMapping(path = "/api/groups/addNewMemberInGroup/{groups_id}")
+    @PostMapping( "/api/groups/addNewMemberInGroup/{groups_id}")
     public Optional<Groups> addNewMemberInGroup(@PathVariable Long groups_id, @RequestParam(value = "user_id") Long user_id, @RequestParam(value = "token") String token) {
         return groupsService.addNewMemberInGroup(groups_id, user_id, token);
     }
 
 
-    @GetMapping(path = "/api/groups/serverGroup/{groups_id}")
+    @GetMapping( "/api/groups/serverGroup/{groups_id}")
     public Optional<Server> serverOfGroup(@PathVariable("groups_id") Long groups_ID) {
         return groupsService.serverOfGroup(groups_ID);
     }

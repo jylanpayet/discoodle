@@ -34,6 +34,11 @@ public interface GroupsRepository extends JpaRepository<Groups, Long> {
     @Query(value = "SELECT groups_id FROM link_groups_to_group g where g.son_id=?1", nativeQuery = true)
     Long findParentOfGroup(Long son_id);
 
+    @Transactional
+    @Modifying
+    @Query(value = "DELETE r FROM link_groups_to_group as r where r.groups_id = :groups_id AND r.son_id = :son_id", nativeQuery = true)
+    void deleteLinkGroupsToGroup(@Param("groups_id") Long groups_id, @Param("son_id") Long son_id);
+
     @Modifying
     @Query(value = "insert into link_groups_to_user (user_id, groups_id) VALUES (:user_id,:groups_id)", nativeQuery = true)
     @Transactional
@@ -43,11 +48,6 @@ public interface GroupsRepository extends JpaRepository<Groups, Long> {
     @Query(value = "insert into link_groups_to_group (groups_id, son_id) VALUES (:groups_id,:son_id)", nativeQuery = true)
     @Transactional
     void addNewGroupsInGroup(@Param("groups_id") Long groups_ID, @Param("son_id") Long son_ID);
-
-    @Modifying
-    @Query(value = "UPDATE groups g SET g.groups_rights_id=?2 WHERE g.groups_id=?1", nativeQuery = true)
-    @Transactional
-    void addNewRightsInGroup(@Param("groups_id") Long groups_ID, @Param("rights_id") Long right_ID);
 
     @Modifying
     @Query(value = "insert into link_groups_to_server (groups_id, server_id) VALUES (:groups_id,:server_id)", nativeQuery = true)

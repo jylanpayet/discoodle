@@ -122,55 +122,41 @@ public class UserService implements UserDetailsService {
     }
 
     public Optional<User> changeUsername(Long user_id, String username) {
-        if (!userRepository.findUserByUserName(username).isPresent() && userRepository.changeUsername(user_id, username) == 1) {
+        if (!userRepository.findUserByUserName(username).isPresent() && userRepository.changeUsername(user_id, username) == 1)
             return userRepository.findUserByID(user_id);
-        }
-        return null;
+        return Optional.empty();
     }
 
     public Optional<User> changeMail(Long user_id, String mail) {
-        if (mail.matches("^(.+)@(.+)$") && !userRepository.findUserByMail(mail).isPresent() && userRepository.changeMail(user_id, mail) == 1) {
+        if (mail.matches("^(.+)@(.+)$") && !userRepository.findUserByMail(mail).isPresent() && userRepository.changeMail(user_id, mail) == 1)
             return userRepository.findUserByID(user_id);
-        }
-        return null;
+        return Optional.empty();
     }
 
     public Optional<User> changePassword(Long user_id, String password) {
         if (password.matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}")) {
             String passwordEncoded = bCryptPasswordEncoder.encode(password);
-            if (userRepository.changePassword(user_id, passwordEncoded) == 1) {
+            if (userRepository.changePassword(user_id, passwordEncoded) == 1)
                 return userRepository.findUserByID(user_id);
-            }
         }
-        return null;
+        return Optional.empty();
     }
 
     public Optional<User> changeName(Long user_id, String name) {
-        if (userRepository.changeName(user_id, name) == 1) {
+        if (userRepository.changeName(user_id, name) == 1)
             return userRepository.findUserByID(user_id);
-        }
-        return null;
+        return Optional.empty();
     }
 
     public Optional<User> changeLastName(Long user_id, String last_name) {
-        if (userRepository.changeLastName(user_id, last_name) == 1) {
+        if (userRepository.changeLastName(user_id, last_name) == 1)
             return userRepository.findUserByID(user_id);
-        }
-        return null;
-    }
-
-    public Optional<User> addFriends(Long user_id, String link_to_avatar) {
-        if (userRepository.changeLinkToAvar(user_id, link_to_avatar) == 1) {
-            return userRepository.findUserByID(user_id);
-        }
-        return null;
+        return Optional.empty();
     }
 
     public Optional<User> changeLinkToAvatar(Long user_id, String link_to_avatar) {
-        if (userRepository.changeLinkToAvar(user_id, link_to_avatar) == 1) {
+        if (userRepository.changeLinkToAvar(user_id, link_to_avatar) == 1)
             return userRepository.findUserByID(user_id);
-        }
-        return null;
+        return Optional.empty();
     }
-
 }

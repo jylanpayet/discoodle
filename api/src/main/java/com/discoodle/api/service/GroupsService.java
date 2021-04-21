@@ -10,8 +10,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -59,17 +57,17 @@ public class GroupsService {
         return Optional.of(finalGroup);
     }
 
-    public boolean editGroup(EditGroupRequest request) {
-        try {
-            groupsRepository.updateNameAndDescGroup(request.getGroups_id(), request.getName(), request.getDescription());
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
+    public Optional<Groups> editGroup(EditGroupRequest request) {
+        Optional<Groups> groups = groupsRepository.updateNameAndDescGroup(request.getGroups_id(), request.getName(), request.getDescription());
+        return groupsRepository.findGroupsByID(groups.get().getGroups_id());
     }
 
-    public void deleteGroupByID(Long groups_ID) {
-        groupsRepository.deleteById(groups_ID);
+    public void deleteGroupByID(Long groups_id) {
+        if(groupsRepository.findGroupsByID(groups_id).isPresent()) {
+            Optional<Groups> group = findGroupsByID(groups_id);
+            groupsRepository.deleteLinkGroupsToGroup(group.get().getParent_id(),groups_id);
+            groupsRepository.deleteById(groups_id);
+        }
     }
 
     public Optional<Groups> addNewMemberInGroup(Long groups_id, Long user_id, String token) {
@@ -116,12 +114,8 @@ public class GroupsService {
         List<Roles> roles = userRepository.findUserByID(user_id).get().getRoles();
         List<Roles> res = new java.util.ArrayList<>();
         for (Roles user : roles) {
-            List<Roles> rolesGroups = groupsRepository.findGroupsByID(group_id).get().getRoles();
-            for (Roles group : rolesGroups) {
-                if (user == group) {
-                    res.add(group);
-                }
-            }
+            if(user.getGroups_id().equals(group_id))
+                res.add(user);
         }
         return res;
     }
