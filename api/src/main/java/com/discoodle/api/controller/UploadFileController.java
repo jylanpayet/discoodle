@@ -26,5 +26,8 @@ public class UploadFileController {
     public String uploadAvatar(@RequestParam("file") MultipartFile file, @PathVariable("user_id") Long user_id) {
         return uploadFileService.uploadAvatar(file, user_id);
     }
-
+    @DeleteMapping("api/deleteImage/{user_id}")
+    public Boolean deleteImage(@PathVariable("user_id") Long user_id){
+        return uploadFileService.deleteImage(user_id);
+    }
 }

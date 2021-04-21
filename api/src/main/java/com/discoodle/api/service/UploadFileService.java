@@ -1,6 +1,8 @@
 package com.discoodle.api.service;
 
 import com.discoodle.api.ApiApplication;
+import com.discoodle.api.model.User;
+import com.discoodle.api.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
@@ -10,12 +12,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 public class UploadFileService {
 
     private UserService userService;
+    private UserRepository userRepository;
 
     public String uploadFile(MultipartFile file, Long group_id) {
         String path = String.format("%sstatic/common/groups/%d/" + file.getOriginalFilename(), ApiApplication.RESSOURCES, group_id);
@@ -72,5 +76,20 @@ public class UploadFileService {
             return "Erreur lors du téléchargement du fichier !";
         }
         return "Fichier upload avec succès !";
+    }
+
+    public Boolean deleteImage(Long user_id) {
+        Optional<User> user=userRepository.findUserByID(user_id);
+        if(user.isPresent()){
+            String path = String.format("%sstatic/common/avatar/", ApiApplication.RESSOURCES)+user.get().getLink_to_avatar().substring(29);
+            File del=new File(path);
+            if(del.exists()){
+                del.delete();
+            }
+            user.get().setLink_to_avatar(null);
+            userRepository.save(user.get());
+            return true;
+        }
+        return false;
     }
 }
