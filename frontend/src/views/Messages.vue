@@ -50,6 +50,7 @@ export default {
       getRoomsFromDB() {
          axios.get(`http://localhost:8080/api/users/seeAllRooms/${this.getUser.id}`).then(response => {
             this.convList = response.data
+            console.log(this.convList);
          });
       },
       addNewGroup(group) {
@@ -85,7 +86,6 @@ export default {
    height: 100%;
    width: 100%;
    background-color: #18161F;
-
 }
 
 .left-pannel {

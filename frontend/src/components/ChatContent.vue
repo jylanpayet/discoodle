@@ -20,8 +20,7 @@
                   <div class="pinned-message-content" :key="messages" v-for="messages in pinned">
                      {{ messages.sender }} : <br>
                      {{ messages.content }} <br>
-                     {{ messages.messageDate }}
-                     <button class="unpin-message" @click="unpinMessage(messages.id)">
+                     <button class="unpin-message" @click="unpinMessage(messages.message_id)">
                         X
                      </button>
                   </div>
@@ -37,11 +36,11 @@
             }}</span>
          <Message :key="message" v-for="message in messages"
                   :content="message.content"
-                  :user-logo="message.sender.charAt(0).toUpperCase()"
-                  :belong-to-myself="message.sender === user"
-                  :message-date="message.messageDate"
-                  :message-i-d="message.id"
-                  :is-edited="message.edited"
+                  :user_logo="message.sender.charAt(0).toUpperCase()"
+                  :belong_to_myself="message.sender === getUser.username"
+                  :message_date="message.message_date"
+                  :message_id="message.message_id"
+                  :edited="message.edited"
                   @pinnedMessage="pinnedMessage"
                   @deletedMessage="deletedMessage"
                   @editedMessage="editedMessage"
@@ -92,7 +91,6 @@ export default {
       return {
          messages: [],
          pinned: [],
-         user: "",
          writers: [],
          showPinned: false,
          showEmoji: false,
@@ -101,7 +99,6 @@ export default {
       }
    },
    mounted() {
-      this.user = this.getUser.username;
       this.getMessagesFromJSON();
       this.connect();
    },
@@ -130,7 +127,7 @@ export default {
       actionInput(event) {
          if (event.keyCode === 13 && document.querySelector(".conv-input > div > input").value !== "") {
             this.send();
-            this.writers.pop(this.user);
+            this.writers.pop(this.getUser.username);
          } else if (event.keyCode !== 13) {
             this.writing();
             const inputContent = document.querySelector(".conv-input > div > input");
@@ -138,9 +135,9 @@ export default {
          }
       },
       writing() {
-         if (!this.writers.includes(this.user)) {
+         if (!this.writers.includes(this.getUser.username)) {
             stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify({
-               sender: this.user,
+               sender: this.getUser.username,
                type: "WRITING"
             }));
          }
@@ -170,21 +167,18 @@ export default {
       onMessageReceived(payload) {
          let message = JSON.parse(payload.body);
 
-         if (message.sender !== this.user) {
+         if (message.sender !== this.getUser.username) {
             if (message.type === "MESSAGE") {
 
                this.messages.unshift({
                   convUUID: message.convUUID,
-                  id: message.id,
+                  message_id: message.message_id,
                   content: message.content,
                   sender: message.sender,
-                  messageDate: message.messageDate,
+                  message_date: message.message_date,
                   pinned: message.pinned,
                   edited: false,
-                  // TODO : Add messageReactions implementation.
-                  // messageReactions: message.messageReactions
                })
-               this.writers.pop(message.sender)
             } else if (message.type === "WRITING") {
                if (!this.writers.includes(message.sender)) {
                   this.writers.push(message.sender)
@@ -194,23 +188,23 @@ export default {
                }
             } else if (message.type === "PINNED") {
                this.messages.forEach(elt => {
-                  if (elt.id === message.id && !this.pinned.includes(elt))
+                  if (elt.message_id === message.message_id && !this.pinned.includes(elt))
                      this.pinned.push(elt);
                });
             } else if (message.type === "UNPINNED") {
-               this.pinned = this.pinned.filter(elt => elt.id !== message.id);
+               this.pinned = this.pinned.filter(elt => elt.message_id !== message.message_id);
             } else if (message.type === "DELETED") {
-               this.messages = this.messages.filter(elt => elt.id !== message.id);
-               this.pinned = this.pinned.filter(elt => elt.id !== message.id);
+               this.messages = this.messages.filter(elt => elt.message_id !== message.message_id);
+               this.pinned = this.pinned.filter(elt => elt.message_id !== message.message_id);
             } else if (message.type === "EDITED") {
                this.messages.forEach(elt => {
-                  if (elt.id === message.id) {
+                  if (elt.message_id === message.message_id) {
                      elt.content = message.content;
                      elt.edited = true;
                   }
                });
                this.pinned.forEach(elt => {
-                  if (elt.id === message.id) {
+                  if (elt.message_id === message.message_id) {
                      elt.content = message.content;
                      elt.edited = true;
                   }
@@ -222,57 +216,46 @@ export default {
          let messageContent = document.querySelector(".conv-input > div > input");
 
          if (messageContent && stompClient) {
-            let date = new Date();
-            date = date.toLocaleString('fr-FR', {timeZone: 'UTC'}).substr(0, 17).replace(",", " -");
-            date = date.substr(0, 13) + ((Number(date.substr(13, 2)) + 1) % 24) + date.substr(15, 3);
-
-            let chatMessage = {
-               id: this.messages.length,
+            axios.post(`http://localhost:8080/api/messages/sendMessage?room_uuid=${this.getCurrentConv}`, {
+               conv_uuid: this.getCurrentConv,
                content: messageContent.value,
-               sender: this.user,
-               messageDate: date,
-               pinned: false,
-               edited: false,
-               convUUID: this.getCurrentConv,
-               // messageReactions: []
-
-               type: "MESSAGE"
-            };
-
-            this.messages.unshift(chatMessage);
-            stompClient.send(`/conversationListener/${this.getCurrentConv}/room.send`, {}, JSON.stringify(chatMessage));
-            messageContent.value = '';
+               sender: this.getUser.username,
+               message_date: Date.now()
+            }).then(response => {
+               this.messages.unshift(response.data);
+               stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify(response.data))
+               messageContent.value = "";
+            });
          }
       },
       getMessagesFromJSON() {
-         axios.get(`http://localhost:8080/api/messages?uuid=${this.getCurrentConv}`).then(response => {
-            this.messages = response.data.messages;
+         axios.get(`http://localhost:8080/api/messages?room_uuid=${this.getCurrentConv}`).then(response => {
+            this.messages = response.data.sort((a, b) => b.message_date - a.message_date);
             this.pinned = this.messages.filter(elt => (elt.pinned === true));
          });
-
       },
       switchPinDisplay() {
          this.showPinned = !this.showPinned;
       },
       unpinMessage(messageID) {
-         axios.put(`http://localhost:8080/api/room/unpinMessage/${this.getCurrentConv}?messageID=${messageID}`).then(() => {
+         axios.put(`http://localhost:8080/api/messages/unpinMessage?message_id=${messageID}`).then(() => {
             let c = 0;
             this.pinned.forEach(elt => {
-               if (elt.id === messageID)
+               if (elt.message_id === messageID)
                   this.pinned.splice(c, 1);
                c++;
             })
             stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify({
-               id: messageID,
+               message_id: messageID,
                type: "UNPINNED"
             }));
          })
       },
       pinnedMessage(messageID) {
          this.messages.forEach(elt => {
-            if (elt.id === messageID && !this.pinned.includes(elt)) {
+            if (elt.message_id === messageID && !this.pinned.includes(elt)) {
                stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify({
-                  id: messageID,
+                  message_id: messageID,
                   type: "PINNED"
                }));
                this.pinned.push(elt);
@@ -281,13 +264,13 @@ export default {
       },
       deletedMessage(messageID) {
          stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify({
-            id: messageID,
+            message_id: messageID,
             type: "DELETED"
          }));
       },
       editedMessage(messageID, content) {
          stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify({
-            id: messageID,
+            message_id: messageID,
             content: content,
             type: "EDITED"
          }));
