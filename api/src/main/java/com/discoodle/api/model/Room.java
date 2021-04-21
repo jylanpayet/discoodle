@@ -1,5 +1,6 @@
 package com.discoodle.api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -46,6 +47,7 @@ public class Room {
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<User> users = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToOne
     @JoinTable(name = "link_server_room",
             joinColumns = @JoinColumn(name = "room_id"),

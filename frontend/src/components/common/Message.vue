@@ -1,28 +1,28 @@
 <template>
-   <div class="Message" :style="belongToMyself ? { justifyContent: 'flex-end' } : { justifyContent: 'flex-start' }">
-      <div @mouseover="showPin = true" @mouseleave="showPin = false" class="content" :style="!belongToMyself ? { flexDirection: 'row-reverse' } : { flexDirection: 'row' }">
-         <span v-if="isEdited" style="color: #7f7f7f; margin-left: 20px; margin-right: 20px; font-weight: 500; font-size: 11px;">
+   <div class="Message" :style="belong_to_myself ? { justifyContent: 'flex-end' } : { justifyContent: 'flex-start' }">
+      <div @mouseover="showPin = true" @mouseleave="showPin = false" class="content" :style="!belong_to_myself ? { flexDirection: 'row-reverse' } : { flexDirection: 'row' }">
+         <span v-if="edited" style="color: #7f7f7f; margin-left: 20px; margin-right: 20px; font-weight: 500; font-size: 11px;">
             (Modifié)
          </span>
-         <div v-if="!messageEdit" :class="mention ? 'message-content mention' : 'message-content'" v-html="displayMessage(content, true, true, true)" :style="belongToMyself ? { marginRight: '10px', backgroundColor: '#e85c5c', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: getTheme ? '#C4C4C4' : '#F4F4F4' }">
+         <div v-if="!messageEdit" :class="mention ? 'message-content mention' : 'message-content'" v-html="displayMessage(content, true, true, true)" :style="belong_to_myself ? { marginRight: '10px', backgroundColor: '#e85c5c', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: getTheme ? '#C4C4C4' : '#F4F4F4' }">
 
          </div>
-         <div v-else :class="mention ? 'message-content mention' : 'message-content'" :style="belongToMyself ? { marginRight: '10px', backgroundColor: '#e85c5c', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: getTheme ? '#C4C4C4' : '#F4F4F4' }">
+         <div v-else :class="mention ? 'message-content mention' : 'message-content'" :style="belong_to_myself ? { marginRight: '10px', backgroundColor: '#e85c5c', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: getTheme ? '#C4C4C4' : '#F4F4F4' }">
             <input type="text" :value="content" @keydown="actionInput">
          </div>
-         <div class="buttons" v-if="showPin" :style="belongToMyself ? { left: 0 } : { right: 0 }">
+         <div class="buttons" v-if="showPin" :style="belong_to_myself ? { left: 0 } : { right: 0 }">
             <button class="pin-message" @click="pinMessage">
                <img src="../../assets/pin.png" alt="">
             </button>
-            <button class="edit-message" @click="messageEdit = true" v-if="belongToMyself">
+            <button class="edit-message" @click="messageEdit = true" v-if="belong_to_myself">
                <img src="../../assets/pen.svg" alt="Pen">
             </button>
-            <button class="delete-message" @click="deleteMessage" v-if="belongToMyself">
+            <button class="delete-message" @click="deleteMessage" v-if="belong_to_myself">
                X
             </button>
          </div>
          <div class="user-logo" :style="{ backgroundColor: '#F4F4F4' }">
-            {{ userLogo }}
+            {{ user_logo }}
          </div>
       </div>
    </div>
@@ -41,23 +41,23 @@ export default {
          type: String,
          required: true
       },
-      userLogo: {
+      user_logo: {
          required: true
       },
-      belongToMyself: {
+      belong_to_myself: {
          type: Boolean,
          required: true,
          default: true
       },
-      messageDate: {
-         type: String,
+      message_date: {
+         type: Number,
          required: true
       },
-      messageID: {
+      message_id: {
          type: Number,
          required: true,
       },
-      isEdited: {
+      edited: {
          type: Boolean,
          required: true,
          default: false,
@@ -102,19 +102,19 @@ export default {
          return content;
       },
       pinMessage() {
-         axios.put(`http://localhost:8080/api/room/pinMessage/${this.getCurrentConv}?messageID=${this.messageID}`);
-         this.$emit('pinnedMessage', this.messageID);
+         axios.put(`http://localhost:8080/api/messages/pinMessage?message_id=${this.message_id}`);
+         this.$emit('pinnedMessage', this.message_id);
       },
       deleteMessage() {
-         axios.put(`http://localhost:8080/api/room/deleteMessage/${this.getCurrentConv}?messageID=${this.messageID}`);
-         this.$emit('deletedMessage', this.messageID);
+         axios.delete(`http://localhost:8080/api/messages/deleteMessage?message_id=${this.message_id}`);
+         this.$emit('deletedMessage', this.message_id);
       },
       editMessage(content) {
-         axios.put(`http://localhost:8080/api/room/editMessage/${this.getCurrentConv}`, {
-            messageID: this.messageID,
+         axios.put(`http://localhost:8080/api/messages/editMessage`, {
+            message_id: this.message_id,
             content: content
          })
-         this.$emit('editedMessage', this.messageID, content);
+         this.$emit('editedMessage', this.message_id, content);
       },
 
       actionInput(event) {
@@ -127,7 +127,7 @@ export default {
             this.messageEdit = false;
          } else {
             this.messageEdit = event.keyCode !== 27;
-            input.value = this.displayMessage(input.value, false, true, false);
+            input.value = this.displayMessage(input.value, false, false, false);
          }
       }
    },

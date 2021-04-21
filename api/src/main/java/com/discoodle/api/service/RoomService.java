@@ -2,6 +2,7 @@ package com.discoodle.api.service;
 
 import com.discoodle.api.model.*;
 import com.discoodle.api.repository.RoomRepository;
+import com.discoodle.api.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,7 @@ import java.util.Optional;
 public class RoomService {
 
     private final RoomRepository roomRepository;
+    private final UserRepository userRepository;
 
     public Room createNewRoom(String room_name, List<Long> room_members) {
         Room room = new Room(
@@ -22,7 +24,11 @@ public class RoomService {
         );
         Room finalRoom = roomRepository.save(room);
         for (Long room_member : room_members) {
-            roomRepository.addNewMember(finalRoom.getRoom_id(), room_member);
+            Optional<User> temp = userRepository.findById(room_member);
+            if (temp.isPresent()) {
+                roomRepository.addNewMember(finalRoom.getRoom_id(),room_member);
+                finalRoom.getUsers().add(temp.get());
+            }
         }
         return finalRoom;
     }
@@ -41,21 +47,21 @@ public class RoomService {
         for (Long room_member : room_members) {
             roomRepository.addNewMember(room_id, room_member);
         }
-        return roomRepository.findRoomByUUID(room_id);
+        return roomRepository.findById(room_id);
     }
 
     public Optional<Room> changeLinkPicture(String room_id, String link_to_avatar) {
-        if (roomRepository.changeLinkPicture(room_id, link_to_avatar) == 1) {
-            return roomRepository.findRoomByUUID(room_id);
+        if(roomRepository.changeLinkPicture(room_id, link_to_avatar) == 1) {
+            return roomRepository.findById(room_id);
         }
-        return null;
+        return Optional.empty();
     }
 
     public Optional<Room> changeAdmin(String room_id, Long room_admin) {
-        if (roomRepository.changeAdmin(room_id, room_admin) == 1) {
-            return roomRepository.findRoomByUUID(room_id);
+        if(roomRepository.changeAdmin(room_id, room_admin) == 1) {
+            return roomRepository.findById(room_id);
         }
-        return null;
+        return Optional.empty();
     }
 
 }
