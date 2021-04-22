@@ -18,6 +18,9 @@ public class NoteController {
         return noteService.createNewNote(request);
     }
 
-
+    @DeleteMapping("{note_id}")
+    public void deleteNote(@PathVariable("note_id") Long note_id) {
+        noteService.deleteNote(note_id);
+    }
 
 }

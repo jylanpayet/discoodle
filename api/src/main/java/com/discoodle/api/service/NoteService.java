@@ -28,5 +28,8 @@ public class NoteService {
         return Optional.of(finalNote);
     }
 
+    public void deleteNote(Long note_id) {
 
+        noteRepository.deleteById(note_id);
+    }
 }
