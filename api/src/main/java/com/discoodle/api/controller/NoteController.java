@@ -36,9 +36,9 @@ public class NoteController {
         noteService.deleteAllNoteByUserId(user_id);
     }
 
-    @DeleteMapping("api/note/deleteBT/{titre}")
-    public void deleteAllNoteByTitre(@PathVariable("titre") String titre) {
-        noteService.deleteAllNoteByTitre(titre);
+    @DeleteMapping("api/note/deleteBT/{group_id}/{titre}")
+    public void deleteAllNoteByTitre(@PathVariable("group_id") Long group_id,@PathVariable("titre") String titre) {
+        noteService.deleteAllNoteByTitre(group_id,titre);
     }
 
     @GetMapping("api/note/group_id/{group_id}")
@@ -53,10 +53,10 @@ public class NoteController {
         return noteService.getAllNoteByUserId(user_id);
     }
 
-    @GetMapping("api/note/titre/{titre}")
+    @GetMapping("api/note/titre/{group_id}/{titre}")
     @ResponseBody
-    public List<Note> getAllNoteByTitre(@PathVariable("titre") String titre) {
-        return noteService.getAllNoteByTitre(titre);
+    public List<Note> getAllNoteByTitre(@PathVariable("group_id") Long group_id,@PathVariable("titre") String titre) {
+        return noteService.getAllNoteByTitre(group_id,titre);
     }
 
     @GetMapping("api/note/note_id/{note_id}")
