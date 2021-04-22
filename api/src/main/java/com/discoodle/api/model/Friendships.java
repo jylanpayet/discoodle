@@ -20,12 +20,12 @@ public class Friendships {
     }
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     @Column(name = "friendships_id", unique = true, nullable = false)
     private Long friendships_id;
 
     @Column(nullable = false, columnDefinition = "TINYINT(1)")
-    private boolean status = false;
+    private Boolean status = false;
 
     @Column(name = "sender_id")
     private Long sender_id;
@@ -38,7 +38,5 @@ public class Friendships {
     @ToString
     public static class FriendshipsRequest {
         private final List<Long> friendships = new LinkedList<>();
-        private Long sender_id;
-        private Long receiver_id;
     }
 }

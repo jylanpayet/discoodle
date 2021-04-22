@@ -24,30 +24,24 @@ public class RoomService {
         );
         Room finalRoom = roomRepository.save(room);
         for (Long room_member : room_members) {
-            Optional<User> temp = userRepository.findById(room_member);
-            if (temp.isPresent()) {
+            if (userRepository.existsById(room_member)) {
                 roomRepository.addNewMember(finalRoom.getRoom_id(),room_member);
-                finalRoom.getUsers().add(temp.get());
             }
         }
         return finalRoom;
     }
 
-    public Optional<Room> deleteMember(String room_id, Long user_id) {
-        Optional<Room> room = roomRepository.findRoomByUUID(room_id);
-        roomRepository.deleteMember(room_id, user_id);
-        return room;
+    public Optional<Room> removeMember(String room_id, Long user_id) {
+        if(roomRepository.existsById(room_id)) {
+            Optional<Room> room = roomRepository.findRoomByUUID(room_id);
+            roomRepository.removeMember(room_id, user_id);
+            return room;
+        }
+        return Optional.empty();
     }
 
     public void addNewMember(String room_id, Long user_id) {
         roomRepository.addNewMember(room_id, user_id);
-    }
-
-    public Optional<Room> addNewMembers(String room_id, List<Long> room_members) {
-        for (Long room_member : room_members) {
-            roomRepository.addNewMember(room_id, room_member);
-        }
-        return roomRepository.findById(room_id);
     }
 
     public Optional<Room> changeLinkPicture(String room_id, String link_to_avatar) {

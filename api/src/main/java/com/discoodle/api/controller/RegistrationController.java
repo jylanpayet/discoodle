@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(path = "/api/registration")
+@RequestMapping("/api/registration")
 @AllArgsConstructor
 public class RegistrationController {
 
@@ -22,7 +22,7 @@ public class RegistrationController {
         return registrationService.login(request);
     }
 
-    @GetMapping( "confirm")
+    @GetMapping( "/confirm")
     public String confirm(@RequestParam("token") String token) {
         return registrationService.confirmToken(token);
     }

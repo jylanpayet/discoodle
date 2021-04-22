@@ -9,8 +9,7 @@
 
          <div class="notification-bell">
             <button @click="showNotification = !showNotification">
-               <img src="../../assets/bell.png" alt="Bell" v-if="getTheme">
-               <img src="../../assets/bell-daymode.png" alt="Bell" v-else>
+               <img src="../../assets/bell.png" alt="Bell">
             </button>
             <div class="red-alert" v-if="1 > 0"></div>
          </div>
@@ -35,7 +34,7 @@ export default {
       }
    },
    computed: {
-      ...mapGetters(['getTheme', 'getColors'])
+      ...mapGetters(['getColors'])
    }
 }
 </script>

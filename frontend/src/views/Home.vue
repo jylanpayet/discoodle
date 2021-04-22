@@ -1,7 +1,6 @@
 <template>
    <div class="Home">
       <div @scroll="loadPosts">
-         <SearchBar/>
          <div class="home-content">
             <div>
                <div class="welcome-discoodle">
@@ -31,7 +30,6 @@
 </template>
 
 <script>
-import SearchBar from "@/components/common/SearchBar";
 import axios from "axios";
 import Post from "@/components/common/Post";
 import { mapGetters } from "vuex"
@@ -39,7 +37,6 @@ import { mapGetters } from "vuex"
 export default {
    name: 'Home',
    components: {
-      SearchBar,
       Post
    },
    data() {

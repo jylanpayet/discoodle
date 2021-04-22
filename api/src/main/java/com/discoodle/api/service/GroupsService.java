@@ -46,10 +46,6 @@ public class GroupsService {
             try {
                 File dossier = new File((String.format("%sstatic/common/groups/%d", ApiApplication.RESSOURCES, finalGroup.getGroups_id())));
                 dossier.mkdirs();
-                if (dossier.exists() && dossier.isDirectory()) {
-                    File fichier = new File((String.format("%sstatic/common/groups/%d/%d.json", ApiApplication.RESSOURCES, finalGroup.getGroups_id(), finalGroup.getGroups_id())));
-                    fichier.createNewFile();
-                }
             } catch (Exception e) {
                 System.out.println("Dossier du groups non crée !");
             }
@@ -63,7 +59,7 @@ public class GroupsService {
     }
 
     public void deleteGroupByID(Long groups_id) {
-        if(groupsRepository.findGroupsByID(groups_id).isPresent()) {
+        if(groupsRepository.existsById(groups_id)) {
             Optional<Groups> group = findGroupsByID(groups_id);
             groupsRepository.deleteLinkGroupsToGroup(group.get().getParent_id(),groups_id);
             groupsRepository.deleteById(groups_id);
@@ -91,13 +87,16 @@ public class GroupsService {
     }
 
     public Optional<Roles> addRoleForGroup(Long group_id, GroupsRequest request) {
-        Roles role = new Roles(
-                request.getRole_name(),
-                request.getRights()
-        );
-        rolesRepository.save(role);
-        groupsRepository.addRoleForGroup(group_id, role.getRole_id());
-        return Optional.of(role);
+        if(groupsRepository.existsById(group_id)) {
+            Roles role = new Roles(
+                    request.getRole_name(),
+                    request.getRights()
+            );
+            rolesRepository.save(role);
+            groupsRepository.addRoleForGroup(group_id, role.getRole_id());
+            return Optional.of(role);
+        }
+        return Optional.empty();
     }
 
     public Optional<Roles> addRoleForUsers(List<Long> user_id, Long role_id) {
@@ -121,13 +120,19 @@ public class GroupsService {
     }
 
     public Optional<Roles> modifyRightsForRole(Long role_id, String rights) {
-        groupsRepository.modifyRightsForRole(role_id, rights);
-        return rolesRepository.findById(role_id);
+        Optional<Roles> roles=rolesRepository.findById(role_id);
+        if(roles.isPresent()) {
+            groupsRepository.modifyRightsForRole(role_id, rights);
+        }
+        return roles;
     }
 
     public Boolean deleteRole(Long role_id) {
-        rolesRepository.deleteById(role_id);
-        return rolesRepository.findById(role_id).isEmpty();
+        if(rolesRepository.existsById(role_id)) {
+            rolesRepository.deleteById(role_id);
+            return true;
+        }
+        return false;
     }
 
 }

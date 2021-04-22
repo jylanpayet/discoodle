@@ -18,6 +18,26 @@ body {
     overflow-y: hidden;
 }
 
+.code {
+    background-color: #2d2d2d;
+    color: #F4F4F4;
+    padding: 10px;
+    border: 1px solid #757575;
+    border-radius: 6px;
+}
+
+p > a {
+    color: #0057c8;
+}
+
+p > img {
+    width: 100%;
+}
+
+p > a:hover {
+    color: darkblue;
+}
+
 a {
     color: #F4F4F4;
 }
@@ -30,15 +50,6 @@ a {
 *::-webkit-scrollbar-thumb {
     background: #454150;
     border-radius: 15px;
-}
-
-code {
-    background-color: #454150;
-    border: #2d2d2d;
-    color: #f4f4f4;
-    border-radius: 5px;
-    padding: 10px;
-    font-family: 'Inconsolata', monospace;
 }
 
 del {

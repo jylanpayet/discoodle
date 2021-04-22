@@ -27,22 +27,6 @@
                            <span :style="{ color: getColors.color5 }">COMPTE</span></router-link>
                      </div>
                   </div>
-
-                  <div class="fast-access">
-                     <span class="headerNavbar">ACCÈS RAPIDE</span>
-                     <div class="links">
-                        <!-- Mettre les liens de l'accès rapide ici -->
-                     </div>
-                  </div>
-
-                  <!-- TODO : Implementer l'accès rapide -->
-
-               </div>
-            </div>
-            <div class="theme-switcher">
-               <div>
-                  <input type="checkbox" id="switch" @change="switchTheme" checked/><label for="switch">Toggle</label>
-                  <span class="headerNavbar" style="margin-left: 20px;">{{ getTheme ? "NIGHT" : "DAY" }} MODE</span>
                </div>
             </div>
          </div>
@@ -64,10 +48,10 @@ export default {
 
    },
    methods: {
-      ...mapActions(['switchTheme', 'setUser'])
+      ...mapActions(['setUser'])
    },
    computed: {
-      ...mapGetters(['getColors', 'getTheme'])
+      ...mapGetters(['getColors'])
    },
    mounted() {
       if (vueCookie.get("username") !== null && vueCookie.get("username") !== "") {

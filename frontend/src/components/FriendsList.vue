@@ -18,7 +18,7 @@
          </div>
       </div>
       <div class="current-friends">
-         <span v-if="getFriends.length === 0" style="font-weight: 600; font-size: 17px; color: #f4f4f4">Ajoutez des amis pour les voir ici !</span>
+         <span v-if="getFriends.length === 0" style="font-weight: 600; font-size: 17px; color: #f4f4f4">Ajoute des amis pour les voir ici !</span>
          <span v-else style="margin-bottom: 10px; font-weight: 600; font-size: 17px; color: #f4f4f4">Vos amis :</span>
          <div class="user" :key="user" v-for="user in getFriends">
             <div class="user-image">
@@ -57,7 +57,7 @@ export default {
          users.forEach(username => {
             axios.get(`http://localhost:8080/api/users/${username}`).then(response => {
                if (response.data && response.data.id !== this.getUser.id) {
-                  axios.post(`http://localhost:8080/inviteMembers/${this.getUser.id}`, {
+                  axios.post(`http://localhost:8080/api/friendships/inviteMembers/${this.getUser.id}`, {
                      friendships: [response.data.id]
                   }).then(() => {
                      this.alertText = "Utilisateur(s) ajouté(s)"
@@ -72,10 +72,7 @@ export default {
       },
       acceptInvite(friend_id) {
          console.log(friend_id)
-         axios.put(`http://localhost:8080/acceptInvitation/`, {
-            sender_id: friend_id,
-            receiver_id: this.getUser.id,
-         }).then(() => {
+         axios.put(`http://localhost:8080/api/friendships/acceptInvitation?sender_id=${friend_id}&receiver_id=${this.getUser.id}`).then(() => {
             axios.get(`http://localhost:8080/api/users/infos/${friend_id}`).then(friend => {
                const temp = {
                   id: friend.data.id,
@@ -100,7 +97,7 @@ export default {
       },
       refuseInvite(friend_id) {
          console.log(friend_id);
-         axios.delete(`http://localhost:8080/refuseInvitation`, {
+         axios.delete(`http://localhost:8080/api/friendships/refuseInvitation`, {
             headers: {},
             data: {
                sender_id: friend_id,
@@ -145,7 +142,7 @@ export default {
    mounted() {
       if (!(JSON.stringify(this.getUser) === JSON.stringify({}))) {
          // Get all pending invites for the user.
-         axios.get(`http://localhost:8080/getAllInvitations/${this.getUser.id}`).then(response => {
+         axios.get(`http://localhost:8080/api/friendships/getAllInvitations/${this.getUser.id}`).then(response => {
             response.data.forEach(elt => {
                if (!elt.status) {
                   axios.get(`http://localhost:8080/api/users/infos/${elt.sender_id}`).then(friend => {
@@ -238,6 +235,7 @@ export default {
    display: flex;
    align-items: center;
    justify-content: space-between;
+   margin-bottom: 10px;
    width: 100%;
    height: 50px;
    background-color: #454150;

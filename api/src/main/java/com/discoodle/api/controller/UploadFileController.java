@@ -22,4 +22,12 @@ public class UploadFileController {
         return uploadFileService.uploadSubject(file, group_id);
     }
 
+    @PostMapping(value = "api/uploadAvatar/{user_id}")
+    public String uploadAvatar(@RequestParam("file") MultipartFile file, @PathVariable("user_id") Long user_id) {
+        return uploadFileService.uploadAvatar(file, user_id);
+    }
+    @DeleteMapping("api/deleteImage/{user_id}")
+    public Boolean deleteImage(@PathVariable("user_id") Long user_id){
+        return uploadFileService.deleteImage(user_id);
+    }
 }
