@@ -93,7 +93,7 @@ public class UploadFileService {
     }
 
     public Boolean deleteAvatar(Long user_id){
-        Optional<User> user=userRepository.findUserByID(user_id);
+        Optional<User> user=userRepository.findById(user_id);
         if(user.isPresent()) {
             String path = String.format("%sstatic/common/avatar/", ApiApplication.RESSOURCES) + user.get().getLink_to_avatar().substring(36);
             try {
