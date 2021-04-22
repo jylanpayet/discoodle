@@ -35,7 +35,7 @@ public class UserService implements UserDetailsService {
     }
 
     public Optional<User> getUserByID(Long user_id) {
-        return userRepository.findUserByID(user_id);
+        return userRepository.findById(user_id);
     }
 
     public Optional<User.Role> findUserByRole(User.Role role) {
@@ -114,7 +114,7 @@ public class UserService implements UserDetailsService {
         list.addAll(userRepository.getFriendListForSender(user_id));
         List<User> res = new LinkedList<>();
         for (int i = 0; i < list.size(); i++) {
-            Optional<User> tmp = userRepository.findUserByID(list.get(i));
+            Optional<User> tmp = userRepository.findById(list.get(i));
             tmp.ifPresent(res::add);
         }
         return res;
@@ -122,13 +122,13 @@ public class UserService implements UserDetailsService {
 
     public Optional<User> changeUsername(Long user_id, String username) {
         if (!userRepository.findUserByUserName(username).isPresent() && userRepository.changeUsername(user_id, username) == 1)
-            return userRepository.findUserByID(user_id);
+            return userRepository.findById(user_id);
         return Optional.empty();
     }
 
     public Optional<User> changeMail(Long user_id, String mail) {
         if (mail.matches("^(.+)@(.+)$") && !userRepository.findUserByMail(mail).isPresent() && userRepository.changeMail(user_id, mail) == 1)
-            return userRepository.findUserByID(user_id);
+            return userRepository.findById(user_id);
         return Optional.empty();
     }
 
@@ -136,26 +136,26 @@ public class UserService implements UserDetailsService {
         if (password.matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}")) {
             String passwordEncoded = bCryptPasswordEncoder.encode(password);
             if (userRepository.changePassword(user_id, passwordEncoded) == 1)
-                return userRepository.findUserByID(user_id);
+                return userRepository.findById(user_id);
         }
         return Optional.empty();
     }
 
     public Optional<User> changeName(Long user_id, String name) {
         if (userRepository.changeName(user_id, name) == 1)
-            return userRepository.findUserByID(user_id);
+            return userRepository.findById(user_id);
         return Optional.empty();
     }
 
     public Optional<User> changeLastName(Long user_id, String last_name) {
         if (userRepository.changeLastName(user_id, last_name) == 1)
-            return userRepository.findUserByID(user_id);
+            return userRepository.findById(user_id);
         return Optional.empty();
     }
 
     public Optional<User> changeLinkToAvatar(Long user_id, String link_to_avatar) {
-        if (userRepository.changeLinkToAvar(user_id, link_to_avatar) == 1)
-            return userRepository.findUserByID(user_id);
+        if (userRepository.changeLinkToAvatar(user_id, link_to_avatar) == 1)
+            return userRepository.findById(user_id);
         return Optional.empty();
     }
 }

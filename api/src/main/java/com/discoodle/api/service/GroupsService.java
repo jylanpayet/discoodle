@@ -86,11 +86,11 @@ public class GroupsService {
         return groupsRepository.findGroupsByID(groups_ID);
     }
 
-    public Optional<Roles> addRoleForGroup(Long group_id, GroupsRequest request) {
+    public Optional<Roles> addRoleForGroup(Long group_id, String role_name, String rights) {
         if(groupsRepository.existsById(group_id)) {
             Roles role = new Roles(
-                    request.getRole_name(),
-                    request.getRights()
+                    role_name,
+                    rights
             );
             rolesRepository.save(role);
             groupsRepository.addRoleForGroup(group_id, role.getRole_id());
@@ -102,7 +102,9 @@ public class GroupsService {
     public Optional<Roles> addRoleForUsers(List<Long> user_id, Long role_id) {
         if (rolesRepository.findById(role_id).isPresent()) {
             for (Long user : user_id) {
-                groupsRepository.addRoleForUser(user, role_id);
+                if(!userRepository.findById(user).get().getRoles().contains(rolesRepository.findById(role_id))){
+                    groupsRepository.addRoleForUser(user, role_id);
+                }
             }
             return rolesRepository.findById(role_id);
         }
@@ -110,7 +112,7 @@ public class GroupsService {
     }
 
     public List<Roles> getRoleByGroupAndUser(Long group_id, Long user_id) {
-        List<Roles> roles = userRepository.findUserByID(user_id).get().getRoles();
+        List<Roles> roles = userRepository.findById(user_id).get().getRoles();
         List<Roles> res = new java.util.ArrayList<>();
         for (Roles user : roles) {
             if(user.getGroups_id().equals(group_id))

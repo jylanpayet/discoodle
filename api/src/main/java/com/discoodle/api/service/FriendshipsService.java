@@ -34,12 +34,15 @@ public class FriendshipsService {
         if(userRepository.existsById(user_id)) {
             for (int i = 0; i < friends_id.size(); i++) {
                 if(userRepository.existsById(friends_id.get(i))) {
-                    Friendships friendships = new Friendships(
-                            user_id,
-                            friends_id.get(i)
-                    );
-                    friendshipsRepository.save(friendships);
-                }
+                    if(!userRepository.getFriendListForSender(user_id).contains(friends_id.get(i)) && !userRepository.getFriendListForReceiver(friends_id.get(i)).contains(user_id)) {
+                        Friendships friendships = new Friendships(
+                                user_id,
+                                friends_id.get(i)
+                        );
+                        friendshipsRepository.save(friendships);
+                        return "Votre invitation a été envoyé avec succès !";
+                    } return "Vous êtes déjà ami ou vous avez déjà une invitation avec cet utilisateur.";
+                } return "L'utilisateur n'existe pas.";
             }
         }
         return "";

@@ -62,8 +62,8 @@ public class GroupsController {
     }
 
     @PostMapping("/addRoleForGroup/{group_id}")
-    public Optional<Roles> addRoleForGroup(@PathVariable Long group_id, @RequestBody GroupsRequest request) {
-        return groupsService.addRoleForGroup(group_id, request);
+    public Optional<Roles> addRoleForGroup(@PathVariable Long group_id, @RequestParam(value = "role_name") String role_name, @RequestParam(value = "rights") String rights) {
+        return groupsService.addRoleForGroup(group_id, role_name, rights);
     }
 
     @PostMapping("/addRoleForUser/")

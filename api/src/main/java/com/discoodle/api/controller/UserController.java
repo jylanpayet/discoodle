@@ -115,10 +115,10 @@ public class UserController {
         return userService.changeLinkToAvatar(user_id, request.getLink_to_avatar());
     }
 
-    @GetMapping("/seeAllGroups/{user_ID}")
+    @GetMapping("/seeAllGroups/{user_id}")
     @ResponseBody
-    public List<Groups> findAllGroupsByUserID(@PathVariable Long user_ID) {
-        return userService.getUserByID(user_ID).get().getGroups();
+    public List<Groups> findAllGroupsByUserID(@PathVariable Long user_id) {
+        return userService.getUserByID(user_id).get().getGroups();
     }
 
     @GetMapping("/seeAllSubjects/{user_ID}")
