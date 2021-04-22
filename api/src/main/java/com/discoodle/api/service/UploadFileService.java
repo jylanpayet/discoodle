@@ -2,8 +2,10 @@ package com.discoodle.api.service;
 
 import com.discoodle.api.ApiApplication;
 import com.discoodle.api.model.Groups;
+import com.discoodle.api.model.Room;
 import com.discoodle.api.model.User;
 import com.discoodle.api.repository.GroupsRepository;
+import com.discoodle.api.repository.RoomRepository;
 import com.discoodle.api.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
@@ -21,9 +23,12 @@ import java.util.Optional;
 public class UploadFileService {
 
     private final UserService userService;
+    private final RoomService roomService;
     private final UserRepository userRepository;
     private final GroupsRepository groupsRepository;
+    private final RoomRepository roomRepository;
 
+    // Changement upload de file pour message
     public String uploadFile(MultipartFile file, Long group_id) {
         if(!groupsRepository.existsById(group_id))
             return "le group n'existe pas !";
@@ -42,7 +47,6 @@ public class UploadFileService {
         } catch (IOException e) {
             System.out.println(e);
         }
-
         return "Fichier upload avec succès !";
     }
 
@@ -88,7 +92,7 @@ public class UploadFileService {
         return "Fichier upload avec succès !";
     }
 
-    public Boolean deleteImage(Long user_id){
+    public Boolean deleteAvatar(Long user_id){
         Optional<User> user=userRepository.findUserByID(user_id);
         if(user.isPresent()) {
             String path = String.format("%sstatic/common/avatar/", ApiApplication.RESSOURCES) + user.get().getLink_to_avatar().substring(36);
@@ -103,4 +107,42 @@ public class UploadFileService {
         }
         return false;
     }
+
+    public String uploadRoomAvatar(MultipartFile file, String room_id) {
+        if(!roomRepository.existsById(room_id))
+            return "la room n'existe pas !";
+        String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+        if(!extension.equals("jpg") && !extension.equals("png")){
+            return "Une erreur est survenue lors du téléchargements !";
+        }
+        String path = String.format("%sstatic/common/roomAvatar/%d.%s", ApiApplication.RESSOURCES,room_id,extension);
+        File add = new File(path);
+        try {
+            if (!add.exists()) {
+                add.createNewFile();
+            }
+            roomService.changeLinkPicture(room_id,path);
+            Files.write(Path.of(path), file.getBytes());
+        } catch (Exception e) {
+            return "Erreur lors du téléchargement du fichier !";
+        }
+        return "Fichier upload avec succès !";
+    }
+
+    public Boolean deleteRoomAvatar(String room_id){
+        Optional<Room> room=roomRepository.findById(room_id);
+        if(room.isPresent()) {
+            String path = String.format("%sstatic/common/roomAvatar/", ApiApplication.RESSOURCES) + room.get().getLink_picture().substring(40);
+            try {
+                Files.deleteIfExists(Path.of(path));
+            } catch (Exception e) {
+                return false;
+            }
+            room.get().setLink_picture(null);
+            roomRepository.save(room.get());
+            return true;
+        }
+        return false;
+    }
+
 }

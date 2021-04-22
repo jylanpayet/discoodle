@@ -57,12 +57,6 @@ public class UserController {
 
     @GetMapping("/seeAllRooms/{user_id}")
     @ResponseBody
-    public List<Room> findAllRoomsByUserID(@PathVariable Long user_id) {
-        return userService.getUserByID(user_id).get().getRooms();
-    }
-
-    @GetMapping("/seeAllRooms0/{user_id}")
-    @ResponseBody
     public List<Room> findAllRooms0ByUserID(@PathVariable Long user_id) {
         List<Room> all = userService.getUserByID(user_id).get().getRooms();
         List<Room> rooms = new ArrayList<>();
@@ -73,7 +67,7 @@ public class UserController {
         return rooms;
     }
 
-    @GetMapping("/seeAllRooms1/{user_id}")
+    @GetMapping("/seeAllServRooms/{user_id}")
     @ResponseBody
     public List<Room> findAllRooms1ByUserID(@PathVariable Long user_id) {
         List<Room> all = userService.getUserByID(user_id).get().getRooms();

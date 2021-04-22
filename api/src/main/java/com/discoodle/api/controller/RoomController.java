@@ -33,8 +33,8 @@ public class RoomController {
     }
 
     @PostMapping("/changeLinkPicture/{room_id}")
-    public Optional<Room> changeLinkPicture(@PathVariable String room_id, @RequestBody Room.RoomRequest request) {
-        return roomService.changeLinkPicture(room_id, request.getLink_picture());
+    public Optional<Room> changeLinkPicture(@PathVariable String room_id,@RequestParam(value="link_picture") String link_picture) {
+        return roomService.changeLinkPicture(room_id,link_picture);
     }
 
     @PostMapping("/changeAdmin/{room_id}")
