@@ -1,6 +1,5 @@
 <template>
    <div class="Account" v-if="isAuthentificated">
-      <SearchBar/>
       <div class="content">
          <div class="nav-account">
             <div style="justify-content: flex-start; padding-left: 20px; width: calc(100% - 20px); font-size: 18px; color: #909090">Paramètres</div>
@@ -33,15 +32,13 @@
 </template>
 
 <script>
-import SearchBar from "@/components/common/SearchBar";
 import Authentication from "@/components/Authentification";
 import { mapGetters } from 'vuex'
 
 export default {
    name: "Account",
    components: {
-      SearchBar,
-      Authentication
+         Authentication
    },
    computed: {
       ...mapGetters(['getUser'])

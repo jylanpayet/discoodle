@@ -24,7 +24,7 @@ public class FriendshipsController {
         return friendshipService.getAllInvitations(user_id);
     }
 
-    @PutMapping(path = "/acceptInvitation/")
+    @PutMapping(path = "/acceptInvitation")
     public void acceptInvitation(@RequestParam("sender_id") Long sender_id, @RequestParam("receiver_id") Long receiver_id) {
         friendshipService.acceptInvitation(sender_id, receiver_id);
     }

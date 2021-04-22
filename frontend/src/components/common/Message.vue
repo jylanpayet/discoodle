@@ -4,10 +4,10 @@
          <span v-if="edited" style="color: #7f7f7f; margin-left: 20px; margin-right: 20px; font-weight: 500; font-size: 11px;">
             (Modifié)
          </span>
-         <div v-if="!messageEdit" :class="mention ? 'message-content mention' : 'message-content'" v-html="displayMessage(content, true, true, true)" :style="belong_to_myself ? { marginRight: '10px', backgroundColor: '#e85c5c', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: getTheme ? '#C4C4C4' : '#F4F4F4' }">
+         <div v-if="!messageEdit" :class="mention ? 'message-content mention' : 'message-content'" v-html="displayMessage(content, true, true, true)" :style="belong_to_myself ? { marginRight: '10px', backgroundColor: '#e85c5c', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: '#C4C4C4' }">
 
          </div>
-         <div v-else :class="mention ? 'message-content mention' : 'message-content'" :style="belong_to_myself ? { marginRight: '10px', backgroundColor: '#e85c5c', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: getTheme ? '#C4C4C4' : '#F4F4F4' }">
+         <div v-else :class="mention ? 'message-content mention' : 'message-content'" :style="belong_to_myself ? { marginRight: '10px', backgroundColor: '#e85c5c', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: '#C4C4C4' }">
             <input type="text" :value="content" @keydown="actionInput">
          </div>
          <div class="buttons" v-if="showPin" :style="belong_to_myself ? { left: 0 } : { right: 0 }">
@@ -64,10 +64,6 @@ export default {
       }
    },
    methods: {
-      printDate(messageDate) {
-         return new Date().toLocaleString().substr(0, 10) === messageDate.substr(0, 10) ? messageDate.substr(13) : messageDate.substr(0, 10)
-      },
-
       filterEmoji(content){
          // Regex to match with the emoji string encode ( ':xxxxx_xxx_xxx_xxx:' where '_' is optionnal )
          const regex = ":[a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*:";
@@ -99,7 +95,19 @@ export default {
             content = this.filterEmoji(content);
          if (mardkdown)
             content = this.filterMarkdown(content);
-         return content;
+
+         const body = new DOMParser().parseFromString(content, "text/html").querySelector("body");
+
+         const p = body.children[0];
+         if (p && p.children.length === 1) {
+            if (p.children[0].tagName === "CODE") {
+               p.classList.add("code");
+            } else if (p.children[0].tagName === "A") {
+               p.children[0].setAttribute("target", "_blank");
+            }
+         }
+
+         return body.innerHTML;
       },
       pinMessage() {
          axios.put(`http://localhost:8080/api/messages/pinMessage?message_id=${this.message_id}`);
@@ -114,7 +122,8 @@ export default {
             message_id: this.message_id,
             content: content
          })
-         this.$emit('editedMessage', this.message_id, content);
+         if (content !== this.content)
+            this.$emit('editedMessage', this.message_id, content);
       },
 
       actionInput(event) {
@@ -132,7 +141,7 @@ export default {
       }
    },
    computed: {
-      ...mapGetters(['getColors', 'getTheme', 'getUser', 'getCurrentConv'])
+      ...mapGetters(['getColors', 'getUser', 'getCurrentConv'])
    },
    data() {
       return {
