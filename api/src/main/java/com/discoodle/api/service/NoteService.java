@@ -6,6 +6,7 @@ import com.discoodle.api.request.NoteRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -28,8 +29,21 @@ public class NoteService {
         return Optional.of(finalNote);
     }
 
-    public void deleteNote(Long note_id) {
+    public void deleteNoteById(Long note_id) {
 
         noteRepository.deleteById(note_id);
     }
+
+    public List<Note> getAllNoteByGroupId(Long group_id){
+        return noteRepository.getAllNoteByGroupId(group_id);
+    }
+
+    public List<Note> getAllNoteByUserId(Long user_id){
+        return noteRepository.getAllNoteByUserId(user_id);
+    }
+
+    public List<Note>getAllNoteByTitre(String titre){
+        return noteRepository.getAllNoteByTitre(titre);
+    }
+
 }
