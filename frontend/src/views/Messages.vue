@@ -17,7 +17,8 @@
                <div class="link-content">
                   <div class="user-logo">
                      <img v-if="convs.link_picture !== null" :src="convs.link_picture" alt="">
-                     <span>{{ convs.room_name.charAt(0).toUpperCase() }}</span>
+                     <img src="../assets/group.svg" alt="" v-else-if="convs.users.length > 2" style="width: 65%;">
+                     <span v-else>{{ convs.room_name.charAt(0).toUpperCase() }}</span>
                   </div>
                   <div class="conv-name">
                      {{ convs.room_name }}
@@ -27,7 +28,7 @@
          </div>
       </div>
       <div class="right-pannel">
-         <router-view/>
+         <router-view @userAdded="getRoomsFromDB"/>
       </div>
    </div>
    <Account @logSuccess="getRoomsFromDB" v-else />
@@ -43,18 +44,16 @@ export default {
    name: "Messages",
    components: {AddConversation, Account},
    computed: {
-      ...mapGetters(['getColors', 'getTheme', 'getUser']),
+      ...mapGetters(['getColors', 'getUser']),
    },
    methods: {
       ...mapActions(['setConvUUID']),
       getRoomsFromDB() {
          axios.get(`http://localhost:8080/api/users/seeAllRooms/${this.getUser.id}`).then(response => {
             this.convList = response.data
-            console.log(this.convList);
          });
       },
       addNewGroup(group) {
-         console.log(group);
          this.convList.unshift({
             link_picture: group.link_picture,
             room_name: group.room_name,

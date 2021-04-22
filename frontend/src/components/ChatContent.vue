@@ -326,7 +326,9 @@ export default {
             users.forEach(user => {
                if (this.containUsername(user)) {
                   axios.get(`http://localhost:8080/api/users/${user}`).then(response => {
-                     axios.post(`http://localhost:8080/api/room/${this.getCurrentConv}/room.add?user_id=${response.data.id}`)
+                     axios.post(`http://localhost:8080/api/room/addNewMember/${this.getCurrentConv}?user_id=${response.data.id}`).then(() => {
+                        this.$emit("userAdded");
+                     })
                   })
                }
             })
@@ -335,7 +337,7 @@ export default {
       }
    },
    computed: {
-      ...mapGetters(['getColors', 'getTheme', 'getCurrentConv', 'getUser', 'getFriends'])
+      ...mapGetters(['getColors', 'getCurrentConv', 'getUser', 'getFriends'])
    }
 }
 </script>

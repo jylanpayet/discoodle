@@ -2,46 +2,24 @@ import {createStore} from 'vuex'
 
 export default createStore({
     state: {
-        theme: {
-            night: {
-                color1: "#13111A",
-                color2: "#454150",
-                color3: "#909090",
-                color4: "#E85C5C",
-                color5: "#F4F4F4",
-                color6: "#FFFFFF"
-            },
-            day: {
-                color1: "#FDFDFD",
-                color2: "#454150",
-                color3: "#909090",
-                color4: "#E85C5C",
-                color5: "#454150",
-                color6: "#FFFFFF"
-            },
-            currentMode: {
-                type: Boolean,
-                default: true
-                // Represents the mode. If currentMode is true, then night mode is enabled, else it's day mode.
-            }
-        },
         messages: {
             currentConvShown: {
                 type: String,
             }
         },
-        user: {  },
-        friends: [
-
-        ],
-        groups: {
-
-        }
+        user: {},
+        friends: [],
+        groups: {},
+        night: {
+            color1: "#13111A",
+            color2: "#454150",
+            color3: "#909090",
+            color4: "#E85C5C",
+            color5: "#F4F4F4",
+            color6: "#FFFFFF"
+        },
     },
     mutations: {
-        SWITCH_THEME(state) {
-            state.theme.currentMode = !state.theme.currentMode
-        },
         SET_CONV_UUID(state, uuid) {
             state.messages.currentConvShown = uuid;
         },
@@ -56,9 +34,6 @@ export default createStore({
         }
     },
     actions: {
-        switchTheme(context) {
-            context.commit('SWITCH_THEME');
-        },
         setConvUUID(context, uuid) {
             context.commit('SET_CONV_UUID', uuid);
         },
@@ -74,13 +49,7 @@ export default createStore({
     },
     getters: {
         getColors: state => {
-            if (state.theme.currentMode)
-                return state.theme.night;
-            else
-                return state.theme.day;
-        },
-        getTheme: state => {
-            return state.theme.currentMode;
+            return state.night;
         },
         getCurrentConv: state => {
             return state.messages.currentConvShown;
@@ -95,7 +64,5 @@ export default createStore({
             return state.groups;
         }
     },
-    modules: {
-
-    }
+    modules: {}
 })
