@@ -30,8 +30,19 @@ public class NoteService {
     }
 
     public void deleteNoteById(Long note_id) {
-
         noteRepository.deleteById(note_id);
+    }
+
+    public void deleteAllNoteByGroupId(Long group_id){
+        noteRepository.deleteAllNoteByGroupId(group_id);
+    }
+
+    public void deleteAllNoteByUserId(Long user_id){
+        noteRepository.deleteAllNoteByUserId(user_id);
+    }
+
+    public void deleteAllNoteByTitre(String titre){
+        noteRepository.deleteAllNoteByTitre(titre);
     }
 
     public List<Note> getAllNoteByGroupId(Long group_id){
@@ -44,6 +55,14 @@ public class NoteService {
 
     public List<Note>getAllNoteByTitre(String titre){
         return noteRepository.getAllNoteByTitre(titre);
+    }
+
+    public Optional<Note> getNoteByNoteId(Long note_id){
+        return noteRepository.findById(note_id);
+    }
+
+    public void editNote(Long group_id, Long user_id, double note){
+        noteRepository.editNote(group_id,user_id,note);
     }
 
 }
