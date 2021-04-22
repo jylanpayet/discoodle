@@ -2,6 +2,7 @@ package com.discoodle.api.controller;
 
 import com.discoodle.api.model.*;
 import com.discoodle.api.repository.RoomRepository;
+import com.discoodle.api.request.RoomRequest;
 import com.discoodle.api.service.RoomService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,7 +19,7 @@ public class RoomController {
     private final RoomRepository roomRepository;
 
     @PostMapping( "/addNewRoom")
-    public Room addNewRoom(@RequestBody Room.RoomRequest request) {
+    public Room addNewRoom(@RequestBody RoomRequest request) {
         return roomService.createNewRoom(request.getRoom_name(), request.getRoom_members());
     }
 

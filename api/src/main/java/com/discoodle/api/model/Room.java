@@ -55,19 +55,4 @@ public class Room {
     private Server server;
 
 
-    @Getter
-    @AllArgsConstructor
-    @EqualsAndHashCode
-    @ToString
-    public static class RoomRequest {
-
-        private final String room_name;
-
-        private final String link_picture;
-
-        private final List<Long> room_members;
-
-        private final Long room_admin;
-
-    }
 }

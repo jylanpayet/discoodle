@@ -1,6 +1,7 @@
 package com.discoodle.api.controller;
 
 import com.discoodle.api.model.Friendships;
+import com.discoodle.api.request.FriendshipsRequest;
 import com.discoodle.api.service.FriendshipsService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +16,7 @@ public class FriendshipsController {
     private final FriendshipsService friendshipService;
 
     @PostMapping("/inviteMembers/{user_id}")
-    public String inviteMembers(@PathVariable Long user_id, @RequestBody Friendships.FriendshipsRequest friends_id) {
+    public String inviteMembers(@PathVariable Long user_id, @RequestBody FriendshipsRequest friends_id) {
         return friendshipService.inviteMembers(user_id, friends_id.getFriendships());
     }
 
