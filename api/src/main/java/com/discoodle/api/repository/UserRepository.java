@@ -64,4 +64,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("UPDATE User user SET user.link_to_avatar = :link_to_avatar WHERE user.id = :user_id")
     int changeLinkToAvatar(@Param("user_id") Long user_id, @Param("link_to_avatar") String link_to_avatar);
 
+    @Transactional
+    @Modifying
+    @Query(value = "DELETE ct FROM confirmation_token as ct where ct.user_id = :user_id", nativeQuery = true)
+    void removeToken(@Param("user_id") Long user_id);
+
 }

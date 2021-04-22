@@ -52,9 +52,11 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
-    public void deleteUser(Long userId) {
-        if (userRepository.existsById(userId))
-            userRepository.deleteById(userId);
+    public void deleteUser(Long user_id) {
+        if (userRepository.existsById(user_id)) {
+            userRepository.removeToken(user_id);
+            userRepository.deleteById(user_id);
+        }
     }
 
     @Override

@@ -43,7 +43,7 @@ public class RoomController {
         return roomService.changeAdmin(room_id, room_admin);
     }
 
-    @GetMapping
+    @GetMapping("/removeRoom/{room_id}")
     public void deleteRoom(@PathVariable String room_id){
         if(roomRepository.existsById(room_id))
             roomRepository.deleteById(room_id);
