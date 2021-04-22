@@ -53,11 +53,8 @@ public class UserService implements UserDetailsService {
     }
 
     public void deleteUser(Long userId) {
-        boolean exists = userRepository.existsById(userId);
-        if (!exists) {
-            throw new IllegalStateException("L'étudiant avec l'id : " + userId + "n'existe pas.");
-        }
-        userRepository.deleteById(userId);
+        if (userRepository.existsById(userId))
+            userRepository.deleteById(userId);
     }
 
     @Override
@@ -111,6 +108,8 @@ public class UserService implements UserDetailsService {
     }
 
     public List<User> getFriendList(Long user_id) {
+        if(userRepository.existsById(user_id))
+            return List.of();
         List<Long> list = userRepository.getFriendListForReceiver(user_id);
         list.addAll(userRepository.getFriendListForSender(user_id));
         List<User> res = new LinkedList<>();

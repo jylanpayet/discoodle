@@ -26,7 +26,8 @@ public class ServerService {
         );
         Server finalServ = serverRepository.save(serv);
         for (Long server_member : server_members) {
-            serverRepository.addNewMember(finalServ.getServer_id(), server_member);
+            if(userRepository.existsById(server_member))
+                serverRepository.addNewMember(finalServ.getServer_id(), server_member);
         }
         Room room = roomService.createNewRoom("Géneral", server_members);
         room.setRoom_link(true);
@@ -35,7 +36,7 @@ public class ServerService {
     }
 
     public Optional<Server> addNewMember(Long server_id, Long user_id) {
-        if(serverRepository.findById(server_id).isPresent() && userRepository.findUserByID(user_id).isPresent()){
+        if(serverRepository.existsById(server_id) && userRepository.existsById(user_id)){
             serverRepository.addNewMember(server_id, user_id);
             Server server = serverRepository.findById(server_id).get();
             for (Room room : server.getRooms()) {
@@ -47,15 +48,16 @@ public class ServerService {
     }
 
     public Optional<Server> addNewRoom(Long server_id, String name) {
-        if (serverRepository.findById(server_id).isPresent()) {
-            List<User> server = serverRepository.findById(server_id).get().getUsers();
+        if (serverRepository.existsById(server_id)) {
+            Optional<Server> server = serverRepository.findById(server_id);
             List<Long> users_id = new LinkedList<>();
-            for (User user : server) {
+            for (User user : server.get().getUsers()) {
                 users_id.add(user.getId());
             }
             Room newRoom = roomService.createNewRoom(name, users_id);
             newRoom.setRoom_link(true);
             serverRepository.addNewRoomInServ(server_id, newRoom.getRoom_id());
+            return server;
         }
         return Optional.empty();
     }

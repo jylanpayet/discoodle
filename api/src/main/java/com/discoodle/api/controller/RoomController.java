@@ -1,8 +1,10 @@
 package com.discoodle.api.controller;
 
 import com.discoodle.api.model.*;
+import com.discoodle.api.repository.RoomRepository;
 import com.discoodle.api.service.RoomService;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -13,7 +15,7 @@ import java.util.Optional;
 public class RoomController {
 
     private final RoomService roomService;
-
+    private final RoomRepository roomRepository;
 
     @PostMapping( "/addNewRoom")
     public Room addNewRoom(@RequestBody Room.RoomRequest request) {
@@ -40,4 +42,9 @@ public class RoomController {
         return roomService.changeAdmin(room_id, room_admin);
     }
 
+    @GetMapping
+    public void deleteRoom(@PathVariable String room_id){
+        if(roomRepository.existsById(room_id))
+            roomRepository.deleteById(room_id);
+    }
 }
