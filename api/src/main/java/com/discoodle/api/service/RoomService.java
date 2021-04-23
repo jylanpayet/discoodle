@@ -57,4 +57,8 @@ public class RoomService {
         return Optional.empty();
     }
 
+    public void renameRoom(String room_id, String new_name) {
+        roomRepository.renameRoom(room_id, new_name);
+    }
+
 }

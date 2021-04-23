@@ -97,13 +97,7 @@ export default {
       },
       refuseInvite(friend_id) {
          console.log(friend_id);
-         axios.delete(`http://localhost:8080/api/friendships/refuseInvitation`, {
-            headers: {},
-            data: {
-               sender_id: friend_id,
-               receiver_id: this.getUser.id,
-            }
-         }).then(() => {
+         axios.delete(`http://localhost:8080/api/friendships/refuseInvitation?sender_id=${friend_id}&receiver_id=${this.getCurrentConv}`).then(() => {
             axios.get(`http://localhost:8080/api/users/infos/${friend_id}`).then(friend => {
                const temp = {
                   id: friend.data.id,
@@ -137,7 +131,7 @@ export default {
       }
    },
    computed: {
-      ...mapGetters(['getUser', 'getFriends'])
+      ...mapGetters(['getUser', 'getFriends', 'getCurrentConv'])
    },
    mounted() {
       if (!(JSON.stringify(this.getUser) === JSON.stringify({}))) {

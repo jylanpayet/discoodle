@@ -40,4 +40,9 @@ public class RoomController {
         return roomService.changeAdmin(room_id, room_admin);
     }
 
+    @PutMapping("/renameRoom/{room_id}")
+    public void renameRoom(@PathVariable String room_id, @RequestParam(value = "new_name") String new_name) {
+        roomService.renameRoom(room_id, new_name);
+    }
+
 }
