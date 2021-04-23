@@ -34,7 +34,9 @@ public class FriendshipsService {
         if(userRepository.existsById(user_id)) {
             for (Long aLong : friends_id) {
                 if (userRepository.existsById(aLong)) {
-                    if (!userRepository.getFriendListForSender(user_id).contains(aLong) && !userRepository.getFriendListForReceiver(aLong).contains(user_id)) {
+                    if (!userRepository.getFriendListCompleteForSender(user_id).contains(aLong) && !userRepository.getFriendListCompleteForReceiver(aLong).contains(user_id)) {
+                        System.out.println(userRepository.getFriendListForReceiver(aLong));
+                        System.out.println(userRepository.getFriendListForSender(user_id));
                         Friendships friendships = new Friendships(
                               user_id,
                               aLong

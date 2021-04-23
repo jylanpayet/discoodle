@@ -20,6 +20,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT user FROM User user where user.mail = :mail")
     Optional<User> findUserByMail(String mail);
 
+    @Query("SELECT friendships.sender_id FROM Friendships friendships where friendships.receiver_id = :user_id")
+    List<Long> getFriendListCompleteForReceiver(Long user_id);
+
+    @Query("SELECT friendships.receiver_id FROM Friendships friendships where friendships.sender_id = :user_id")
+    List<Long> getFriendListCompleteForSender(Long user_id);
+
     @Query("SELECT friendships.sender_id FROM Friendships friendships where friendships.receiver_id = :user_id AND friendships.status = true")
     List<Long> getFriendListForReceiver(Long user_id);
 
