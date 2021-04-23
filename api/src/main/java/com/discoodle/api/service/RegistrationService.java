@@ -2,6 +2,7 @@ package com.discoodle.api.service;
 
 import com.discoodle.api.model.User;
 
+import com.discoodle.api.request.RegistrationRequest;
 import com.discoodle.api.security.mailConfirmation.MailSender;
 import com.discoodle.api.security.token.ConfirmationToken;
 import com.discoodle.api.security.token.ConfirmationTokenService;
@@ -19,7 +20,7 @@ public class RegistrationService {
     private final ConfirmationTokenService confirmationTokenService;
     private final MailSender mailSender;
 
-    public String register(User.RegistrationRequest request) {
+    public String register(RegistrationRequest request) {
         if (request.getPassword().matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}")) {
             if (request.getMail().matches("^(.+)@(.+)$")) {
                 String token = userService.signUpUser(
@@ -50,7 +51,7 @@ public class RegistrationService {
                 """;
     }
 
-    public String login(User.RegistrationRequest request) {
+    public String login(RegistrationRequest request) {
         return userService.login(request.getUsername(), request.getPassword());
     }
 

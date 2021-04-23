@@ -59,7 +59,7 @@ public class GroupsService {
     }
 
     public void deleteGroupByID(Long groups_id) {
-        if(groupsRepository.findGroupsByID(groups_id).isPresent()) {
+        if(groupsRepository.existsById(groups_id)) {
             Optional<Groups> group = findGroupsByID(groups_id);
             groupsRepository.deleteLinkGroupsToGroup(group.get().getParent_id(),groups_id);
             groupsRepository.deleteById(groups_id);
@@ -86,20 +86,25 @@ public class GroupsService {
         return groupsRepository.findGroupsByID(groups_ID);
     }
 
-    public Optional<Roles> addRoleForGroup(Long group_id, GroupsRequest request) {
-        Roles role = new Roles(
-                request.getRole_name(),
-                request.getRights()
-        );
-        rolesRepository.save(role);
-        groupsRepository.addRoleForGroup(group_id, role.getRole_id());
-        return Optional.of(role);
+    public Optional<Roles> addRoleForGroup(Long group_id, String role_name, String rights) {
+        if(groupsRepository.existsById(group_id)) {
+            Roles role = new Roles(
+                    role_name,
+                    rights
+            );
+            rolesRepository.save(role);
+            groupsRepository.addRoleForGroup(group_id, role.getRole_id());
+            return Optional.of(role);
+        }
+        return Optional.empty();
     }
 
     public Optional<Roles> addRoleForUsers(List<Long> user_id, Long role_id) {
         if (rolesRepository.findById(role_id).isPresent()) {
             for (Long user : user_id) {
-                groupsRepository.addRoleForUser(user, role_id);
+                if(!userRepository.findById(user).get().getRoles().contains(rolesRepository.findById(role_id).get())){
+                    groupsRepository.addRoleForUser(user, role_id);
+                }
             }
             return rolesRepository.findById(role_id);
         }
@@ -107,7 +112,7 @@ public class GroupsService {
     }
 
     public List<Roles> getRoleByGroupAndUser(Long group_id, Long user_id) {
-        List<Roles> roles = userRepository.findUserByID(user_id).get().getRoles();
+        List<Roles> roles = userRepository.findById(user_id).get().getRoles();
         List<Roles> res = new java.util.ArrayList<>();
         for (Roles user : roles) {
             if(user.getGroups_id().equals(group_id))
@@ -117,13 +122,19 @@ public class GroupsService {
     }
 
     public Optional<Roles> modifyRightsForRole(Long role_id, String rights) {
-        groupsRepository.modifyRightsForRole(role_id, rights);
-        return rolesRepository.findById(role_id);
+        Optional<Roles> roles=rolesRepository.findById(role_id);
+        if(roles.isPresent()) {
+            groupsRepository.modifyRightsForRole(role_id, rights);
+        }
+        return roles;
     }
 
     public Boolean deleteRole(Long role_id) {
-        rolesRepository.deleteById(role_id);
-        return rolesRepository.findById(role_id).isEmpty();
+        if(rolesRepository.existsById(role_id)) {
+            rolesRepository.deleteById(role_id);
+            return true;
+        }
+        return false;
     }
 
 }

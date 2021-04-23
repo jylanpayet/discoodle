@@ -33,4 +33,7 @@ public interface MessagesRepository extends JpaRepository<Message, Long> {
    @Modifying
    @Query("UPDATE Message messages SET messages.edited = true WHERE messages.message_id = :message_id")
    void setEdited(Long message_id);
+
+   @Query("SELECT messages FROM Message messages WHERE messages.sender = :username")
+   List<Message> findMessagesOfUser(String username);
 }

@@ -3,6 +3,7 @@ package com.discoodle.api.controller;
 import com.discoodle.api.model.Groups;
 import com.discoodle.api.model.Roles;
 import com.discoodle.api.model.Server;
+import com.discoodle.api.repository.GroupsRepository;
 import com.discoodle.api.request.EditGroupRequest;
 import com.discoodle.api.request.GroupsRequest;
 import com.discoodle.api.service.GroupsService;
@@ -17,6 +18,7 @@ import java.util.Optional;
 public class GroupsController {
 
     private final GroupsService groupsService;
+
 
     @PostMapping("/api/groups/addNewGroup")
     public Optional<Groups> addNewGroup(@RequestBody GroupsRequest request) {
@@ -60,8 +62,8 @@ public class GroupsController {
     }
 
     @PostMapping("/addRoleForGroup/{group_id}")
-    public Optional<Roles> addRoleForGroup(@PathVariable Long group_id, @RequestBody GroupsRequest request) {
-        return groupsService.addRoleForGroup(group_id, request);
+    public Optional<Roles> addRoleForGroup(@PathVariable Long group_id, @RequestParam(value = "role_name") String role_name, @RequestParam(value = "rights") String rights) {
+        return groupsService.addRoleForGroup(group_id, role_name, rights);
     }
 
     @PostMapping("/addRoleForUser/")

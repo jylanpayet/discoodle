@@ -1,6 +1,7 @@
 package com.discoodle.api.repository;
 
 import com.discoodle.api.model.Room;
+import com.discoodle.api.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -8,18 +9,16 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 
 
 @Repository
 public interface RoomRepository extends JpaRepository<Room, String> {
 
-    @Query("SELECT room FROM Room room WHERE room.room_id = ?1")
-    Optional<Room> findRoomByUUID(String room_id);
-
+    @Transactional
     @Modifying
     @Query(value = "INSERT INTO link_rooms_users (user_id, room_id) VALUES (:user_id,:room_id)", nativeQuery = true)
-    @Transactional
     void addNewMember(@Param("room_id") String room_id, @Param("user_id") Long user_id);
 
     @Transactional
@@ -42,4 +41,10 @@ public interface RoomRepository extends JpaRepository<Room, String> {
     @Modifying
     @Query("UPDATE Room room SET room.room_name = :new_name WHERE room.room_id = :room_id")
     void renameRoom(@Param("room_id") String room_id, @Param("new_name") String new_name);
+
+    @Query("SELECT room.users FROM Room room WHERE room.room_id = :room_id")
+    List<User> findUserOfRoom(String room_id);
+
+    @Query("SELECT room.room_admin FROM Room room WHERE room.room_id = :room_id")
+    Long findAdminOfRoom(String room_id);
 }

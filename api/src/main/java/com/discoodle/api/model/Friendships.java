@@ -33,10 +33,4 @@ public class Friendships {
     @Column(name = "receiver_id")
     private Long receiver_id;
 
-    @Getter
-    @EqualsAndHashCode
-    @ToString
-    public static class FriendshipsRequest {
-        private final List<Long> friendships = new LinkedList<>();
-    }
 }

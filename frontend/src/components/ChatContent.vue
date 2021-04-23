@@ -11,7 +11,31 @@
                <button style="color: #F4F4F4; font-size: 33px; font-weight: 500; height: 100%" @click="showAddUser = true">
                   +
                </button>
-               <AddUserInConv v-if="showAddUser" @addUsers="addUsers" @desactivatePopUp="showAddUser = false" />
+               <button style="cursor: pointer;" @click="showUserList = true;">
+                  <img src="../assets/user.svg" alt="" style="width: 25px;">
+               </button>
+               <w-drawer
+                  v-model="showUserList"
+                  right
+                  width="350px"
+                  bg-color="grey-dark5"
+               >
+                  <div class="user-list">
+                     <div :key="user.id" class="user" v-for="user in users">
+                        <img src="../assets/crown.svg" style="height: 80%; margin-right: 10px;" alt="" v-if="user.id === roomAdminID">
+                        {{ user.username }}
+                        <div>
+                           <button v-if="user.id !== getUser.id && getUser.id === roomAdminID" style="margin-right: 6px;" @click="promoteAdmin(user.id)">
+                              <img src="../assets/crown.svg" style="height: 70%" alt="">
+                           </button>
+                           <button v-if="user.id !== getUser.id && user.id !== roomAdminID" @click="removerUser(user.id)">
+                              X
+                           </button>
+                        </div>
+                     </div>
+                  </div>
+               </w-drawer>
+               <AddUserInConv v-if="showAddUser" @addUsers="addUsers" @desactivatePopUp="showAddUser = false;"  :show-autocomplete="true" />
             </div>
 
             <div class="pinned-message" v-if="showPinned">
@@ -90,22 +114,37 @@ export default {
    data() {
       return {
          messages: [],
+         users: [],
          pinned: [],
          writers: [],
          showPinned: false,
          showEmoji: false,
          pinAdd: false,
-         showAddUser: false
+         showAddUser: false,
+         showUserList: false,
+         roomAdminID: Number,
       }
    },
    mounted() {
       this.getMessagesFromJSON();
       this.connect();
+      axios.get(`http://localhost:8080/api/room/findUserOfRoom?room_id=${this.getCurrentConv}`).then(response => {
+         this.users = response.data;
+      });
+      axios.get(`http://localhost:8080/api/room/findAdminOfRoom?room_id=${this.getCurrentConv}`).then(response => {
+         this.roomAdminID = response.data.id;
+      })
    },
    beforeRouteUpdate() {
       this.disconnect();
       this.getMessagesFromJSON();
       this.connect();
+      axios.get(`http://localhost:8080/api/room/findUserOfRoom?room_id=${this.getCurrentConv}`).then(response => {
+         this.users = response.data;
+      });
+      axios.get(`http://localhost:8080/api/room/findAdminOfRoom?room_id=${this.getCurrentConv}`).then(response => {
+         this.roomAdminID = response.data.id;
+      })
    },
    unmounted() {
       this.disconnect();
@@ -320,20 +359,31 @@ export default {
          })
          return bool;
       },
-
       addUsers(users) {
          if (users.length > 0) {
             users.forEach(user => {
                if (this.containUsername(user)) {
                   axios.get(`http://localhost:8080/api/users/${user}`).then(response => {
                      axios.post(`http://localhost:8080/api/room/addNewMember/${this.getCurrentConv}?user_id=${response.data.id}`).then(() => {
-                        this.$emit("userAdded");
+                        this.$emit("userChanged");
                      })
+                     this.users.push(response.data)
                   })
                }
             })
          }
-
+         this.showAddUser = false;
+      },
+      removerUser(user_id) {
+         axios.delete(`http://localhost:8080/api/room/removeMember/${this.getCurrentConv}?user_id=${user_id}`).then(response => {
+            this.users = this.users.filter(elt => elt.id !== response.data.id);
+            this.$emit("userChanged");
+         })
+      },
+      promoteAdmin(user_id) {
+         axios.put(`http://localhost:8080/api/room/changeAdmin/${this.getCurrentConv}?admin=${user_id}`).then(response => {
+            this.roomAdminID = response.data.room_admin;
+         })
       }
    },
    computed: {
@@ -389,7 +439,7 @@ button {
    justify-content: space-between;
 
    height: 40px;
-   width: 65px;
+   width: 100px;
 }
 
 .conv-input {
@@ -572,6 +622,53 @@ button {
    top: -10px;
    left: 32px;
    transform: translateX(-100%) translateY(-100%);
+}
+
+.user-list {
+   padding: 20px;
+   width: 100%;
+   height: 100%;
+
+   display: flex;
+   align-items: flex-start;
+   justify-content: flex-start;
+   flex-direction: column;
+}
+
+.user {
+   position: relative;
+   width: 100%;
+   height: 40px;
+   background-color: #8F8F8F;
+   border-radius: 12px;
+
+   display: flex;
+   align-items: center;
+   justify-content: flex-start;
+   padding-left: 15px;
+
+   color: #F4F4F4;
+   font-size: 18px;
+   font-weight: 600;
+   margin-bottom: 10px;
+}
+
+.user > div {
+   position: absolute;
+   right: 20px;
+
+   display: flex;
+   flex-direction: row;
+   align-items: center;
+   justify-content: space-between;
+}
+
+.user > div > button {
+   font-size: 18px;
+   width: 22px;
+   height: 22px;
+   font-weight: 600;
+   color: #F4F4F4;
 }
 
 @keyframes appear-opacity {

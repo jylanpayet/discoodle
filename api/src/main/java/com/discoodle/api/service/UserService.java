@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -35,7 +36,7 @@ public class UserService implements UserDetailsService {
     }
 
     public Optional<User> getUserByID(Long user_id) {
-        return userRepository.findUserByID(user_id);
+        return userRepository.findById(user_id);
     }
 
     public Optional<User.Role> findUserByRole(User.Role role) {
@@ -52,12 +53,11 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
-    public void deleteUser(Long userId) {
-        boolean exists = userRepository.existsById(userId);
-        if (!exists) {
-            throw new IllegalStateException("L'étudiant avec l'id : " + userId + "n'existe pas.");
+    public void deleteUser(Long user_id) {
+        if (userRepository.existsById(user_id)) {
+            userRepository.removeToken(user_id);
+            userRepository.deleteById(user_id);
         }
-        userRepository.deleteById(userId);
     }
 
     @Override
@@ -111,25 +111,30 @@ public class UserService implements UserDetailsService {
     }
 
     public List<User> getFriendList(Long user_id) {
+        if(!userRepository.existsById(user_id))
+            return List.of();
         List<Long> list = userRepository.getFriendListForReceiver(user_id);
         list.addAll(userRepository.getFriendListForSender(user_id));
+        return list.stream().filter(userRepository::existsById).map(elt -> userRepository.findById(elt).get()).collect(Collectors.toList());
+        /*
         List<User> res = new LinkedList<>();
         for (int i = 0; i < list.size(); i++) {
-            Optional<User> tmp = userRepository.findUserByID(list.get(i));
+            Optional<User> tmp = userRepository.findById(list.get(i));
             tmp.ifPresent(res::add);
         }
         return res;
+         */
     }
 
     public Optional<User> changeUsername(Long user_id, String username) {
-        if (!userRepository.findUserByUserName(username).isPresent() && userRepository.changeUsername(user_id, username) == 1)
-            return userRepository.findUserByID(user_id);
+        if (userRepository.findUserByUserName(username).isEmpty() && userRepository.changeUsername(user_id, username) == 1)
+            return userRepository.findById(user_id);
         return Optional.empty();
     }
 
     public Optional<User> changeMail(Long user_id, String mail) {
-        if (mail.matches("^(.+)@(.+)$") && !userRepository.findUserByMail(mail).isPresent() && userRepository.changeMail(user_id, mail) == 1)
-            return userRepository.findUserByID(user_id);
+        if (mail.matches("^(.+)@(.+)$") && userRepository.findUserByMail(mail).isEmpty() && userRepository.changeMail(user_id, mail) == 1)
+            return userRepository.findById(user_id);
         return Optional.empty();
     }
 
@@ -137,26 +142,26 @@ public class UserService implements UserDetailsService {
         if (password.matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}")) {
             String passwordEncoded = bCryptPasswordEncoder.encode(password);
             if (userRepository.changePassword(user_id, passwordEncoded) == 1)
-                return userRepository.findUserByID(user_id);
+                return userRepository.findById(user_id);
         }
         return Optional.empty();
     }
 
     public Optional<User> changeName(Long user_id, String name) {
         if (userRepository.changeName(user_id, name) == 1)
-            return userRepository.findUserByID(user_id);
+            return userRepository.findById(user_id);
         return Optional.empty();
     }
 
     public Optional<User> changeLastName(Long user_id, String last_name) {
         if (userRepository.changeLastName(user_id, last_name) == 1)
-            return userRepository.findUserByID(user_id);
+            return userRepository.findById(user_id);
         return Optional.empty();
     }
 
     public Optional<User> changeLinkToAvatar(Long user_id, String link_to_avatar) {
-        if (userRepository.changeLinkToAvar(user_id, link_to_avatar) == 1)
-            return userRepository.findUserByID(user_id);
+        if (userRepository.changeLinkToAvatar(user_id, link_to_avatar) == 1)
+            return userRepository.findById(user_id);
         return Optional.empty();
     }
 }

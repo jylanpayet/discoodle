@@ -23,7 +23,7 @@
                   <div class="conv-name">
                      {{ convs.room_name }}
                   </div>
-                  <button class="edit-button" v-if="modifying" @click="editRoom.show = !editRoom.show; setConvUUID(convs.room_id)">
+                  <button class="edit-button" v-if="modifying" @click="editRoom.show = !editRoom.show; new_name = ''; setConvUUID(convs.room_id)">
                      <img src="../assets/pen.svg" alt="" style="width: 60%;">
                   </button>
                   <w-dialog
@@ -35,10 +35,13 @@
                   >
                      <div>
                         <span style="margin-bottom: 10px; font-size: 19px; font-weight: 600; color: #454150">Modifier la discussion :</span>
-                        <w-input :minlength="1" v-model="new_name">Modifier le nom de la room.</w-input>
-                        <div style="display: flex; flex-direction: row; justify-content: space-between; margin-top: 10px;">
-                           <button class="submit" @click="deleteRoom; editRoom.show = false;" style="background-color: #E85C5C !important;">
+                        <w-input color="primary-dark2" :minlength="1" v-model="new_name">Modifier le nom de la room.</w-input>
+                        <div style="display: flex; flex-direction: column; justify-content: space-between; margin-top: 10px;">
+                           <button class="submit" @click="deleteRoom" style="background-color: #E85C5C !important;">
                               Supprimer
+                           </button>
+                           <button class="submit" @click="exitRoom" style="background-color: #E85C5C !important;">
+                              Quitter la conversation
                            </button>
                            <button class="submit" @click="roomEdit">
                               Enregistrer
@@ -51,7 +54,7 @@
          </div>
       </div>
       <div class="right-pannel">
-         <router-view @userAdded="getRoomsFromDB" />
+         <router-view @userChanged="getRoomsFromDB" />
       </div>
    </div>
    <Account @logSuccess="getRoomsFromDB" v-else />
@@ -95,7 +98,18 @@ export default {
 
       },
       deleteRoom() {
-
+         const conv_uuid = this.getCurrentConv
+         axios.delete(`http://localhost:8080/api/room/removeRoom/${conv_uuid}`).then(() => {
+            this.convList = this.convList.filter(elt => elt.room_id !== conv_uuid);
+            this.editRoom.show = false;
+         })
+      },
+      exitRoom() {
+         const conv_uuid = this.getCurrentConv;
+         axios.delete(`http://localhost:8080/api/room/removeMember/${conv_uuid}?user_id=${this.getUser.id}`).then(() => {
+            this.convList = this.convList.filter(elt => elt.room_id !== conv_uuid);
+            this.editRoom.show = false;
+         })
       }
    },
    data() {
@@ -331,8 +345,9 @@ export default {
 }
 
 .submit {
-   height: 35px;
-   width: 40%;
+   margin-bottom: 10px;
+   height: 32px;
+   width: 100%;
    background-color: #28b140;
    font-size: 15px;
    font-weight: 600;

@@ -26,8 +26,4 @@ public class GroupsRequest {
 
     private final String text;
 
-    private final String role_name;
-
-    private final String rights;
-
 }

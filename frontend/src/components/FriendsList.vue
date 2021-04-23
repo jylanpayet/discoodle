@@ -3,7 +3,7 @@
       <div class="pannel">
          <span style="font-weight: 600; font-size: 14px; color: #f4f4f4; width: 100%; height: 30px; justify-self: flex-start; display: flex; align-items: center">Ajouter un ami</span>
          <button @click="showAddFriends = true">+</button>
-         <AddUserInConv v-if="showAddFriends" @desactivatePopUp="showAddFriends = false" @addUsers="addUsers"/>
+         <AddUserInConv v-if="showAddFriends" @desactivatePopUp="showAddFriends = false" @addUsers="addUsers" :show-autocomplete="false"/>
       </div>
       <div class="incoming-invite" v-if="invite.length > 0">
          <span style="margin-bottom: 10px; font-weight: 600; font-size: 14px; color: #f4f4f4">Ils m'ont demandé en ami :</span>
@@ -69,9 +69,9 @@ export default {
                }
             })
          })
+         this.showAddFriends = false;
       },
       acceptInvite(friend_id) {
-         console.log(friend_id)
          axios.put(`http://localhost:8080/api/friendships/acceptInvitation?sender_id=${friend_id}&receiver_id=${this.getUser.id}`).then(() => {
             axios.get(`http://localhost:8080/api/users/infos/${friend_id}`).then(friend => {
                const temp = {
@@ -97,7 +97,7 @@ export default {
       },
       refuseInvite(friend_id) {
          console.log(friend_id);
-         axios.delete(`http://localhost:8080/api/friendships/refuseInvitation?sender_id=${friend_id}&receiver_id=${this.getCurrentConv}`).then(() => {
+         axios.delete(`http://localhost:8080/api/friendships/refuseInvitation?sender_id=${friend_id}&receiver_id=${this.getUser.id}`).then(() => {
             axios.get(`http://localhost:8080/api/users/infos/${friend_id}`).then(friend => {
                const temp = {
                   id: friend.data.id,
@@ -161,6 +161,7 @@ export default {
                   id: elt.id,
                   username: elt.username,
                   name: elt.name,
+                  last_name: elt.last_name,
                   link_to_avatar: elt.link_to_avatar,
                };
                if (!this.friendsIncludes(temp))

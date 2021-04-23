@@ -1,6 +1,5 @@
 package com.discoodle.api.repository;
 
-import com.discoodle.api.model.Friendships;
 import com.discoodle.api.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -15,27 +14,24 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    @Query("SELECT user FROM User user where user.username = ?1")
+    @Query("SELECT user FROM User user where user.username = :username")
     Optional<User> findUserByUserName(String username);
 
-    @Query("SELECT user FROM User user where user.id = ?1")
-    Optional<User> findUserByID(Long user_ID);
-
-    @Query("SELECT user FROM User user where user.mail = ?1")
+    @Query("SELECT user FROM User user where user.mail = :mail")
     Optional<User> findUserByMail(String mail);
 
-    @Query("SELECT friendships.sender_id FROM Friendships friendships where friendships.receiver_id = ?1 AND friendships.status = true")
+    @Query("SELECT friendships.sender_id FROM Friendships friendships where friendships.receiver_id = :user_id AND friendships.status = true")
     List<Long> getFriendListForReceiver(Long user_id);
 
-    @Query("SELECT friendships.receiver_id FROM Friendships friendships where friendships.sender_id = ?1 AND friendships.status = true")
+    @Query("SELECT friendships.receiver_id FROM Friendships friendships where friendships.sender_id = :user_id AND friendships.status = true")
     List<Long> getFriendListForSender(Long user_id);
 
-    @Query("SELECT user FROM User user where user.role= ?1")
+    @Query("SELECT user FROM User user where user.role= :role")
     Optional<User.Role> findUserByRole(User.Role role);
 
     @Transactional
     @Modifying
-    @Query("UPDATE User user SET user.enabled = true WHERE user.mail = ?1")
+    @Query("UPDATE User user SET user.enabled = true WHERE user.mail = :mail")
     int enableUser(String mail);
 
     @Transactional
@@ -66,6 +62,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Transactional
     @Modifying
     @Query("UPDATE User user SET user.link_to_avatar = :link_to_avatar WHERE user.id = :user_id")
-    int changeLinkToAvar(@Param("user_id") Long user_id, @Param("link_to_avatar") String link_to_avatar);
+    int changeLinkToAvatar(@Param("user_id") Long user_id, @Param("link_to_avatar") String link_to_avatar);
+
+    @Transactional
+    @Modifying
+    @Query(value = "DELETE ct FROM confirmation_token as ct where ct.user_id = :user_id", nativeQuery = true)
+    void removeToken(@Param("user_id") Long user_id);
 
 }

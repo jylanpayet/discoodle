@@ -4,7 +4,7 @@
          <div class="login" v-if="showLogin">
             <div style="display: flex; flex-direction: column; align-items: flex-start; justify-content: center; width: 100%;">
                <span style="color: #F4F4F4; font-size: 30px; font-weight: 600">Se connecter</span>
-               <input type="text" placeholder="Pseudo" name="userlog" autocomplete="false" required spellcheck="false" @keypress="actionInputLogin">
+               <input type="text" placeholder="Pseudo" name="userlog" autocomplete="off" required spellcheck="false" @keypress="actionInputLogin">
                <input type="password" placeholder="Mot de passe" name="passwordlog" required spellcheck="false" @keypress="actionInputLogin">
                <a href="" style="font-size: 12px; color: #909090">Mot de passe oublié ?</a>
                <label>

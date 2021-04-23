@@ -35,6 +35,7 @@ public class User {
     @Column(name = "username")
     private String username;
 
+    @JsonIgnore
     @Column(name = "password")
     private String password;
 
@@ -90,28 +91,6 @@ public class User {
         STUDENT,
         TEACHER,
         ADMIN
-    }
-
-    @Getter
-    @AllArgsConstructor
-    @EqualsAndHashCode
-    @ToString
-    public static class RegistrationRequest {
-
-        private final String mail;
-
-        private final String username;
-
-        private final String password;
-
-        private final String name;
-
-        private final String last_name;
-
-        private final String link_to_avatar;
-
-        private final User.Role role;
-
     }
 
 }
