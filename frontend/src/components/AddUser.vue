@@ -78,9 +78,10 @@ export default {
       ...mapGetters(['getFriends', 'getCurrentConv'])
    },
    mounted() {
-      axios.get(`http://localhost:8080/api/room/findUserOfRoom?room_id=${this.getCurrentConv}`).then(response => {
-         this.users = response.data;
-      })
+      if (this.getCurrentConv !== "")
+         axios.get(`http://localhost:8080/api/room/findUserOfRoom?room_id=${this.getCurrentConv}`).then(response => {
+            this.users = response.data;
+         })
    }
 }
 </script>

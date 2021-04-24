@@ -7,8 +7,8 @@
          <div v-if="!messageEdit" :class="mention ? 'message-content mention' : 'message-content'" v-html="displayMessage(content, true, true, true)" :style="belong_to_myself ? { marginRight: '10px', backgroundColor: '#e85c5c', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: '#C4C4C4' }">
 
          </div>
-         <div v-else :class="mention ? 'message-content mention' : 'message-content'" :style="belong_to_myself ? { marginRight: '10px', backgroundColor: '#e85c5c', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: '#C4C4C4' }">
-            <input type="text" :value="content" @keydown="actionInput">
+         <div v-else :class="mention ? 'message-content mention' : 'message-content'" :style="belong_to_myself ? { marginRight: '10px', backgroundColor: '#e85c5c', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: '#F4F4F4' }">
+            <input type="text" :value="content" autocomplete="off" @keydown="actionInput">
          </div>
          <div class="buttons" v-if="showPin" :style="belong_to_myself ? { left: 0 } : { right: 0 }">
             <button class="pin-message" @click="pinMessage">
@@ -22,8 +22,10 @@
             </button>
          </div>
          <div class="user-logo" :style="{ backgroundColor: '#F4F4F4' }">
-            {{ user_logo }}
+            <span v-if="user.link_to_avatar === null">{{ sender.charAt(0).toUpperCase() }}</span>
+            <img :src="user.link_to_avatar" alt="" v-else>
          </div>
+
       </div>
    </div>
 </template>
@@ -34,6 +36,8 @@ import emojis from "@/assets/emojis_uncathegorized";
 import marked from "marked";
 import axios from "axios";
 
+// TODO : charger l'image de l'user dont l'username est user
+
 export default {
    name: "Message",
    props: {
@@ -41,7 +45,7 @@ export default {
          type: String,
          required: true
       },
-      user_logo: {
+      sender: {
          required: true
       },
       belong_to_myself: {
@@ -118,12 +122,13 @@ export default {
          this.$emit('deletedMessage', this.message_id);
       },
       editMessage(content) {
-         axios.put(`http://localhost:8080/api/messages/editMessage`, {
-            message_id: this.message_id,
-            content: content
-         })
-         if (content !== this.content)
+         if (content !== this.content) {
+            axios.put(`http://localhost:8080/api/messages/editMessage`, {
+               message_id: this.message_id,
+               content: content
+            })
             this.$emit('editedMessage', this.message_id, content);
+         }
       },
 
       actionInput(event) {
@@ -147,8 +152,14 @@ export default {
       return {
          mention: false,
          showPin: false,
-         messageEdit: false
+         messageEdit: false,
+         user: {}
       }
+   },
+   mounted() {
+      axios.get(`http://localhost:8080/api/users/${this.sender}`).then(response => {
+         this.user = response.data;
+      })
    }
 }
 </script>
@@ -191,8 +202,10 @@ export default {
 }
 
 .user-logo {
-   min-width: 42px;
-   min-height: 42px;
+   min-width: 40px;
+   min-height: 40px;
+   width: 40px;
+   height: 40px;
 
    background-color: #F4F4F4;
    color: #454150;
@@ -204,6 +217,11 @@ export default {
    justify-content: center;
 
    border-radius: 100px;
+}
+
+.user-logo > img {
+   width: 100%;
+   height: 100%;
 }
 
 .mention {

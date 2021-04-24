@@ -3,9 +3,7 @@ import {createStore} from 'vuex'
 export default createStore({
     state: {
         messages: {
-            currentConvShown: {
-                type: String,
-            }
+            currentConvShown: ""
         },
         user: {},
         friends: [],
@@ -31,6 +29,12 @@ export default createStore({
         },
         SET_GROUP(state, groups) {
             state.groups = groups;
+        },
+        SET_FRIENDS(state, friends) {
+            state.friends = friends;
+        },
+        SET_LINK_TO_AVATAR(state, link) {
+            state.user.link_to_avatar = link;
         }
     },
     actions: {
@@ -45,6 +49,12 @@ export default createStore({
         },
         setGroup(context, groups) {
             context.commit('SET_GROUP', groups);
+        },
+        setFriends(context, friends) {
+            context.commit('SET_FRIENDS', friends)
+        },
+        setLinkToAvatar(context, link) {
+            context.commit('SET_LINK_TO_AVATAR', link);
         }
     },
     getters: {

@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -48,6 +49,27 @@ public class UploadFileService {
             System.out.println(e);
         }
         return "Fichier upload avec succès !";
+    }
+
+    public String uploadImageInChat(MultipartFile file, String room_id) {
+        if (roomRepository.findById(room_id).isEmpty())
+            return "La room n'existe pas.";
+        String extension =  FilenameUtils.getExtension(file.getOriginalFilename());
+        if (extension != null && !extension.equals("jpg") && !extension.equals("png")) {
+            return "L'extension n'est pas un fichier jpg ou png, il ne peut donc pas être upload";
+        }
+        String uuid = UUID.randomUUID().toString();
+        String path = String.format("%sstatic/common/images/rooms/%s.%s", ApiApplication.RESSOURCES, uuid, extension);
+        File add = new File(path);
+        try {
+            if (!add.exists()) {
+                add.createNewFile();
+            }
+            Files.write(Path.of(path), file.getBytes());
+        } catch (Exception e) {
+            return "Erreur lors du téléchargement de l'image !";
+        }
+        return "http://localhost:8080/common/images/rooms/" + uuid + "." + extension;
     }
 
     public String uploadSubject(MultipartFile file, Long group_id) {
@@ -84,12 +106,12 @@ public class UploadFileService {
             if (!add.exists()) {
                 add.createNewFile();
             }
-            userService.changeLinkToAvatar(user_id,path);
+            userService.changeLinkToAvatar(user_id,String.format("http://localhost:8080/common/avatar/%d.%s", user_id, extension));
             Files.write(Path.of(path), file.getBytes());
         } catch (Exception e) {
             return "Erreur lors du téléchargement du fichier !";
         }
-        return "Fichier upload avec succès !";
+        return String.format("http://localhost:8080/common/avatar/%d.%s", user_id, extension);
     }
 
     public Boolean deleteAvatar(Long user_id){

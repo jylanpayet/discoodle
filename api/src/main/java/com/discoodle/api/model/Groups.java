@@ -81,11 +81,13 @@ public class Groups {
 
 
     public enum TypeOfGroup {
-        DISCOODLE,
-        ESTABLISHMENT,
-        FACULTY,
-        ADMINISTRATION,
-        SUBJECTS,
-        CLASS
+        DISCOODLE,           // Admins de discoodle
+        ESTABLISHMENT,       // Établissement (si ce n'est pas une université)
+        FACULTY,             // Université
+        ADMINISTRATION,      // Administration d'un établissement
+        COURSE,              // Filière (ex: informatique, histoire, ...)
+        GRADE,               // Année (ex: L2, M1, 2nde, ...)
+        SUBJECTS,            // Matière enseignée (ex: AAL, Math, etc)
+        OTHER,               // Sous groupe annexe, ne sera pas affiché dans les groupes
     }
 }

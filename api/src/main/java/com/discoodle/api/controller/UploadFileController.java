@@ -22,11 +22,16 @@ public class UploadFileController {
         return uploadFileService.uploadSubject(file, group_id);
     }
 
+    @PostMapping(value = "api/uploadImageInChat/{room_id}")
+    public String uploadImageInChat(@RequestParam("file") MultipartFile file, @PathVariable("room_id") String room_id) {
+        return uploadFileService.uploadImageInChat(file, room_id);
+    }
+
     @PostMapping(value = "api/uploadAvatar/{user_id}")
     public String uploadAvatar(@RequestParam("file") MultipartFile file, @PathVariable("user_id") Long user_id) {
         return uploadFileService.uploadAvatar(file, user_id);
     }
-    @DeleteMapping("api/deleteImage/{user_id}")
+    @DeleteMapping("api/deleteAvatar/{user_id}")
     public Boolean deleteAvatar(@PathVariable("user_id") Long user_id){
         return uploadFileService.deleteAvatar(user_id);
     }

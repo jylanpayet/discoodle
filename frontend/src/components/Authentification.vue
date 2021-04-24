@@ -19,11 +19,11 @@
          <div class="register" v-else>
             <span style="margin-bottom: 15px; color: #F4F4F4; font-size: 30px; font-weight: 600">Créer mon compte</span>
 
-            <input type="text" placeholder="Pseudo" name="username" required @keypress="actionInputRegister">
-            <input type="text" placeholder="Prénom" name="name" required @keypress="actionInputRegister">
-            <input type="text" placeholder="Nom" name="lastname" required @keypress="actionInputRegister">
-            <input type="email" placeholder="Mail" name="mailReg" required @keypress="actionInputRegister">
-            <input type="password" placeholder="Mot de passe" name="passwordReg" required @keypress="actionInputRegister">
+            <input type="text" placeholder="Pseudo" autocomplete="off" name="username" required @keypress="actionInputRegister">
+            <input type="text" placeholder="Prénom" autocomplete="off" name="name" required @keypress="actionInputRegister">
+            <input type="text" placeholder="Nom" autocomplete="off" name="lastname" required @keypress="actionInputRegister">
+            <input type="email" placeholder="Mail" autocomplete="off" name="mailReg" required @keypress="actionInputRegister">
+            <input type="password" placeholder="Mot de passe" autocomplete="off" name="passwordReg" required @keypress="actionInputRegister">
             <button @click="userRegistration" style="align-self: center; margin-top: 15px;" class="submit">C'est parti !</button>
 
 

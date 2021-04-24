@@ -21,6 +21,7 @@
                   bg-color="grey-dark5"
                >
                   <div class="user-list">
+                     <span style="font-size: 18px; color: #F4F4F4; font-weight: 600; margin-bottom: 10px;">Utilisateur(s) de la room :</span>
                      <div :key="user.id" class="user" v-for="user in users">
                         <img src="../assets/crown.svg" style="height: 80%; margin-right: 10px;" alt="" v-if="user.id === roomAdminID">
                         {{ user.username }}
@@ -35,7 +36,7 @@
                      </div>
                   </div>
                </w-drawer>
-               <AddUserInConv v-if="showAddUser" @addUsers="addUsers" @desactivatePopUp="showAddUser = false;"  :show-autocomplete="true" />
+               <AddUser v-if="showAddUser" @addUsers="addUsers" @desactivatePopUp="showAddUser = false;"  :show-autocomplete="true" />
             </div>
 
             <div class="pinned-message" v-if="showPinned">
@@ -60,7 +61,7 @@
             }}</span>
          <Message :key="message" v-for="message in messages"
                   :content="message.content"
-                  :user_logo="message.sender.charAt(0).toUpperCase()"
+                  :sender="message.sender"
                   :belong_to_myself="message.sender === getUser.username"
                   :message_date="message.message_date"
                   :message_id="message.message_id"
@@ -82,9 +83,10 @@
                <button style="height: 32px; width: 32px;" @click="showEmoji = !showEmoji">
                   <img src="../assets/happy.svg" alt="Smiley">
                </button>
-               <button class="submit-file">
+               <label class="submit-file" style="cursor: pointer;">
                   +
-               </button>
+                  <input type="file" ref="uploadImage" @change="uploadImage()" style="height: 0; width: 0;">
+               </label>
             </div>
          </div>
       </div>
@@ -100,14 +102,14 @@ import marked from "marked";
 import Message from "@/components/common/Message";
 import emojis from "@/assets/emojis_uncathegorized";
 import EmojiPicker from "@/components/common/EmojiPicker";
-import AddUserInConv from "@/components/AddUserInConv";
+import AddUser from "@/components/AddUser";
 
 let stompClient = null;
 
 export default {
    name: "ChatContent",
    components: {
-      AddUserInConv,
+      AddUser,
       EmojiPicker,
       Message
    },
@@ -313,6 +315,32 @@ export default {
             content: content,
             type: "EDITED"
          }));
+      },
+      uploadImage() {
+         let file=this.$refs.uploadImage.files[0];
+         let temp = new FormData();
+         temp.append("file",file);
+         axios({
+            url: `http://localhost:8080/api/uploadImageInChat/${this.getCurrentConv}`,
+            method: 'POST',
+            data: temp,
+            headers: {
+               Accept: 'application/json',
+               'Content-type': 'multipart/form-data'
+            }
+         }).then(response =>{
+            if (response.data !== "L'extension n'est pas un fichier jpg ou png, il ne peut donc pas être upload" && response.data !== "Erreur lors du téléchargement de l'image !") {
+               axios.post(`http://localhost:8080/api/messages/sendMessage?room_uuid=${this.getCurrentConv}`, {
+                  conv_uuid: this.getCurrentConv,
+                  content: `![${"Image de " + this.getUser.username}](${response.data})`,
+                  sender: this.getUser.username,
+                  message_date: Date.now()
+               }).then(response => {
+                  this.messages.unshift(response.data);
+                  stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify(response.data))
+               });
+            }
+         })
       },
 
       filterEmoji(content){

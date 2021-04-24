@@ -10,7 +10,7 @@
          <div class="user" :key="user" v-for="user in invite">
             <div class="user-image">
                <span v-if="user.link_to_avatar === null">{{ user.name.charAt(0).toUpperCase() }}</span>
-               <img :src="user.link_to_avatar" alt="" v-else>
+               <img :src="user.link_to_avatar" alt="" v-else >
             </div>
             <span style="color: #f4f4f4; width: 85%; font-size: 19px; font-weight: 600;">{{ user.name }}</span>
             <button class="accept-invite" @click="acceptInvite(user.id)">✅</button>
@@ -37,9 +37,9 @@
 </template>
 
 <script>
-import {mapGetters} from "vuex";
+import {mapActions, mapGetters} from "vuex";
 import axios from "axios";
-import AddUserInConv from "@/components/AddUserInConv";
+import AddUserInConv from "@/components/AddUser";
 
 export default {
    name: "FriendsList",
@@ -96,7 +96,6 @@ export default {
          })
       },
       refuseInvite(friend_id) {
-         console.log(friend_id);
          axios.delete(`http://localhost:8080/api/friendships/refuseInvitation?sender_id=${friend_id}&receiver_id=${this.getUser.id}`).then(() => {
             axios.get(`http://localhost:8080/api/users/infos/${friend_id}`).then(friend => {
                const temp = {
@@ -128,7 +127,8 @@ export default {
                bool = true;
          });
          return bool;
-      }
+      },
+      ...mapActions(['setFriends'])
    },
    computed: {
       ...mapGetters(['getUser', 'getFriends', 'getCurrentConv'])
@@ -148,7 +148,6 @@ export default {
                      }
                      if (!this.invite.includes(temp))
                         this.invite.push(temp)
-                     console.log(this.invite);
                   })
                }
             })
@@ -156,6 +155,7 @@ export default {
 
          // Get all friends of a user.
          axios.get(`http://localhost:8080/api/users/seeAllFriends/${this.getUser.id}`).then(response => {
+            this.setFriends([]);
             response.data.forEach(elt => {
                const temp = {
                   id: elt.id,
@@ -260,6 +260,11 @@ export default {
    display: flex;
    align-items: center;
    justify-content: center;
+}
+
+.user-image > img {
+   width: 100%;
+   height: 100%;
 }
 
 

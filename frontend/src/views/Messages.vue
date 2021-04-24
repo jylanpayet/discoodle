@@ -7,8 +7,12 @@
                   +
                </div>
                <AddConversation v-if="showPopUp" @groupAdded="addNewRoom" @desactivatePopUp="showPopUp = false" />
-               <a class="settings" :style="modifying ? { animation: '10s cubic-bezier(.11, 0, .09, 1) settingsRoll' } : {}" href="#/messages" @click="modifying = !modifying;"><img src="../assets/settings.png" alt="Settings"
+
+               <a class="settings" v-if="JSON.stringify($route.params) === JSON.stringify({})" :style="modifying ? { animation: '10s cubic-bezier(.11, 0, .09, 1) settingsRoll' } : {}" href="#/messages" @click="modifying = !modifying;"><img src="../assets/settings.png" alt="Settings"
                                           style="height: 100%; width: 100%;"></a>
+               <router-link v-else to="/messages" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background-color: transparent !important;">
+                  <img src="../assets/arrow.svg" alt="" style="width: 70%;">
+               </router-link>
             </div>
          </div>
          <div class="convs-list">
@@ -94,6 +98,7 @@ export default {
          axios.put(`http://localhost:8080/api/room/renameRoom/${conv_uuid}?new_name=${this.new_name}`).then(() => {
             this.convList.filter(elt => elt.room_id === conv_uuid).map(elt => elt.room_name = this.new_name);
             this.editRoom.show = false;
+            this.modifying = false;
          })
 
       },
@@ -102,6 +107,7 @@ export default {
          axios.delete(`http://localhost:8080/api/room/removeRoom/${conv_uuid}`).then(() => {
             this.convList = this.convList.filter(elt => elt.room_id !== conv_uuid);
             this.editRoom.show = false;
+            this.modifying = false;
          })
       },
       exitRoom() {
@@ -109,7 +115,12 @@ export default {
          axios.delete(`http://localhost:8080/api/room/removeMember/${conv_uuid}?user_id=${this.getUser.id}`).then(() => {
             this.convList = this.convList.filter(elt => elt.room_id !== conv_uuid);
             this.editRoom.show = false;
+            this.modifying = false;
          })
+      },
+
+      showRoute() {
+         console.log(this.$route);
       }
    },
    data() {

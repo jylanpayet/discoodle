@@ -33,6 +33,7 @@ export default {
       ...mapGetters(['getGroup', 'getUser'])
    },
    mounted() {
+      console.log(this.getGroup);
    }
 }
 </script>

@@ -48,8 +48,12 @@ public class RoomService {
             Optional<Room> room = roomRepository.findById(room_id);
             if (room.get().getUsers().size() > 1) {
                 roomRepository.removeMember(room_id, user_id);
-                System.out.println(room.get().getUsers().get(0).getId().equals(user_id));
-                this.changeAdmin(room_id, room.get().getUsers().get(0).getId());
+                if (user_id.equals(room.get().getRoom_admin())) {
+                    if (room.get().getUsers().get(1).getId().equals(user_id))
+                        this.changeAdmin(room_id, room.get().getUsers().get(0).getId());
+                    else
+                        this.changeAdmin(room_id, room.get().getUsers().get(1).getId());
+                }
                 this.findMessagesOfUser(userRepository.findById(user_id).get().getUsername())
                       .forEach(elt -> messagesRepository.deleteById(elt.getMessage_id()));
             } else {
