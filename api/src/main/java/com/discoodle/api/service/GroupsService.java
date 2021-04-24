@@ -86,6 +86,13 @@ public class GroupsService {
         return groupsRepository.findGroupsByID(groups_ID);
     }
 
+    public List<Groups> underGroup(Long groups_id) {
+        Optional<Groups> tempGroup = groupsRepository.findGroupsByID(groups_id);
+        if(tempGroup.isPresent())
+            return tempGroup.get().getUnderGroups();
+        return List.of();
+    }
+
     public Optional<Roles> addRoleForGroup(Long group_id, String role_name, String rights) {
         if(groupsRepository.existsById(group_id)) {
             Roles role = new Roles(

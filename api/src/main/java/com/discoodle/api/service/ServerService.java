@@ -8,6 +8,7 @@ import com.discoodle.api.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -60,5 +61,16 @@ public class ServerService {
             return server;
         }
         return Optional.empty();
+    }
+
+    public List<Room> findAllRoomsByServerID(Long server_id) {
+        List<Room> all = serverRepository.findById(server_id).get().getRooms();
+        List<Room> rooms = new ArrayList<>();
+        for (Room room : all) {
+            if (room.getRoom_link()) {
+                rooms.add(room);
+            }
+        }
+        return rooms;
     }
 }

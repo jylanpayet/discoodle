@@ -11,13 +11,11 @@ public class UploadFileController {
 
     private final UploadFileService uploadFileService;
 
-    //devient pour upload pour room
     @PostMapping(value = "api/upload/{group_id}")
     public String uploadFile(@RequestParam("file") MultipartFile file, @PathVariable("group_id") Long group_id) {
         System.out.println(file.getOriginalFilename());
         return uploadFileService.uploadFile(file, group_id);
     }
-    // delete pour room
 
     @PostMapping(value = "api/uploadSubject/{group_id}")
     public String uploadSubject(@RequestParam("file") MultipartFile file, @PathVariable("group_id") Long group_id) {

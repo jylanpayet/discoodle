@@ -51,6 +51,11 @@ public class GroupsController {
         return groupsService.serverOfGroup(groups_ID);
     }
 
+    @GetMapping( "/api/groups/underGroup/{groups_id}")
+    public List<Groups> underGroup(@PathVariable("groups_id") Long groups_ID) {
+        return groupsService.underGroup(groups_ID);
+    }
+
     @GetMapping("/getAllRolesByGroup/{group_id}")
     public List<Roles> getAllRolesByGroup(@PathVariable Long group_id) {
         return groupsService.findGroupsByID(group_id).get().getRoles();
