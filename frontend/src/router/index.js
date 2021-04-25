@@ -25,39 +25,14 @@ const routes = [
                 component: () =>import(/* webpackChunkName: "courses/subject" */'../components/courses/Group'),
             },
             {
-                path: "subject/:id",
-                name: "Subjects",
+                path: ":id",
+                name: "Group",
                 component: () =>import(/* webpackChunkName: "courses/subject" */'../components/courses/Group'),
                 children: [
                     {
                         path: "",
                         name: "DefaultGroup",
                         redirect: "accueil"
-                    },
-                    {
-                        path: "accueil",
-                        name: "Subject Home",
-                        component: () => import('../components/courses/SubjectHome')
-                    },
-                    {
-                        path: "cours",
-                        name: "Subject Course",
-                        component: () => import('../components/courses/SubjectCourse')
-                    },
-                    {
-                        path: "chat",
-                        name: "Subject Chat",
-                        component: () => import('../components/courses/SubjectChat')
-                    },
-                    {
-                        path: "notes",
-                        name: "Subject Notes",
-                        component: () => import('../components/courses/SubjectNotes')
-                    },
-                    {
-                        path: "parametres",
-                        name: "Subject Settings",
-                        component: () => import('../components/courses/SubjectSettings')
                     }
                 ]
             }
