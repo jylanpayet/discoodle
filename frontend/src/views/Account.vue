@@ -35,9 +35,23 @@
             </div>
          </div>
 
-         <div class="container">
+         <div class="container cursus">
             <span>Scolarité :</span>
             <div class="container-content">
+               <SelectGroup @selected="updateGroup" :groups="establishments.map(elt => {
+                  return {
+                     label: elt.name,
+                     value: elt
+                  }
+               })" :placeholder="typeTranslation['ESTABLISHMENT']" :index="0"/>
+
+               <SelectGroup @selected="updateGroup" :key="elt.id" v-for="elt in groups" :groups="elt.childs.map(e => {
+                  return {
+                     label: e.name,
+                     value: e
+                  }
+               })" :placeholder="typeTranslation[elt.childs[0]?.type]" :index="elt.index+1"/>
+
 
             </div>
          </div>
@@ -52,10 +66,12 @@
 import Authentication from "@/components/Authentification";
 import {mapActions, mapGetters} from 'vuex'
 import axios from "axios";
+import SelectGroup from "@/components/common/SelectGroup";
 
 export default {
    name: "Account",
    components: {
+      SelectGroup,
          Authentication
    },
    computed: {
@@ -87,15 +103,55 @@ export default {
             })
          }
       },
+      getUnderGroups(parent_id) {
+         return axios.get(`http://localhost:8080/api/groups/underGroup/${parent_id}`)
+      },
+      updateGroup(res) {
+         this.getUnderGroups(res.group.groups_id).then(rep => {
+            // TODO : si index < length, réindexer et supprimer les groups suivants
+            if (res.index < this.groups.length - 1) {
+               this.groups.push({
+                  index: res.index,
+                  group: res.group,
+                  childs: rep.data
+               })
+            } else {
+               this.groups.push({
+                  index: res.index,
+                  group: res.group,
+                  childs: rep.data
+               })
+            }
+
+         });
+      },
       ...mapActions(['setLinkToAvatar'])
    },
    data() {
       return {
-         isAuthentificated: false
+         isAuthentificated: false,
+         groups: [],
+         establishments: [],
+         typeTranslation: {
+            "ESTABLISHMENT": "Établissement",
+            "FACULTY": "Université",
+            "ADMINISTRATION": "Administration",
+            "COURSE": "Filière/cursus",
+            "GRADE": "Année",
+            "SUBJECTS": "Matière",
+            "OTHER": "Autres"
+         }
       }
    },
    mounted() {
       this.isAuthentificated = (JSON.stringify(this.getUser) !== JSON.stringify({}));
+      if (this.isAuthentificated) {
+         axios.get("http://localhost:8080/api/groups/findIDOfDiscoodle").then(response => {
+            axios.get(`http://localhost:8080/api/groups/underGroup/${response.data}`).then(rep => {
+               this.establishments = rep.data;
+            })
+         })
+      }
    }
 }
 </script>
@@ -139,7 +195,7 @@ export default {
 
 .container {
    width: 100%;
-   height: 400px;
+   min-height: 360px;
 
    display: flex;
    align-items: flex-start;
@@ -168,6 +224,7 @@ export default {
 
    width: 100%;
    height: 85%;
+   min-height: 280px;
 }
 
 .logo-and-text {
@@ -262,4 +319,11 @@ export default {
    justify-content: center;
 }
 
+.cursus {
+
+}
+
+.cursus > div {
+   justify-content: flex-start;
+}
 </style>

@@ -13,7 +13,7 @@
                         <router-link to="/accueil">
                            <div class="navbar-icon"><img src=assets/home.png alt="Home"></div>
                            <span :style="{ color: getColors.color5 }">ACCUEIL</span></router-link>
-                        <router-link to="/cours">
+                        <router-link to="/groupes" @click="setGroup({})">
                            <div class="navbar-icon"><img src="assets/courses.png" alt="Courses"></div>
                            <span :style="{ color: getColors.color5 }">COURS</span></router-link>
                         <router-link to="/messages">
@@ -48,7 +48,7 @@ export default {
 
    },
    methods: {
-      ...mapActions(['setUser'])
+      ...mapActions(['setUser', 'setGroup']),
    },
    computed: {
       ...mapGetters(['getColors'])

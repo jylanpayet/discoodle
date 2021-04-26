@@ -15,26 +15,56 @@ const routes = [
         component: () => import(/* webpackChunkName: "home" */ '../views/Home')
     },
     {
-        path: '/cours',
+        path: '/groupes',
         name: 'Cours',
         component: () => import(/* webpackChunkName: "courses" */ '../views/Courses'),
         children: [
             {
                 path: "",
                 name: "DefaultCourses",
-                component: () =>import(/* webpackChunkName: "courses/subject" */'../components/courses/Group'),
+                component: () =>import(/* webpackChunkName: "courses/subject" */'../components/groups/Group'),
+            },
+            {
+                path: "subject/:id",
+                name: "Subjects",
+                component: () =>import(/* webpackChunkName: "courses/subject" */'../components/groups/Group'),
+                children: [
+                    {
+                        path: "",
+                        name: "Default Subjects",
+                        redirect: { name: 'Home Subjects' }
+                    },
+                    {
+                        path: "accueil",
+                        name: "Home Subjects",
+                        component: () => import('../components/groups/SubjectHome')
+                    },
+                    {
+                        path: "cours",
+                        name: "Course Subjects",
+                        component: () => import('../components/groups/SubjectCourse')
+                    },
+                    {
+                        path: "discussion",
+                        name: "Server Subjects",
+                        component: () => import('../components/groups/SubjectChat')
+                    },
+                    {
+                        path: "notes",
+                        name: "Notes Subjects",
+                        component: () => import('../components/groups/SubjectNotes')
+                    },
+                    {
+                        path: "parametres",
+                        name: "Settings Subjects",
+                        component: () => import('../components/groups/SubjectSettings')
+                    }
+                ]
             },
             {
                 path: ":id",
                 name: "Group",
-                component: () =>import(/* webpackChunkName: "courses/subject" */'../components/courses/Group'),
-                children: [
-                    {
-                        path: "",
-                        name: "DefaultGroup",
-                        redirect: "accueil"
-                    }
-                ]
+                component: () =>import(/* webpackChunkName: "courses/subject" */'../components/groups/Group'),
             }
         ]
     },

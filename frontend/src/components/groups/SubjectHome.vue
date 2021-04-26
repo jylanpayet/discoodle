@@ -6,9 +6,9 @@
 </template>
 
 <script>
-import axios from "axios";
-import marked from "marked";
 import {mapGetters} from "vuex";
+import axios from "axios";
+import marked from 'marked';
 
 export default {
    name: "SubjectHome",
@@ -20,7 +20,9 @@ export default {
    mounted() {
       axios.get(`http://localhost:8080/common/groups/${this.getGroup.groups_id}/cours.md`).then(rep => {
          this.content = marked(rep.data);
-      })
+      }).catch(err => {
+         console.log(err);
+      });
    },
    computed: {
       ...mapGetters(['getGroup'])

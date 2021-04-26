@@ -9,6 +9,7 @@ import com.discoodle.api.repository.GroupsRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
@@ -142,6 +143,10 @@ public class GroupsService {
             return true;
         }
         return false;
+    }
+
+    public Optional<Long> findIDOfDiscoodle() {
+    return groupsRepository.findIDOfDiscoodle();
     }
 
 }

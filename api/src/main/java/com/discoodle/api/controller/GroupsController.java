@@ -40,6 +40,11 @@ public class GroupsController {
         return groupsService.findGroupsByID(group_id);
     }
 
+    @GetMapping("/api/groups/findIDOfDiscoodle")
+    public Optional<Long> findIDOfDiscoodle() {
+        return groupsService.findIDOfDiscoodle();
+    }
+
     @PostMapping( "/api/groups/addNewMemberInGroup/{groups_id}")
     public Optional<Groups> addNewMemberInGroup(@PathVariable Long groups_id, @RequestParam(value = "user_id") Long user_id, @RequestParam(value = "token") String token) {
         return groupsService.addNewMemberInGroup(groups_id, user_id, token);

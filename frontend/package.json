@@ -9,7 +9,9 @@
   },
   "dependencies": {
     "core-js": "^3.9.0",
+    "firebase": "^8.4.2",
     "marked": "^2.0.1",
+    "simple-peer": "^9.11.0",
     "stompjs": "^2.3.3",
     "vue": "^3.0.0",
     "vue-cookie": "^1.1.4",

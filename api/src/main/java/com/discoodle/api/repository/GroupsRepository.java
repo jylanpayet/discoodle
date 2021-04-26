@@ -68,4 +68,7 @@ public interface GroupsRepository extends JpaRepository<Groups, Long> {
     @Modifying
     @Query(value = "UPDATE roles r SET r.rights=?2 WHERE r.role_id=?1", nativeQuery = true)
     int modifyRightsForRole(@Param("role_id") Long role_id, @Param("rights") String rights);
+
+    @Query("SELECT group.groups_id FROM Groups group WHERE group.type = 'DISCOODLE'")
+    Optional<Long> findIDOfDiscoodle();
 }

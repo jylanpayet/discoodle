@@ -48,6 +48,7 @@ export default createStore({
             context.commit('ADD_FRIEND', user);
         },
         setGroup(context, groups) {
+            console.log(groups);
             context.commit('SET_GROUP', groups);
         },
         setFriends(context, friends) {
