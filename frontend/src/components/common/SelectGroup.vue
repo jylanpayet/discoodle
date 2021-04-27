@@ -38,9 +38,6 @@ export default {
             group: group,
          });
       }
-   },
-   mounted() {
-      console.log(this.groups);
    }
 }
 </script>

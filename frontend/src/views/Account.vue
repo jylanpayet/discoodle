@@ -38,21 +38,42 @@
          <div class="container cursus">
             <span>Scolarité :</span>
             <div class="container-content">
-               <SelectGroup @selected="updateGroup" :groups="establishments.map(elt => {
-                  return {
-                     label: elt.name,
-                     value: elt
-                  }
-               })" :placeholder="typeTranslation['ESTABLISHMENT']" :index="0"/>
+               <div class="select-groups">
+                  <SelectGroup @selected="showGroup" :groups="establishments.map(elt => {
+                     return {
+                        label: elt.name,
+                        value: elt
+                     }
+                  })" :placeholder="typeTranslation['ESTABLISHMENT']" :index="0"/>
 
-               <SelectGroup @selected="updateGroup" :key="elt.id" v-for="elt in groups" :groups="elt.childs.map(e => {
-                  return {
-                     label: e.name,
-                     value: e
-                  }
-               })" :placeholder="typeTranslation[elt.childs[0]?.type]" :index="elt.index+1"/>
+                  <SelectGroup @selected="showGroup" :key="elt.index" v-for="elt in groups" :groups="elt.childs.filter(item => (
+                        allowedTypes.includes(item.type)
+                  )).map(e => {
+                     return {
+                        label: e.name,
+                        value: e
+                     }
+                  })" :placeholder="typeTranslation[elt.childs[0]?.type]" :index="elt.index+1"/>
+               </div>
 
+               <div class="submit-delete">
+                  <w-button class="ma1" bg-color="error" lg @click="resetSelects(true, true)">
+                     Effacer
+                  </w-button>
+                  <w-button class="ma1" bg-color="success" lg @click="confirmRegister.show = true">
+                     Mettre à jour !
+                  </w-button>
+               </div>
 
+               <JoinGroup v-if="showJoinGroup"
+                          :name="groupSelected.group.name"
+                          :id="groupSelected.group.groups_id"
+                          :readonly="true"
+                          @user-entry="checkEntry"
+                          @close="disableGroup"
+                          persistent
+                          @cancel="removeLast"
+               />
             </div>
          </div>
       </div>
@@ -60,6 +81,32 @@
    <div style="width: 100%; height: 100%;" v-else>
       <Authentication @logSuccess="isAuthentificated = true; $emit('logSuccess')" />
    </div>
+
+   <w-dialog
+         v-model="confirmRegister.show"
+         title="Êtes-vous sûr(e) de vouloir vous inscrire dans ces groupes ?"
+         persistent
+         :width="550">
+      Vous pourrez à tout moment changer cette inscription, mais il faudra vous munir des clés de connection fournies par votre établissement.
+
+      <template #actions>
+         <div class="spacer" />
+         <w-button
+               class="mr2"
+               @click="confirmRegister.show = false"
+               bg-color="error">
+            Je modifie ce que j'ai choisi.
+         </w-button>
+         <w-button
+               @click="registerInGroups"
+               bg-color="success">
+            Je m'inscris !
+         </w-button>
+      </template>
+   </w-dialog>
+
+   <w-notification error plain bottom v-model="showAlert" :timeout="5000">{{ message }}</w-notification>
+   <w-notification success plain bottom v-model="showSuccess" :timeout="5000">{{ message }}</w-notification>
 </template>
 
 <script>
@@ -67,12 +114,14 @@ import Authentication from "@/components/Authentification";
 import {mapActions, mapGetters} from 'vuex'
 import axios from "axios";
 import SelectGroup from "@/components/common/SelectGroup";
+import JoinGroup from "@/components/groups/JoinGroup";
 
 export default {
    name: "Account",
    components: {
+      JoinGroup,
       SelectGroup,
-         Authentication
+      Authentication
    },
    computed: {
       ...mapGetters(['getUser'])
@@ -108,23 +157,113 @@ export default {
       },
       updateGroup(res) {
          this.getUnderGroups(res.group.groups_id).then(rep => {
-            // TODO : si index < length, réindexer et supprimer les groups suivants
-            if (res.index < this.groups.length - 1) {
-               this.groups.push({
-                  index: res.index,
-                  group: res.group,
-                  childs: rep.data
-               })
-            } else {
-               this.groups.push({
-                  index: res.index,
-                  group: res.group,
-                  childs: rep.data
-               })
+            if (res.index <= this.groups.length - 1) {
+               // Si on change une valeur qui a déjà été entrée
+               this.groups = this.groups.filter(elt => (
+                     elt.index < res.index
+               ))
+               // Alors on met à jour les groupes après cette valeur
             }
+            this.groups.push({
+               index: res.index,
+               group: res.group,
+               childs: rep.data
+            })
+         });
+         console.log(this.groups);
+      },
 
+      updateEstablishment(res) {
+         this.groups = [];
+         this.getUnderGroups(res.group.groups_id).then(rep => {
+            this.groups.push({
+               index: res.index,
+               group: res.group,
+               childs: rep.data
+            })
          });
       },
+
+      showGroup(res) {
+         this.showJoinGroup = true;
+         this.groupSelected = res;
+      },
+      disableGroup() {
+         this.showJoinGroup = false;
+         this.groupSelected = {}
+      },
+      checkEntry(res) {
+         if (res.token === this.groupSelected.group.token) {
+            this.updateGroup(this.groupSelected);
+         } else {
+            this.showAlert = true;
+            this.message = "Mauvaise clé de groupe."
+            this.clearAfter(this.groupSelected.index);
+         }
+      },
+
+      resetSelects(reset_est, reset_grp) {
+         if (reset_grp)
+            this.groups = [];
+         if (reset_est) {
+            this.establishments = [];
+            axios.get("http://localhost:8080/api/groups/findIDOfDiscoodle").then(response => {
+               axios.get(`http://localhost:8080/api/groups/underGroup/${response.data}`).then(rep => {
+                  this.establishments = rep.data;
+               })
+            })
+         }
+      },
+      clearAfter(index) {
+         if (index === 0) {
+            this.resetSelects(true, true);
+         } else {
+            const temp = this.groups[index - 1];
+            this.groups = this.groups.filter(elt => (
+                  elt.index < index - 1
+            ))
+            setTimeout(() => {
+               this.groups.push(temp);
+            }, 20)
+         }
+      },
+      removeLast() {
+         this.showAlert = true;
+         this.message = "Annulé"
+         this.clearAfter(this.groupSelected.index);
+      },
+
+      registerInGroups() {
+         let noErr = true;
+         this.confirmRegister.show = false;
+         this.groups.forEach(elt => {
+            if (elt.group.type === "GRADE" || elt.group.type === "COURSE") {
+               elt.childs.forEach(group => {
+                  if (group.type === "SUBJECTS") {
+                     axios.post(
+                           `http://localhost:8080/api/groups/addNewMemberInGroup/${group.groups_id}?user_id=${this.getUser.id}&token=${group.token}`
+                     ).catch(() => {
+                        noErr = false;
+                     })
+                  }
+               })
+            }
+            axios.post(
+                  `http://localhost:8080/api/groups/addNewMemberInGroup/${elt.group.groups_id}?user_id=${this.getUser.id}&token=${elt.group.token}`
+            ).catch(() => {
+               noErr = false;
+            })
+         })
+
+         if (noErr) {
+            this.showSuccess = true;
+            this.message = "Inscription effectuée avec succès !"
+         } else {
+            this.showAlert = true;
+            this.message = "Erreur lors de l'inscription dans les groupes."
+         }
+      },
+
       ...mapActions(['setLinkToAvatar'])
    },
    data() {
@@ -140,6 +279,22 @@ export default {
             "GRADE": "Année",
             "SUBJECTS": "Matière",
             "OTHER": "Autres"
+         },
+         allowedTypes: [
+            "ESTABLISHMENT",
+            "FACULTY",
+            "ADMINISTRATION",
+            "COURSE",
+            "GRADE",
+            "OTHER"
+         ],
+         showJoinGroup: false,
+         groupSelected: {},
+         showAlert: false,
+         showSuccess: false,
+         message: "",
+         confirmRegister: {
+            show: false
          }
       }
    },
@@ -151,6 +306,25 @@ export default {
                this.establishments = rep.data;
             })
          })
+
+         axios.get(`http://localhost:8080/api/users/seeAllGroups/${this.getUser.id}`).then(response => {
+            const groups = response.data.sort((a, b) => (
+               a.depth - b.depth
+            )).filter(elt => (
+                  elt.type !== "SUBJECTS" && elt.type !== "DISCOODLE" && elt.type !== "OTHER"
+            ))
+            console.log(groups);
+            groups.forEach(elt => {
+               this.getUnderGroups(elt.groups_id).then(rep => {
+                  console.log(rep);
+                  this.groups.push({
+                     index: this.groups.length,
+                     group: elt,
+                     childs: rep.data
+                  })
+               })
+            })
+         });
       }
    }
 }
@@ -217,14 +391,24 @@ export default {
    border-radius: 6px;
    padding: 20px;
 
+   width: 100%;
+   height: 85%;
+   min-height: 280px;
+
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   flex-direction: column;
+}
+
+.select-groups {
    display: flex;
    flex-direction: column;
    align-items: center;
    justify-content: space-between;
 
+   margin-bottom: 10px;
    width: 100%;
-   height: 85%;
-   min-height: 280px;
 }
 
 .logo-and-text {
@@ -319,11 +503,16 @@ export default {
    justify-content: center;
 }
 
-.cursus {
+.submit-delete {
+   width: 100%;
+   height: 30px;
 
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
 }
 
-.cursus > div {
-   justify-content: flex-start;
+.cursus > span {
+   margin-bottom: 10px;
 }
 </style>

@@ -2,22 +2,27 @@
    <w-dialog
          :fullscreen="joinGroup.fullscreen"
          :width="joinGroup.width"
-         :persistent="joinGroup.persistent"
          :persistent-no-animation="joinGroup.persistentNoAnimation"
          @close="$emit('close')"
+         :persistent="persistent"
+         v-model="joinGroup.show"
    >
       <div class="joinGroup">
          <span style="margin-bottom: 10px; font-size: 19px; font-weight: 600; color: #454150">Rejoindre un groupe :</span>
+         <span v-if="name !== ''">{{ name }}</span>
          <div style="width: 100%;">
-            <w-input color="darkgray" autocomplete="off" @keydown="join" required style="margin-bottom: 10px; width: 90%" name="groupID" v-model="groupID">
+            <w-input color="darkgray" autocomplete="off" @keydown="join" required style="margin-bottom: 10px; width: 90%" :readonly="readonly" name="groupID" v-model="groupID">
                Identifiant du groupe
             </w-input>
             <w-input color="darkgray" autocomplete="off" required style="margin-bottom: 10px; width: 90%" type="password" name="groupKey"
                      @keydown="join" v-model="groupToken">Clé du groupe
             </w-input>
          </div>
-         <button class="submit" @click="join">
+         <button class="submit" style="background-color: #61e85c; margin-bottom: 10px;" @click="join">
             Rejoindre !
+         </button>
+         <button class="submit" style="background-color: #E85C5C;" @click="joinGroup.show = false; $emit('cancel')">
+            Annuler
          </button>
       </div>
    </w-dialog>
@@ -28,6 +33,21 @@ import {mapGetters} from "vuex";
 
 export default {
    name: "JoinGroup",
+   props: {
+      id: Number,
+      readonly: {
+         type: Boolean,
+         default: false,
+      },
+      name: {
+         type: String,
+         default: ""
+      },
+      persistent: {
+         type: Boolean,
+         default: false
+      }
+   },
    methods: {
       join(event) {
          if (this.groupID !== "" && this.groupToken !== "" && !this.didAdd) {
@@ -49,6 +69,7 @@ export default {
    data() {
       return {
          joinGroup: {
+            show: true,
             fullscreen: false,
             persistent: false,
             persistentNoAnimation: false,
@@ -59,6 +80,10 @@ export default {
          didAdd: false
       }
    },
+   mounted() {
+      if (this.id)
+         this.groupID = String(this.id);
+   }
 }
 </script>
 
@@ -66,7 +91,6 @@ export default {
 .submit {
    height: 35px;
    width: 150px;
-   background-color: #E85C5C;
    font-size: 15px;
    font-weight: 600;
    border: none;
@@ -77,7 +101,7 @@ export default {
 }
 
 .joinGroup {
-   height: 175px;
+   height: 250px;
    width: 100%;
    display: flex;
    flex-direction: column;
