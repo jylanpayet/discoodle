@@ -37,6 +37,12 @@ public class GroupsService {
                 token
         );
         Groups finalGroup = groupsRepository.save(group);
+        Roles roles = new Roles(
+                "Admin",
+                "*"
+        );
+        Roles finalRole = rolesRepository.save(roles);
+        groupsRepository.addRoleForGroup(finalGroup.getGroups_id(), finalRole.getRole_id());
         if(request.getParent_id()!=null)
             groupsRepository.addNewGroupsInGroup(request.getParent_id(), finalGroup.getGroups_id());
         groupsRepository.addNewMemberInGroup(request.getUser_id(), finalGroup.getGroups_id());
