@@ -3,8 +3,6 @@ package com.discoodle.api.model;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.LinkedList;
-import java.util.List;
 
 @Getter
 @Setter

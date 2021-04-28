@@ -1,6 +1,9 @@
 package com.discoodle.api.service;
 
+import com.discoodle.api.model.Friendships;
+import com.discoodle.api.model.Room;
 import com.discoodle.api.model.User;
+import com.discoodle.api.repository.FriendshipsRepository;
 import com.discoodle.api.repository.UserRepository;
 import com.discoodle.api.security.token.ConfirmationToken;
 import com.discoodle.api.security.token.ConfirmationTokenService;
@@ -10,10 +13,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDateTime;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,6 +25,8 @@ import java.util.stream.Collectors;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final FriendshipsRepository friendshipsRepository;
+    private final RoomService roomService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final ConfirmationTokenService confirmationTokenService;
 
@@ -54,8 +57,18 @@ public class UserService implements UserDetailsService {
     }
 
     public void deleteUser(Long user_id) {
+        User delete = userRepository.findById(user_id).get();
         if (userRepository.existsById(user_id)) {
             userRepository.removeToken(user_id);
+            for(Room test_room : delete.getRooms()) {
+                roomService.removeMember(test_room.getRoom_id(), user_id);
+            }
+            List<Long> list = userRepository.getFriendListForSender(user_id);
+            list.addAll(userRepository.getFriendListForReceiver(user_id));
+            List<Friendships> friendships = friendshipsRepository.getALlRelations(user_id);
+            for(Friendships test_friendships : friendships) {
+                friendshipsRepository.deleteById(test_friendships.getFriendships_id());
+            }
             userRepository.deleteById(user_id);
         }
     }
@@ -116,14 +129,6 @@ public class UserService implements UserDetailsService {
         List<Long> list = userRepository.getFriendListForReceiver(user_id);
         list.addAll(userRepository.getFriendListForSender(user_id));
         return list.stream().filter(userRepository::existsById).map(elt -> userRepository.findById(elt).get()).collect(Collectors.toList());
-        /*
-        List<User> res = new LinkedList<>();
-        for (int i = 0; i < list.size(); i++) {
-            Optional<User> tmp = userRepository.findById(list.get(i));
-            tmp.ifPresent(res::add);
-        }
-        return res;
-         */
     }
 
     public Optional<User> changeUsername(Long user_id, String username) {

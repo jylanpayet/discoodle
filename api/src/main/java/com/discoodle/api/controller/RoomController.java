@@ -5,7 +5,6 @@ import com.discoodle.api.repository.RoomRepository;
 import com.discoodle.api.request.RoomRequest;
 import com.discoodle.api.service.RoomService;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

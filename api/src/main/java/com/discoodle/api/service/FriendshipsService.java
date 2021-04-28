@@ -2,7 +2,6 @@ package com.discoodle.api.service;
 
 import com.discoodle.api.model.Friendships;
 
-import com.discoodle.api.model.Room;
 import com.discoodle.api.repository.FriendshipsRepository;
 import com.discoodle.api.repository.UserRepository;
 import lombok.AllArgsConstructor;

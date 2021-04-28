@@ -16,6 +16,9 @@ public interface FriendshipsRepository extends JpaRepository<Friendships, Long> 
     @Query("SELECT friendships FROM Friendships friendships where friendships.receiver_id = :user_id AND friendships.status = false")
     List<Friendships> getAllInvitations(Long user_id);
 
+    @Query("SELECT friendships FROM Friendships friendships where friendships.receiver_id = :user_id OR friendships.sender_id = :user_id")
+    List<Friendships> getALlRelations(Long user_id);
+
     @Transactional
     @Modifying
     @Query("UPDATE Friendships friendships SET friendships.status = true WHERE friendships.sender_id = :sender_id AND friendships.receiver_id = :receiver_id")

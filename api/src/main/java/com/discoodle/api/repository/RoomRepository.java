@@ -10,7 +10,6 @@ import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 
 
 @Repository
@@ -35,7 +34,6 @@ public interface RoomRepository extends JpaRepository<Room, String> {
     @Modifying
     @Query("UPDATE Room room SET room.room_admin = :room_admin WHERE room.room_id = :room_id")
     int changeAdmin(@Param("room_id") String room_id, @Param("room_admin") Long room_admin);
-
 
     @Transactional
     @Modifying
