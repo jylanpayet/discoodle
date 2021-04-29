@@ -33,36 +33,38 @@ public class NoteService {
         noteRepository.deleteById(note_id);
     }
 
-    public void deleteAllNoteByGroupId(Long group_id){
+    public void deleteAllNoteByGroupId(Long group_id) {
         noteRepository.deleteAllNoteByGroupId(group_id);
     }
 
-    public void deleteAllNoteByUserId(Long user_id){
+    public void deleteAllNoteByUserId(Long user_id) {
         noteRepository.deleteAllNoteByUserId(user_id);
     }
 
-    public void deleteAllNoteByTitre(Long group_id,String titre){
-        noteRepository.deleteAllNoteByTitre(group_id,titre);
+    public void deleteAllNoteByTitre(Long group_id, String titre) {
+        noteRepository.deleteAllNoteByTitre(group_id, titre);
     }
 
-    public List<Note> getAllNoteByGroupId(Long group_id){
+    public List<Note> getAllNoteByGroupId(Long group_id) {
         return noteRepository.getAllNoteByGroupId(group_id);
     }
 
-    public List<Note> getAllNoteByUserId(Long user_id){
+    public List<Note> getAllNoteByUserId(Long user_id) {
         return noteRepository.getAllNoteByUserId(user_id);
     }
 
-    public List<Note>getAllNoteByTitre(Long group_id,String titre){
-        return noteRepository.getAllNoteByTitre(group_id,titre);
+    public List<Note> getAllNoteByTitre(Long group_id, String titre) {
+        return noteRepository.getAllNoteByTitre(group_id, titre);
     }
 
-    public Optional<Note> getNoteByNoteId(Long note_id){
+    public Optional<Note> getNoteByNoteId(Long note_id) {
         return noteRepository.findById(note_id);
     }
 
-    public void editNote(Long group_id, Long user_id, double note){
-        noteRepository.editNote(group_id,user_id,note);
+    public List<Note> getUserNoteByGroupId(Long group_id, Long user_id){ return noteRepository.getUserNoteByGroupId(group_id,user_id);    }
+
+    public void editNote(Long group_id, Long user_id, double note) {
+        noteRepository.editNote(group_id, user_id, note);
     }
 
 }

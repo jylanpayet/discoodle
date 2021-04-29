@@ -66,7 +66,7 @@ export default {
       async startWebcam() {
          this.localStream = await navigator.mediaDevices.getUserMedia({
             video: true,
-            audio: false
+            audio: true
          })
 
          this.remoteStream = new MediaStream();
