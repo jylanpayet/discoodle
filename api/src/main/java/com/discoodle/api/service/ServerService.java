@@ -1,5 +1,6 @@
 package com.discoodle.api.service;
 
+import com.discoodle.api.model.Groups;
 import com.discoodle.api.model.Room;
 import com.discoodle.api.model.Server;
 import com.discoodle.api.model.User;
