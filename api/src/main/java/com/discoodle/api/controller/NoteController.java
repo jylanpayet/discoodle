@@ -65,6 +65,12 @@ public class NoteController {
         return noteService.getNoteByNoteId(note_id);
     }
 
+    @GetMapping("api/note/{group_id}/{user_id}")
+    @ResponseBody
+    public List<Note> getUserNoteByGroupId(@PathVariable("group_id") Long group_id, @PathVariable("user_id") Long user_id){
+        return noteService.getUserNoteByGroupId(group_id,user_id);
+    }
+
 
     @PostMapping("api/note/editNote/{group_id}/{note_id}")
     public void editNote(@PathVariable(name = "group_id") Long group_id,

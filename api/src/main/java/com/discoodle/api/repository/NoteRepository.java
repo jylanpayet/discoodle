@@ -22,6 +22,9 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
     @Query("SELECT note FROM Note note  WHERE note.group_id= :group_id AND note.titre= :titre")
     List<Note> getAllNoteByTitre(@Param("group_id") Long group_id,@Param("titre") String titre);
 
+    @Query("SELECT note FROM Note note WHERE note.group_id= :group_id AND note.user_id = :user_id")
+    List<Note> getUserNoteByGroupId(@Param("group_id") Long group_id, @Param("user_id") Long user_id);
+
     @Transactional
     @Modifying
     @Query("DELETE FROM Note note WHERE note.group_id= :group_id")
