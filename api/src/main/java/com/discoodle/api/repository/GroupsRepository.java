@@ -26,6 +26,9 @@ public interface GroupsRepository extends JpaRepository<Groups, Long> {
     @Query(value = "SELECT groups FROM Groups groups where groups.type=?1")
     Optional<Groups> findAllGroupsByType(String type);
 
+    @Query(value = "SELECT groups FROM Groups groups where groups.name=?1 AND groups.depth=?2")
+    Optional<Groups> findAllGroupsByNameAndDepth(String name,Integer depth);
+
     @Transactional
     @Modifying
     @Query(value = "UPDATE groups g SET g.name=?2,g.description=?3 WHERE g.groups_id=?1", nativeQuery = true)

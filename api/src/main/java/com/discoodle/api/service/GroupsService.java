@@ -28,6 +28,9 @@ public class GroupsService {
 
     public Optional<Groups> createNewGroup(GroupsRequest request) {
         String token = UUID.randomUUID().toString().replaceAll("-", "").substring(0, 8);
+        if(request.getDepth()==1 && groupsRepository.findAllGroupsByNameAndDepth(request.getName(), request.getDepth()).isPresent()){
+            return Optional.empty();
+        }
         Groups group = new Groups(
                 request.getParent_id(),
                 request.getDepth(),
@@ -83,9 +86,10 @@ public class GroupsService {
     public Optional<Groups> addNewMemberInGroup(Long groups_id, Long user_id, String token) {
         Optional<Groups> tempGroup = groupsRepository.findGroupsByID(groups_id);
         Optional<User> tempUser = userService.getUserByID(user_id);
-        if (tempGroup.isPresent() && tempUser.isPresent() && (tempGroup.get().getToken().equals(token)) && groupsRepository.addNewMemberInGroup(user_id,groups_id)==1){
-            serverService.addNewMember(tempGroup.get().getServer().getServer_id(),user_id);
-           return tempGroup;
+        if (tempGroup.isPresent() && tempUser.isPresent() && (tempGroup.get().getToken().equals(token)) && !tempGroup.get().getUsers().contains(tempUser.get())) {
+            groupsRepository.addNewMemberInGroup(user_id, groups_id);
+            serverService.addNewMember(tempGroup.get().getServer().getServer_id(), user_id);
+            return tempGroup;
         }
         return Optional.empty();
     }

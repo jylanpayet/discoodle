@@ -33,7 +33,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<Long> getFriendListForSender(Long user_id);
 
     @Query("SELECT user FROM User user where user.role= :role")
-    Optional<User.Role> findUserByRole(User.Role role);
+    Optional<User.Role> getUserByRole(User.Role role);
 
     @Transactional
     @Modifying

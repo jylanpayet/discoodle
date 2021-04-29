@@ -15,13 +15,13 @@ public class FriendshipsController {
 
     private final FriendshipsService friendshipService;
 
-    @PostMapping("/inviteMembers/{user_id}")
-    public String inviteMembers(@PathVariable Long user_id, @RequestBody FriendshipsRequest friends_id) {
+    @PostMapping("/inviteMembers")
+    public String inviteMembers(@RequestParam(value = "user_id") Long user_id, @RequestBody FriendshipsRequest friends_id) {
         return friendshipService.inviteMembers(user_id, friends_id.getFriendships());
     }
 
-    @GetMapping("/getAllInvitations/{user_id}")
-    public List<Friendships> getAllInvitations(@PathVariable Long user_id) {
+    @GetMapping("/getAllInvitations")
+    public List<Friendships> getAllInvitations(@RequestParam(value = "user_id") Long user_id) {
         return friendshipService.getAllInvitations(user_id);
     }
 

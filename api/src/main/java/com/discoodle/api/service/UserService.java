@@ -42,8 +42,8 @@ public class UserService implements UserDetailsService {
         return userRepository.findById(user_id);
     }
 
-    public Optional<User.Role> findUserByRole(User.Role role) {
-        return userRepository.findUserByRole(role);
+    public Optional<User.Role> getUserByRole(User.Role role) {
+        return userRepository.getUserByRole(role);
     }
 
     public void addNewUser(User user) {
