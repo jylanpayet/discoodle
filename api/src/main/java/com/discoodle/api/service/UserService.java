@@ -94,9 +94,11 @@ public class UserService implements UserDetailsService {
     }
 
     public String login(String username, String password) {
-        if(userRepository.findUserByUserName(username).isPresent() /*&& userRepository.findUserByUserName(username).get().isEnabled()*/) {
+        if(userRepository.findUserByUserName(username).isPresent() && userRepository.findUserByUserName(username).get().isEnabled()) {
             if (!bCryptPasswordEncoder.matches(password, userRepository.findUserByUserName(username).get().getPassword()))
                 return "Mot de passe ou nom d'utilisateur incorrect";
+            else if(!userRepository.findUserByUserName(username).get().isEnabled())
+                return "Veuillez valider votre compte par mail.";
             else
                 return "";
         }

@@ -31,9 +31,9 @@ public class RegistrationService {
                                 User.Role.STUDENT
                         )
                 );
-            /*String link = "http://localhost:8080/api/registration/confirm?token=" + token;
+            String link = "http://localhost:8080/api/registration/confirm?token=" + token;
             mailSender.send(request.getMail(),
-                    buildMail(request.getName(), link));*/
+                    buildMail(request.getName(), link));
                 return token;
             }
             return "Votre mail n'est pas valide.\n";
