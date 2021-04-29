@@ -34,11 +34,11 @@ public class RoomService {
     }
 
     public List<User> findUserOfRoom(String room_id) {
-        return roomRepository.findUserOfRoom(room_id);
+        return roomRepository.getUserOfRoom(room_id);
     }
 
-    public Optional<User> findAdminOfRoom(String room_id) {
-        return userRepository.findById(roomRepository.findAdminOfRoom(room_id));
+    public Optional<User> getAdminOfRoom(String room_id) {
+        return userRepository.findById(roomRepository.getAdminOfRoom(room_id));
     }
 
     public Optional<User> removeMember(String room_id, Long user_id) {

@@ -41,8 +41,8 @@ public interface RoomRepository extends JpaRepository<Room, String> {
     void renameRoom(@Param("room_id") String room_id, @Param("new_name") String new_name);
 
     @Query("SELECT room.users FROM Room room WHERE room.room_id = :room_id")
-    List<User> findUserOfRoom(String room_id);
+    List<User> getUserOfRoom(String room_id);
 
     @Query("SELECT room.room_admin FROM Room room WHERE room.room_id = :room_id")
-    Long findAdminOfRoom(String room_id);
+    Long getAdminOfRoom(String room_id);
 }
