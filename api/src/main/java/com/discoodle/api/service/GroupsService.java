@@ -45,9 +45,11 @@ public class GroupsService {
                 "Etudiant",
                 "-"
         );
-        Roles finalRole = rolesRepository.save(role_admin);
-        groupsRepository.addRoleForGroup(finalGroup.getGroups_id(), finalRole.getRole_id());
-        groupsRepository.addNewMemberInGroup(request.getUser_id(), finalGroup.getGroups_id());
+        Roles finalRole_admin = rolesRepository.save(role_admin);
+        Roles finalRole_student = rolesRepository.save(role_student);
+        groupsRepository.addRoleForGroup(finalGroup.getGroups_id(), finalRole_admin.getRole_id());
+        groupsRepository.addRoleForGroup(finalGroup.getGroups_id(), finalRole_student.getRole_id());
+        groupsRepository.addRoleForUser(request.getUser_id(), finalRole_admin.getRole_id());
         if (request.getParent_id() != null)
             groupsRepository.addNewGroupsInGroup(request.getParent_id(), finalGroup.getGroups_id());
         groupsRepository.addNewMemberInGroup(request.getUser_id(), finalGroup.getGroups_id());
