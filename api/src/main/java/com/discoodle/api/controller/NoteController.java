@@ -21,60 +21,60 @@ public class NoteController {
         return noteService.createNewNote(request);
     }
 
-    @DeleteMapping("/api/note/deleteBNI{note_id}")
-    public void deleteNoteById(@PathVariable("note_id") Long note_id) {
+    @DeleteMapping("/api/note/deleteNoteById")
+    public void deleteNoteById(@RequestParam("note_id") Long note_id) {
         noteService.deleteNoteById(note_id);
     }
 
-    @DeleteMapping("api/note/deleteBGI/{group_id}")
-    public void deleteAllNoteByGroupId(@PathVariable("group_id") Long group_id) {
+    @DeleteMapping("api/note/deleteAllNoteByGroupId")
+    public void deleteAllNoteByGroupId(@RequestParam("group_id") Long group_id) {
         noteService.deleteAllNoteByGroupId(group_id);
     }
 
-    @DeleteMapping("api/note/deleteBUI/{user_id}")
-    public void deleteAllNoteByUserId(@PathVariable("user_id") Long user_id) {
+    @DeleteMapping("api/note/deleteAllNoteByUserId")
+    public void deleteAllNoteByUserId(@RequestParam("user_id") Long user_id) {
         noteService.deleteAllNoteByUserId(user_id);
     }
 
-    @DeleteMapping("api/note/deleteBT/{group_id}/{titre}")
-    public void deleteAllNoteByTitre(@PathVariable("group_id") Long group_id,@PathVariable("titre") String titre) {
+    @DeleteMapping("api/note/deleteAllNoteByTitre")
+    public void deleteAllNoteByTitre(@RequestParam("group_id") Long group_id,@RequestParam("titre") String titre) {
         noteService.deleteAllNoteByTitre(group_id,titre);
     }
 
-    @GetMapping("api/note/group_id/{group_id}")
+    @GetMapping("api/note/getAllNoteByGroupId")
     @ResponseBody
-    public List<Note> getAllNoteByGroupId(@PathVariable("group_id") Long group_id) {
+    public List<Note> getAllNoteByGroupId(@RequestParam("group_id") Long group_id) {
         return noteService.getAllNoteByGroupId(group_id);
     }
 
-    @GetMapping("api/note/user_id/{user_id}")
+    @GetMapping("api/note/getAllNoteByUserId")
     @ResponseBody
-    public List<Note> getAllNoteByUserId(@PathVariable("user_id") Long user_id) {
+    public List<Note> getAllNoteByUserId(@RequestParam("user_id") Long user_id) {
         return noteService.getAllNoteByUserId(user_id);
     }
 
-    @GetMapping("api/note/titre/{group_id}/{titre}")
+    @GetMapping("api/note/getAllNoteByTitre")
     @ResponseBody
-    public List<Note> getAllNoteByTitre(@PathVariable("group_id") Long group_id,@PathVariable("titre") String titre) {
+    public List<Note> getAllNoteByTitre(@RequestParam("group_id") Long group_id,@RequestParam("titre") String titre) {
         return noteService.getAllNoteByTitre(group_id,titre);
     }
 
-    @GetMapping("api/note/note_id/{note_id}")
+    @GetMapping("api/note/getNoteByNoteId")
     @ResponseBody
-    public Optional<Note> getNoteByNoteId(@PathVariable("note_id") Long note_id) {
+    public Optional<Note> getNoteByNoteId(@RequestParam("note_id") Long note_id) {
         return noteService.getNoteByNoteId(note_id);
     }
 
-    @GetMapping("api/note/{group_id}/{user_id}")
+    @GetMapping("api/note/getUserNoteByGroupId")
     @ResponseBody
-    public List<Note> getUserNoteByGroupId(@PathVariable("group_id") Long group_id, @PathVariable("user_id") Long user_id){
+    public List<Note> getUserNoteByGroupId(@RequestParam("group_id") Long group_id, @RequestParam("user_id") Long user_id){
         return noteService.getUserNoteByGroupId(group_id,user_id);
     }
 
 
-    @PostMapping("api/note/editNote/{group_id}/{note_id}")
-    public void editNote(@PathVariable(name = "group_id") Long group_id,
-                         @PathVariable(name = "note_id") Long note_id,
+    @PostMapping("api/note/editNote")
+    public void editNote(@RequestParam(name = "group_id") Long group_id,
+                         @RequestParam(name = "note_id") Long note_id,
                          @RequestParam (value = "note") double note) {
         noteService.editNote(group_id,note_id,note);
     }

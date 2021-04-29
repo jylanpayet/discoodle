@@ -28,6 +28,9 @@ public class GroupsService {
 
     public Optional<Groups> createNewGroup(GroupsRequest request) {
         String token = UUID.randomUUID().toString().replaceAll("-", "").substring(0, 8);
+        if(request.getDepth()==1 && groupsRepository.findAllGroupsByNameAndDepth(request.getName(), request.getDepth()).isPresent()){
+            return Optional.empty();
+        }
         Groups group = new Groups(
                 request.getParent_id(),
                 request.getDepth(),
