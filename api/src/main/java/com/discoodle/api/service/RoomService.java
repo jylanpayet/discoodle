@@ -33,7 +33,7 @@ public class RoomService {
         return finalRoom;
     }
 
-    public List<User> findUserOfRoom(String room_id) {
+    public List<User> getUserOfRoom(String room_id) {
         return roomRepository.getUserOfRoom(room_id);
     }
 
@@ -52,9 +52,12 @@ public class RoomService {
                     else
                         this.changeAdmin(room_id, room.get().getUsers().get(1).getId());
                 }
-                this.findMessagesOfUser(userRepository.findById(user_id).get().getUsername())
+                this.getMessagesOfUser(userRepository.findById(user_id).get().getUsername())
                       .forEach(elt -> messagesRepository.deleteById(elt.getMessage_id()));
             } else {
+                for(Message msg : messagesRepository.getMessagesOfRoom(room_id)) {
+                    messagesRepository.deleteById(msg.getMessage_id());
+                }
                 roomRepository.deleteById(room_id);
             }
             return userRepository.findById(user_id);
@@ -62,8 +65,8 @@ public class RoomService {
         return Optional.empty();
     }
 
-    public List<Message> findMessagesOfUser(String user_id) {
-        return messagesRepository.findMessagesOfUser(user_id);
+    public List<Message> getMessagesOfUser(String user_id) {
+        return messagesRepository.getMessagesOfUser(user_id);
     }
 
     public void addNewMember(String room_id, Long user_id) {

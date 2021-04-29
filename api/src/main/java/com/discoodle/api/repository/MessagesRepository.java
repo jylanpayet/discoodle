@@ -11,8 +11,8 @@ import java.util.List;
 
 public interface MessagesRepository extends JpaRepository<Message, Long> {
 
-   @Query(value = "SELECT messages FROM Message messages WHERE messages.conv_uuid=?1")
-   List<Message> findMessagesOfRoom(String conv_uuid);
+   @Query(value = "SELECT messages FROM Message messages WHERE messages.conv_uuid = :conv_uuid")
+   List<Message> getMessagesOfRoom(String conv_uuid);
 
    @Transactional
    @Modifying
@@ -35,5 +35,5 @@ public interface MessagesRepository extends JpaRepository<Message, Long> {
    void setEdited(Long message_id);
 
    @Query("SELECT messages FROM Message messages WHERE messages.sender = :username")
-   List<Message> findMessagesOfUser(String username);
+   List<Message> getMessagesOfUser(String username);
 }

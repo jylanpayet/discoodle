@@ -25,7 +25,7 @@ public class RoomController {
 
     @GetMapping("/findUserOfRoom")
     public List<User> getUserOfRoom(@RequestParam(value = "room_id") String room_id) {
-        return roomService.findUserOfRoom(room_id);
+        return roomService.getUserOfRoom(room_id);
     }
 
     @GetMapping("/findAdminOfRoom")
