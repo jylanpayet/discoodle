@@ -58,21 +58,21 @@ public class Groups {
             inverseJoinColumns = @JoinColumn(name = "son_id", referencedColumnName = "groups_id"))
     private List<Groups> underGroups = new ArrayList<>();
 
-    @JsonIgnore
+
     @ManyToMany
     @JoinTable(name = "link_groups_to_user",
             joinColumns = @JoinColumn(name = "groups_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<User> users = new ArrayList<>();
 
-    @JsonIgnore
+
     @OneToOne(cascade = CascadeType.REMOVE)
     @JoinTable(name = "link_groups_to_server",
             joinColumns = @JoinColumn(name = "groups_id"),
             inverseJoinColumns = @JoinColumn(name = "server_id"))
     private Server server;
 
-    @JsonIgnore
+
     @OneToMany(cascade = CascadeType.REMOVE)
     @JoinTable(name = "link_group_to_roles",
             joinColumns = @JoinColumn(name = "groups_id"),

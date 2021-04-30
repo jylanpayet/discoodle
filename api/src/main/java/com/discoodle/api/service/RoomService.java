@@ -33,6 +33,10 @@ public class RoomService {
         return finalRoom;
     }
 
+    public Optional<Room> findRoomByID(String room_uuid) {
+        return roomRepository.findById(room_uuid);
+    }
+
     public List<User> findUserOfRoom(String room_id) {
         return roomRepository.getUserOfRoom(room_id);
     }

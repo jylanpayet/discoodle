@@ -1,48 +1,46 @@
 <template>
-   <div class="ChatContent"
-        :key="$route.fullPath">
-      <div class="conv-info">
+   <div class="Channel">
+      <div class="infos">
          <div>
-            <span style="font-size: 23px; font-weight: 500; color: #F4F4F4">{{ $route.query.name }}</span>
-            <div class="top-right-buttons">
+            <h2 class="name" style="color: #F4F4F4;">{{ room.room_name }}</h2>
+            <div class="buttons">
                <button :style="pinAdd ? { animation: '' } : { animation: 'none' }" style="height: 100%;"
-                       @click="switchPinDisplay">
-                  <img src="../assets/pin.png" alt="" style="height: 60%;">
-               </button>
-               <button style="color: #F4F4F4; font-size: 33px; font-weight: 500; height: 100%"
-                       @click="showAddUser = true">
-                  +
+                       @click="showPinned = !showPinned;">
+                  <img src="../../../../assets/pin.png" alt="">
                </button>
                <button style="cursor: pointer;" @click="showUserList = true;">
-                  <img src="../assets/user.svg" alt="" style="width: 25px;">
+                  <img src="../../../../assets/user.svg" alt="">
                </button>
                <w-drawer
                      v-model="showUserList"
                      right
                      width="350px"
                      bg-color="grey-dark5"
+
+                     style="z-index: 550"
                >
                   <div class="user-list">
-                     <span style="font-size: 18px; color: #F4F4F4; font-weight: 600; margin-bottom: 10px;">Utilisateur(s) de la room :</span>
-                     <div :key="user.id" class="user" v-for="user in users">
-                        <img src="../assets/crown.svg" style="height: 80%; margin-right: 10px;" alt=""
-                             v-if="user.id === roomAdminID">
-                        {{ user.username }}
-                        <div>
-                           <button v-if="user.id !== getUser.id && getUser.id === roomAdminID"
-                                   style="margin-right: 6px;" @click="promoteAdmin(user.id)">
-                              <img src="../assets/crown.svg" style="height: 70%" alt="">
-                           </button>
-                           <button v-if="getUser.id === roomAdminID && user.id !== getUser.id && user.id !== roomAdminID"
-                                   @click="removerUser(user.id)">
-                              X
-                           </button>
+                     <span style="font-size: 18px; color: #F4F4F4; font-weight: 600; margin-bottom: 30px;">Utilisateur(s) de la room :</span>
+                     <div class="role" :key="role.id" v-for="role in getGroup.roles">
+                        <span>{{ role.name }} - {{ role.users.length }}</span>
+                        <div :key="user.id" class="user" v-for="user in role.users">
+                           <img src="../../../../assets/crown.svg" style="height: 80%; margin-right: 10px;" alt=""
+                                v-if="user.id === room.room_admin">
+                           {{ user.name }} {{ user.last_name.toUpperCase() }}
+                           <div>
+                              <button v-if="user.id !== getUser.id && getUser.id === room.room_admin"
+                                      style="margin-right: 6px;" @click="promoteAdmin(user.id)">
+                                 <img src="../../../../assets/crown.svg" style="height: 70%" alt="">
+                              </button>
+                              <button v-if="getUser.id === room.room_admin && user.id !== getUser.id && user.id !== room.room_admin"
+                                      @click="removerUser(user.id)">
+                                 X
+                              </button>
+                           </div>
                         </div>
                      </div>
                   </div>
                </w-drawer>
-               <AddUser v-if="showAddUser" @addUsers="addUsers" @desactivatePopUp="showAddUser = false;"
-                        :show-autocomplete="true"/>
             </div>
 
             <div class="pinned-message" v-if="showPinned">
@@ -57,9 +55,9 @@
                   </div>
                </div>
             </div>
-
          </div>
       </div>
+
       <div class="conv-messages">
          <span v-if="messages.length === 0"
                style="align-self: center; font-size: 15px; font-weight: 500; color: #F4F4F4"> Soyez le premier à envoyer un message à {{
@@ -77,6 +75,7 @@
                   @editedMessage="editedMessage"
          />
       </div>
+
       <div class="conv-input">
          <span>
             {{ getWritersAsText() }}
@@ -87,8 +86,8 @@
             <div class="right-side-input">
                <EmojiPicker @selected-emoji="insertEmoji" @closeEmoji="showEmoji = false" v-if="showEmoji"
                             class="emojiPicker"/>
-               <button style="height: 32px; width: 32px;" @click="showEmoji = !showEmoji">
-                  <img src="../assets/happy.svg" alt="Smiley">
+               <button style="height: 28px; width: 28px;" @click="showEmoji = !showEmoji">
+                  <img src="../../../../assets/happy.svg" alt="Smiley" style="width: 100%;">
                </button>
                <label class="submit-file" style="cursor: pointer;">
                   +
@@ -101,99 +100,43 @@
 </template>
 
 <script>
+import axios from "axios";
+import {mapGetters} from "vuex";
+import marked from "marked";
+
 import SockJS from "sockjs-client";
 import Stomp from "stompjs";
-import {mapGetters} from "vuex";
-import axios from 'axios';
-import marked from "marked";
-import Message from "@/components/common/Message";
 import emojis from "@/assets/emojis_uncathegorized";
+import Message from "@/components/common/Message";
 import EmojiPicker from "@/components/common/EmojiPicker";
-import AddUser from "@/components/AddUser";
 
 let stompClient = null;
 
 export default {
-   name: "ChatContent",
+   name: "Channel",
    components: {
-      AddUser,
       EmojiPicker,
-      Message
+      Message,
    },
+   computed: {
+      ...mapGetters(['getCurrentConv', 'getUser', 'getFriends', 'getGroup'])
+   },
+
    data() {
       return {
-         messages: [],
-         users: [],
-         pinned: [],
+         room: {},
          writers: [],
-         showPinned: false,
-         showEmoji: false,
-         pinAdd: false,
-         showAddUser: false,
+         messages: [],
+         pinned: [],
+
          showUserList: false,
-         roomAdminID: Number,
+         pinAdd: false,
+         showPinned: false,
+         showEmoji: false
       }
    },
-   mounted() {
-      this.getMessagesFromJSON();
-      this.connect();
-      this.getUserOfRoom()
-      axios.get(`http://localhost:8080/api/rooms/findAdminOfRoom?room_id=${this.getCurrentConv}`).then(response => {
-         this.roomAdminID = response.data.id;
-      })
-   },
-   beforeRouteUpdate() {
-      this.disconnect();
-      this.getMessagesFromJSON();
-      this.getUserOfRoom()
-      this.connect();
-      axios.get(`http://localhost:8080/api/rooms/findUserOfRoom?room_id=${this.getCurrentConv}`).then(response => {
-         this.users = response.data;
-      });
-      axios.get(`http://localhost:8080/api/rooms/findAdminOfRoom?room_id=${this.getCurrentConv}`).then(response => {
-         this.roomAdminID = response.data.id;
-      })
-   },
-   unmounted() {
-      this.disconnect();
-   },
+
    methods: {
-      getWritersAsText() {
-         if (this.writers.length === 0)
-            return "";
-         if (this.writers.length === 1)
-            return `${this.writers[0]} est en train d'écrire...`
-         if (this.writers.length > 4)
-            return "Plusieurs personnes sont en train d'écrire";
-         let res = "";
-         this.writers.forEach(elt => {
-            res += (elt === this.writers[this.writers.length - 1] ? `et ${elt}` : `${elt}${elt === this.writers[this.writers.length - 2] ? "" : ","} `)
-         });
-         return `${res} sont en train d'écrire...`;
-      },
-      actionInput(event) {
-         if (event.keyCode === 13 && document.querySelector(".conv-input > div > input").value !== "") {
-            this.send();
-            this.writers.pop(this.getUser.username);
-         } else if (event.keyCode !== 13) {
-            this.writing();
-            const inputContent = document.querySelector(".conv-input > div > input");
-            inputContent.value = this.displayMessage(inputContent.value, false, true, false);
-         }
-      },
-      getUserOfRoom() {
-         axios.get(`http://localhost:8080/api/rooms/findUserOfRoom?room_id=${this.getCurrentConv}`).then(response => {
-            this.users = response.data;
-         });
-      },
-      writing() {
-         if (!this.writers.includes(this.getUser.username)) {
-            stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify({
-               sender: this.getUser.username,
-               type: "WRITING"
-            }));
-         }
-      },
       connect() {
          let ws = new SockJS("http://localhost:8080/ws");
          stompClient = Stomp.over(ws);
@@ -272,7 +215,6 @@ export default {
                setTimeout(() => {
                   this.getUserOfRoom()
                }, 500)
-               this.showAddUser = false;
             } else if (message.type === "USER_REMOVED") {
                this.users = this.users.filter(elt => elt.id !== message.user_id);
                setTimeout(() => {
@@ -295,20 +237,29 @@ export default {
                sender: this.getUser.username,
                message_date: Date.now()
             }).then(response => {
+               console.log(response);
                this.messages.unshift(response.data);
                stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify(response.data))
                messageContent.value = "";
             });
          }
       },
-      getMessagesFromJSON() {
-         axios.get(`http://localhost:8080/api/messages?room_uuid=${this.getCurrentConv}`).then(response => {
-            this.messages = response.data.sort((a, b) => b.message_date - a.message_date);
-            this.pinned = this.messages.filter(elt => (elt.pinned === true));
-         });
+      writing() {
+         if (!this.writers.includes(this.getUser.username)) {
+            stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify({
+               sender: this.getUser.username,
+               type: "WRITING"
+            }));
+         }
       },
-      switchPinDisplay() {
-         this.showPinned = !this.showPinned;
+
+
+      promoteAdmin(user_id) {
+         axios.put(`http://localhost:8080/api/rooms/changeAdmin?room_id=${this.getCurrentConv}&admin=${user_id}`)
+         stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify({
+            user_id: user_id,
+            type: "CHANGE_ADMIN"
+         }));
       },
       unpinMessage(messageID) {
          axios.put(`http://localhost:8080/api/messages/unpinMessage?message_id=${messageID}`).then(() => {
@@ -368,15 +319,6 @@ export default {
             type: "USER_REMOVED"
          }));
       },
-      promoteAdmin(user_id) {
-         axios.put(`http://localhost:8080/api/rooms/changeAdmin?room_id=${this.getCurrentConv}&admin=${user_id}`)
-         stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify({
-            user_id: user_id,
-            type: "CHANGE_ADMIN"
-         }));
-      },
-
-
       uploadImage() {
          let file = this.$refs.uploadImage.files[0];
          let temp = new FormData();
@@ -402,6 +344,9 @@ export default {
                });
             }
          })
+      },
+      insertEmoji(emoji) {
+         document.querySelector(".conv-input > div > input").value += emoji;
       },
 
       filterEmoji(content) {
@@ -436,10 +381,43 @@ export default {
          return content;
       },
 
-      insertEmoji(emoji) {
-         document.querySelector(".conv-input > div > input").value += emoji;
+
+      getUserOfRoom() {
+         axios.get(`http://localhost:8080/api/rooms/findUserOfRoom?room_id=${this.getCurrentConv}`).then(response => {
+            this.room.users = response.data;
+         });
+      },
+      getMessagesFromJSON() {
+         axios.get(`http://localhost:8080/api/messages?room_uuid=${this.getCurrentConv}`).then(response => {
+            this.messages = response.data.sort((a, b) => b.message_date - a.message_date);
+            this.pinned = this.messages.filter(elt => (elt.pinned === true));
+         });
       },
 
+
+      actionInput(event) {
+         if (event.keyCode === 13 && document.querySelector(".conv-input > div > input").value !== "") {
+            this.send();
+            this.writers.pop(this.getUser.username);
+         } else if (event.keyCode !== 13) {
+            this.writing();
+            const inputContent = document.querySelector(".conv-input > div > input");
+            inputContent.value = this.displayMessage(inputContent.value, false, true, false);
+         }
+      },
+      getWritersAsText() {
+         if (this.writers.length === 0)
+            return "";
+         if (this.writers.length === 1)
+            return `${this.writers[0]} est en train d'écrire...`
+         if (this.writers.length > 4)
+            return "Plusieurs personnes sont en train d'écrire";
+         let res = "";
+         this.writers.forEach(elt => {
+            res += (elt === this.writers[this.writers.length - 1] ? `et ${elt}` : `${elt}${elt === this.writers[this.writers.length - 2] ? "" : ","} `)
+         });
+         return `${res} sont en train d'écrire...`;
+      },
       containUsername(username) {
          let bool = false;
          this.getFriends.forEach(elt => {
@@ -449,38 +427,88 @@ export default {
          return bool;
       },
    },
-   computed: {
-      ...mapGetters(['getColors', 'getCurrentConv', 'getUser', 'getFriends'])
-   }
+
+   mounted() {
+      axios.get(`http://localhost:8080/api/rooms/findRoomByID?room_uuid=${this.getCurrentConv}`).then(response => {
+         this.room = response.data;
+         this.getMessagesFromJSON();
+         this.connect();
+         console.log(this.room);
+      })
+   },
+   beforeRouteUpdate() {
+      this.disconnect();
+      axios.get(`http://localhost:8080/api/rooms/findRoomByID?room_uuid=${this.getCurrentConv}`).then(response => {
+         this.room = response.data;
+         this.getMessagesFromJSON();
+         console.log(this.room);
+      })
+      this.connect();
+   },
+   unmounted() {
+      this.disconnect();
+   },
 }
 </script>
 
 <style scoped>
-button {
-   background: none;
-   border: none;
-   outline: none;
-   cursor: pointer;
-}
-
-.ChatContent {
+.Channel {
    width: 100%;
    height: 100%;
 
    display: flex;
    flex-direction: column;
    align-items: center;
-   justify-content: center;
+   justify-content: space-between;
 }
 
-.conv-info {
-   width: 100%;
-   height: 80px;
-   background-color: #18161F;
-
+.infos {
    display: flex;
-   justify-content: space-between;
    align-items: center;
+   justify-content: center;
+
+   height: 50px;
+   margin-bottom: 5px;
+   width: 100%;
+}
+
+.infos > div {
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   width: 90%;
+   height: 100%;
+}
+
+.buttons {
+   position: relative;
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+
+   height: 40px;
+   width: 80px;
+}
+
+button {
+   cursor: pointer;
+   background: none;
+   outline: none;
+   border: none;
+
+   height: 40px;
+   width: 40px;
+}
+
+button > img {
+   width: 60%;
+}
+
+button {
+   background: none;
+   border: none;
+   outline: none;
+   cursor: pointer;
 }
 
 .conv-info > div {
@@ -495,16 +523,6 @@ button {
    height: 60px;
 }
 
-.top-right-buttons {
-   position: relative;
-   display: flex;
-   align-items: center;
-   justify-content: space-between;
-
-   height: 40px;
-   width: 100px;
-}
-
 .conv-input {
    height: 100px;
    width: 100%;
@@ -517,7 +535,7 @@ button {
 
 .conv-input > div {
    width: 90%;
-   height: 46px;
+   height: 38px;
    background-color: #F4F4F4;
    border-radius: 100px;
 
@@ -559,14 +577,14 @@ button {
    align-items: center;
    justify-content: space-between;
 
-   height: 44px;
-   width: 90px;
+   height: 38px;
+   width: 70px;
 }
 
 .submit-file {
    background-color: #454150;
-   height: 38px;
-   width: 38px;
+   height: 32px;
+   width: 32px;
    color: #F4F4F4;
    font-size: 30px;
    font-weight: 600;
@@ -590,7 +608,7 @@ button {
 
    max-width: calc(100% - 100px);
    width: 1000px;
-   height: 35px;
+   height: 30px;
    font-size: 15px;
    color: #454150;
 }
@@ -610,8 +628,8 @@ button {
 
    padding: 10px 10px 0 10px;
    border-radius: 12px;
-   right: 70px;
-   top: 70px;
+   right: 80px;
+   top: 170px;
    min-width: 350px;
    background-color: #909090;
 }
@@ -732,6 +750,25 @@ button {
    height: 22px;
    font-weight: 600;
    color: #F4F4F4;
+}
+
+.role {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: flex-start;
+
+   width: 100%;
+   color: #F4F4F4;
+   font-size: 17px;
+   font-weight: 600;
+   margin-bottom: 10px;
+}
+
+.role > span {
+   margin-bottom: 10px;
+   width: 100%;
+   height: 20px;
 }
 
 @keyframes appear-opacity {

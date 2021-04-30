@@ -7,8 +7,6 @@
                   Bienvenue sur Discoodle !
                </div>
 
-               <!-- TODO : Intégrer les posts -->
-
                <div class="posts-content">
                   <div v-if="posts.length === 0"
                        style="color: #F4F4F4; font-size: 20px; display: flex; align-items: center; justify-content: center">
@@ -137,7 +135,7 @@ export default {
    overflow-y: auto;
    margin: auto;
    height: 100%;
-   width: 80%;
+   width: 94%;
 
 
 }

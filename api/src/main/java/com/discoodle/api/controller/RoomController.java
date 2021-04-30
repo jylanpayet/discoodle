@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("api/room")
+@RequestMapping("api/rooms")
 @AllArgsConstructor
 public class RoomController {
 
@@ -21,6 +21,11 @@ public class RoomController {
     @PostMapping( "/addNewRoom")
     public Room addNewRoom(@RequestBody RoomRequest request) {
         return roomService.createNewRoom(request.getRoom_name(), request.getRoom_members());
+    }
+
+    @GetMapping("/findRoomByID")
+    public Optional<Room> getRoomByID(@RequestParam("room_uuid") String room_uuid) {
+        return roomService.findRoomByID(room_uuid);
     }
 
     @GetMapping("/findUserOfRoom")

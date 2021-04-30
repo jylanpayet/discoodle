@@ -2,6 +2,7 @@ package com.discoodle.api.controller;
 
 import com.discoodle.api.model.Message;
 
+import com.discoodle.api.model.Room;
 import com.discoodle.api.repository.RoomRepository;
 import com.discoodle.api.repository.UserRepository;
 import com.discoodle.api.request.MessageRequest;
@@ -11,6 +12,7 @@ import lombok.Getter;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @AllArgsConstructor
 @RestController
@@ -39,7 +41,8 @@ public class MessagesController {
                   message.getMessage_date(),
                   message.getConv_uuid()
             );
-            if(roomRepository.findById(room_uuid).get().getUsers().contains(userRepository.findUserByUserName(message.getSender()).get())) {
+            Optional<Room> room = roomRepository.findById(room_uuid);
+            if(room.isPresent() && room.get().getUsers().contains(userRepository.findUserByUserName(message.getSender()).get())) {
                 return messagesService.sendMessage(msg);
             }
         }

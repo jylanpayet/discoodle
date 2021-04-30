@@ -11,10 +11,19 @@
          <div class="addGroup">
             <span style="margin-bottom: 10px; font-size: 19px; font-weight: 600; color: #454150">Créer un groupe :</span>
             <w-input color="darkgray" required style="margin-bottom: 10px; width: 90%" name="groupName">
-               Identifiant du groupe
+               Nom du sous-groupe.
             </w-input>
+            <w-input color="darkgray" required style="margin-bottom: 10px; width: 90%" name="groupDescription">
+               Initiales du groupe
+            </w-input>
+
+            <span>Type de groupe :</span>
             <w-select color="darkgray" required style="margin-bottom: 10px; width: 90%; z-index: 500" name="groupKey"
-                      :items="groupTypes">
+                      :items="groupTypes.map(e => {
+                         return {
+                            label: typeTranslation[e.label]
+                         }
+                      })">
             </w-select>
             <button class="submit" @click="add">
                Créer !
@@ -48,12 +57,21 @@ export default {
             persistentNoAnimation: false,
             width: 300
          },
+         typeTranslation: {
+            "ESTABLISHMENT": "Établissement",
+            "FACULTY": "Université",
+            "ADMINISTRATION": "Administration",
+            "COURSE": "Filière/cursus",
+            "GRADE": "Année",
+            "SUBJECTS": "Matière",
+            "OTHER": "Autres"
+         },
          types: [
             {label: "ESTABLISHMENT", order: 1},
             {label: "FACULTY", order: 1},
             {label: "ADMINISTRATION", order: 2},
             {label: "SUBJECTS", order: 3},
-            {label: "CLASS", order: 4},
+            {label: "OTHER", order: 4},
          ],
          groupTypes: [],
          uploaded: false,
@@ -67,7 +85,7 @@ export default {
                parent_id: this.getGroup.groups_id,
                user_id: this.getUser.id,
                depth: this.getGroup.depth + 1,
-               description: "",
+               description: document.querySelector("input[name='groupDescription']").value,
                name: document.querySelector("input[name='groupName']").value,
                type: document.querySelector("input[name='groupKey']").value,
                text: ""
@@ -108,6 +126,9 @@ export default {
    },
    mounted() {
       this.groupTypes = this.types.filter(elt => elt.order > this.getOrder(this.getGroup.type));
+
+      console.log(this.groupTypes);
+      console.log(this.groupTypes.map(e => this.typeTranslation[e.label]));
    }
 }
 </script>
@@ -134,7 +155,7 @@ export default {
 }
 
 .addGroup {
-   height: 175px;
+   height: 220px;
    width: 100%;
    display: flex;
    flex-direction: column;

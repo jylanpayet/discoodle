@@ -1,18 +1,20 @@
 <template>
    <div class="Courses" v-if="!(JSON.stringify(getUser) === JSON.stringify({}))">
-      <div class="router">
-         <div>
-            <router-link :key="group.groups_id" v-for="group in groups"
-                         @click="setGroup(group)" :to="group.type === 'SUBJECTS' ? `/groupes/subject/${group.groups_id}` : `/groupes/${group.groups_id}`">
-               <div class="group">
-                  {{ group.name }}
-               </div>
-            </router-link>
+      <div>
+         <div class="router">
+            <div>
+               <router-link :key="group.groups_id" v-for="group in groups"
+                            @click="setGroup(group)" :to="group.type === 'SUBJECTS' ? `/groupes/subject/${group.groups_id}` : `/groupes/${group.groups_id}`">
+                  <div class="group">
+                     {{ group.name }}
+                  </div>
+               </router-link>
+            </div>
+            <JoinGroup v-if="joinGroup" @close="joinGroup = false" @user-entry="addInGroups"/>
+            <button class="addGroup" @click="joinGroup = true">
+               +
+            </button>
          </div>
-         <JoinGroup v-if="joinGroup" @close="joinGroup = false" @user-entry="addInGroups"/>
-         <button class="addGroup" @click="joinGroup = true">
-            +
-         </button>
       </div>
       <router-view/>
    </div>
@@ -42,12 +44,11 @@ export default {
    methods: {
       getRooms(role) {
          if (role === "STUDENT") {
-            axios.get(`http://localhost:8080/api/users/seeAllSubjects/${this.getUser.id}`).then(response => {
+            axios.get(`http://localhost:8080/api/users/seeAllSubjects?user_id=${this.getUser.id}`).then(response => {
                this.groups = response.data;
-               console.log(this.groups);
             })
          } else {
-            axios.get(`http://localhost:8080/api/users/seeAllGroups/${this.getUser.id}`).then(response => {
+            axios.get(`http://localhost:8080/api/users/seeAllGroups?user_id=${this.getUser.id}`).then(response => {
                this.groups = response.data;
                console.log(this.groups);
             })
@@ -94,15 +95,15 @@ export default {
 .router {
    position: relative;
    width: 150px;
+   height: 100vh;
    padding: 50px;
+
+   overflow-y: auto;
 
    display: flex;
    flex-direction: column;
    align-items: center;
    justify-content: flex-start;
-
-   overflow-x: hidden;
-   overflow-y: auto;
 }
 
 .group {

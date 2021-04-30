@@ -1,4 +1,4 @@
-import {createRouter, createWebHashHistory} from 'vue-router'
+import {createRouter, createWebHistory} from 'vue-router'
 import Home from "@/views/Home";
 
 const routes = [
@@ -42,12 +42,19 @@ const routes = [
                     {
                         path: "cours",
                         name: "Course Subjects",
-                        component: () => import('../components/groups/SubjectCourse')
+                        component: () => import('../components/groups/SubjectCourse'),
                     },
                     {
                         path: "discussion",
                         name: "Server Subjects",
-                        component: () => import('../components/groups/SubjectChat')
+                        component: () => import('../components/groups/SubjectChat'),
+                        children: [
+                            {
+                                path: ":room_id",
+                                name: "Channel",
+                                component: () => import('../components/groups/Channel')
+                            }
+                        ]
                     },
                     {
                         path: "notes",
@@ -79,6 +86,7 @@ const routes = [
             },
             {
                 path: ':id',
+                name: "Discussion",
                 component: () => import(/* webpackChunkName: "messages/:id" */ '../components/ChatContent'),
             },
         ]
@@ -111,7 +119,7 @@ const routes = [
 ]
 
 const router = createRouter({
-    history: createWebHashHistory(),
+    history: createWebHistory(),
     routes
 })
 

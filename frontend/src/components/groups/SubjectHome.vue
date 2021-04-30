@@ -1,6 +1,25 @@
 <template>
    <div class="SubjectHome">
-      <div class="content" v-html="content">
+      <div class="content" v-if="showDefaultPage">
+         <h1>{{ getGroup.name }}</h1>
+
+         <h3>Bienvenue dans votre cours de {{ getGroup.name }} </h3>
+         <p>
+            Vous pourrez retrouver ici les documents mis en ligne par votre professeur, comme les devoirs, cours PDF, vidéo de cours, etc.
+         </p>
+         <p>
+            Vous pouvez contacter votre ou vos enseignant(s) à/aux l'adresse(s) mail(s) suivante(s) :
+         </p>
+         <ul>
+            <li :key="mails.id" v-for="mails in getGroup.roles[0].users">
+               <em><strong>
+                  {{ mails.mail }}
+               </strong></em>
+            </li>
+         </ul>
+      </div>
+
+      <div class="content" v-html="content" v-else>
       </div>
    </div>
 </template>
@@ -14,25 +33,34 @@ export default {
    name: "SubjectHome",
    data() {
       return {
-         content: ""
+         content: "",
+         showDefaultPage: false,
       }
+   },
+   beforeRouteUpdate() {
+      axios.get(`http://localhost:8080/common/groups/${this.getGroup.groups_id}/cours.md`).then(rep => {
+         this.content = marked(rep.data);
+      }).catch(() => {
+         this.showDefaultPage = true;
+      });
    },
    mounted() {
       axios.get(`http://localhost:8080/common/groups/${this.getGroup.groups_id}/cours.md`).then(rep => {
          this.content = marked(rep.data);
       }).catch(err => {
          console.log(err);
+         this.showDefaultPage = true;
       });
    },
    computed: {
-      ...mapGetters(['getGroup'])
-   }
+      ...mapGetters(['getGroup', 'getUser'])
+   },
 }
 </script>
 
 <style scoped>
 .SubjectHome {
-   height: calc(100vh - 100px);
+   height: 100%;
    width: 100%;
    padding: 40px;
    overflow-y: auto;
@@ -42,6 +70,11 @@ export default {
 .content {
    color: #F4F4F4;
    font-size: 15px;
-   width: 80%;
+   width: 100%;
+   height: 100%;
+}
+
+.content > * {
+   margin-bottom: 30px;
 }
 </style>

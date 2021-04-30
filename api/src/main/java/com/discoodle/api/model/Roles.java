@@ -28,7 +28,6 @@ public class Roles {
     @Column(name = "role_id", unique = true, nullable = false)
     private Long role_id;
 
-    @JsonIgnore
     @ManyToMany
     @JoinTable(name = "link_role_to_users",
             joinColumns = @JoinColumn(name = "role_id"),

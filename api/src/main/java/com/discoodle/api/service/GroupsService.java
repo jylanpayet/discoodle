@@ -141,7 +141,7 @@ public class GroupsService {
         List<Roles> roles = userRepository.findById(user_id).get().getRoles();
         List<Roles> res = new java.util.ArrayList<>();
         for (Roles user : roles) {
-            if (user.getGroups_id().equals(group_id))
+            if (user.getGroups_id().getGroups_id().equals(group_id))
                 res.add(user);
         }
         return res;
