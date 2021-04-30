@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @AllArgsConstructor
-@RestController
+@RestController("api/server")
 public class ServerController {
 
     ServerService serverService;
@@ -17,19 +17,19 @@ public class ServerController {
 
     //The server is generated automaticaly during the creation of a groups.SUBJECTS.
 
-    @PostMapping(path = "/api/server/{server_id}/server.addMember")
-    public void addNewMember(@PathVariable Long server_id, @RequestParam(value = "user_id") Long user_id) {
+    @PostMapping(path = "/addMember")
+    public void addNewMember(@RequestParam(value="server_id") Long server_id, @RequestParam(value = "user_id") Long user_id) {
         serverService.addNewMember(server_id, user_id);
     }
 
-    @PostMapping(path = "/api/server/{server_id}/server.addRoom")
-    public void addNewRoom(@PathVariable Long server_id, @RequestParam(value = "name") String name) {
+    @PostMapping(path = "/addRoom")
+    public void addNewRoom(@RequestParam(value="server_id")  Long server_id, @RequestParam(value = "name") String name) {
         serverService.addNewRoom(server_id, name);
     }
 
-    @GetMapping("/seeAllServRooms/{server_id}")
+    @GetMapping("/seeAllServRooms")
     @ResponseBody
-    public List<Room> findAllRoomsByServerID(@PathVariable Long server_id) {
+    public List<Room> findAllRoomsByServerID(@RequestParam(value="server_id") Long server_id) {
         return serverService.findAllRoomsByServerID(server_id);
     }
 
