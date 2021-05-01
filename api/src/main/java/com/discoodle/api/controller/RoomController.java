@@ -25,7 +25,7 @@ public class RoomController {
 
     @GetMapping("/findRoomByID")
     public Optional<Room> getRoomByID(@RequestParam("room_uuid") String room_uuid) {
-        return roomService.findRoomByID(room_uuid);
+        return roomRepository.findById(room_uuid);
     }
 
     @GetMapping("/findUserOfRoom")
