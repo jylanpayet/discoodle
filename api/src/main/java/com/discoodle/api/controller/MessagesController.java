@@ -2,7 +2,6 @@ package com.discoodle.api.controller;
 
 import com.discoodle.api.model.Message;
 
-import com.discoodle.api.model.Room;
 import com.discoodle.api.repository.RoomRepository;
 import com.discoodle.api.repository.UserRepository;
 import com.discoodle.api.request.MessageRequest;
@@ -12,7 +11,6 @@ import lombok.Getter;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @AllArgsConstructor
 @RestController
@@ -23,10 +21,10 @@ public class MessagesController {
     private final UserRepository userRepository;
 
     @GetMapping("/api/messages")
-    public List<Message> findMessagesOfRoom(@RequestParam(value = "room_uuid") String room_uuid) {
+    public List<Message> getMessagesOfRoom(@RequestParam(value = "room_uuid") String room_uuid) {
         // If the room_uuid entered is a valid one, then look for it in the database
         if (room_uuid.matches("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$") && roomRepository.existsById(room_uuid))
-            return messagesService.findMessagesOfRoom(room_uuid);
+            return messagesService.getMessagesOfRoom(room_uuid);
         // Else, return an empty list.
         return List.of();
     }
@@ -41,8 +39,7 @@ public class MessagesController {
                   message.getMessage_date(),
                   message.getConv_uuid()
             );
-            Optional<Room> room = roomRepository.findById(room_uuid);
-            if(room.isPresent() && room.get().getUsers().contains(userRepository.findUserByUserName(message.getSender()).get())) {
+            if(roomRepository.findById(room_uuid).get().getUsers().contains(userRepository.getUserByUserName(message.getSender()).get())) {
                 return messagesService.sendMessage(msg);
             }
         }

@@ -15,10 +15,10 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT user FROM User user where user.username = :username")
-    Optional<User> findUserByUserName(String username);
+    Optional<User> getUserByUserName(String username);
 
     @Query("SELECT user FROM User user where user.mail = :mail")
-    Optional<User> findUserByMail(String mail);
+    Optional<User> getUserByMail(String mail);
 
     @Query("SELECT friendships.sender_id FROM Friendships friendships where friendships.receiver_id = :user_id")
     List<Long> getFriendListCompleteForReceiver(Long user_id);

@@ -13,8 +13,8 @@ public class MessagesService {
 
    private final MessagesRepository messageRepository;
 
-   public List<Message> findMessagesOfRoom(String room_uuid) {
-      return messageRepository.findMessagesOfRoom(room_uuid);
+   public List<Message> getMessagesOfRoom(String room_uuid) {
+      return messageRepository.getMessagesOfRoom(room_uuid);
    }
 
    public Message sendMessage(Message message) {

@@ -104,13 +104,13 @@ public class UserController {
 
     @GetMapping("/seeAllGroups")
     @ResponseBody
-    public List<Groups> findAllGroupsByUserID(@RequestParam("user_id") Long user_id) {
+    public List<Groups> getAllGroupsByUserID(@RequestParam("user_id") Long user_id) {
         return userService.getUserByID(user_id).get().getGroups();
     }
 
     @GetMapping("/seeAllSubjects")
     @ResponseBody
-    public List<Groups> findAllSubjectsByUserID(@RequestParam("user_id") Long user_id) {
+    public List<Groups> getAllSubjectsByUserID(@RequestParam("user_id") Long user_id) {
         List<Groups> AllSubjects = userService.getUserByID(user_id).get().getGroups();
         List<Groups> UserSubjects = new ArrayList<>();
         for (Groups allSubject : AllSubjects) {

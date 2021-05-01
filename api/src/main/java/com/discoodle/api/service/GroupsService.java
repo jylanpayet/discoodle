@@ -88,7 +88,11 @@ public class GroupsService {
         Optional<User> tempUser = userService.getUserByID(user_id);
         if (tempGroup.isPresent() && tempUser.isPresent() && (tempGroup.get().getToken().equals(token)) && !tempGroup.get().getUsers().contains(tempUser.get())) {
             groupsRepository.addNewMemberInGroup(user_id, groups_id);
-            serverService.addNewMember(tempGroup.get().getServer().getServer_id(), user_id);
+            Optional<Roles> role = rolesRepository.getRolesByNameAnAndGroupsId("Etudiant",groups_id);
+            if(role.isPresent())
+                groupsRepository.addRoleForUser(user_id, role.get().getRole_id());
+            if(tempGroup.get().getType().equals(Groups.TypeOfGroup.SUBJECTS))
+                serverService.addNewMember(tempGroup.get().getServer().getServer_id(), user_id);
             return tempGroup;
         }
         return Optional.empty();

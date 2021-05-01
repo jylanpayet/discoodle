@@ -35,7 +35,7 @@ public class UserService implements UserDetailsService {
     }
 
     public Optional<User> getUserByUserName(String username) {
-        return userRepository.findUserByUserName(username);
+        return userRepository.getUserByUserName(username);
     }
 
     public Optional<User> getUserByID(Long user_id) {
@@ -47,8 +47,8 @@ public class UserService implements UserDetailsService {
     }
 
     public void addNewUser(User user) {
-        Optional<User> TestPseudo = userRepository.findUserByUserName(user.getUsername());
-        Optional<User> TestMail = userRepository.findUserByMail(user.getMail());
+        Optional<User> TestPseudo = userRepository.getUserByUserName(user.getUsername());
+        Optional<User> TestMail = userRepository.getUserByMail(user.getMail());
 
         if (TestPseudo.isPresent() || TestMail.isPresent()) {
             throw new IllegalStateException("Le pseudo est déjà pris.");
@@ -57,16 +57,16 @@ public class UserService implements UserDetailsService {
     }
 
     public void deleteUser(Long user_id) {
-        User delete = userRepository.findById(user_id).get();
-        if (userRepository.existsById(user_id)) {
+        Optional<User> delete = userRepository.findById(user_id);
+        if(delete.isPresent()) {
             userRepository.removeToken(user_id);
-            for(Room test_room : delete.getRooms()) {
+            for (Room test_room : delete.get().getRooms()) {
                 roomService.removeMember(test_room.getRoom_id(), user_id);
             }
             List<Long> list = userRepository.getFriendListForSender(user_id);
             list.addAll(userRepository.getFriendListForReceiver(user_id));
             List<Friendships> friendships = friendshipsRepository.getALlRelations(user_id);
-            for(Friendships test_friendships : friendships) {
+            for (Friendships test_friendships : friendships) {
                 friendshipsRepository.deleteById(test_friendships.getFriendships_id());
             }
             userRepository.deleteById(user_id);
@@ -75,18 +75,18 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String mail) throws UsernameNotFoundException {
-        return (UserDetails) userRepository.findUserByMail(mail).orElseThrow(() ->
+        return (UserDetails) userRepository.getUserByMail(mail).orElseThrow(() ->
                 new UsernameNotFoundException("L'utilisateur avec l'email " + mail + " n'a pas été trouvé."));
     }
 
     public String signUpUser(User user) {
-        boolean userExist = userRepository.findUserByMail(user.getMail()).isPresent();
+        boolean userExist = userRepository.getUserByMail(user.getMail()).isPresent();
 
         if (userExist) {
             return "L'email est déjà utilisé.";
         }
 
-        userExist = userRepository.findUserByUserName(user.getUsername()).isPresent();
+        userExist = userRepository.getUserByUserName(user.getUsername()).isPresent();
 
         if (userExist) {
             return "Le nom d'utilisateur est déjà utilisé.";
@@ -110,8 +110,8 @@ public class UserService implements UserDetailsService {
     }
 
     public String login(String username, String password) {
-        if (userRepository.findUserByUserName(username).isPresent() /*&& userRepository.findUserByUserName(username).get().isEnabled()*/) {
-            if (!bCryptPasswordEncoder.matches(password, userRepository.findUserByUserName(username).get().getPassword()))
+        if (userRepository.getUserByUserName(username).isPresent()) {
+            if (!bCryptPasswordEncoder.matches(password, userRepository.getUserByUserName(username).get().getPassword()))
                 return "Mot de passe ou nom d'utilisateur incorrect";
             else
                 return "";
@@ -132,22 +132,25 @@ public class UserService implements UserDetailsService {
     }
 
     public Optional<User> changeUsername(Long user_id, String username) {
-        if (userRepository.findUserByUserName(username).isEmpty() && userRepository.changeUsername(user_id, username) == 1)
-            return userRepository.findById(user_id);
+        Optional<User> changeUsername = userRepository.findById(user_id);
+        if (changeUsername.isPresent() && userRepository.changeUsername(user_id, username) == 1)
+            return changeUsername;
         return Optional.empty();
     }
 
     public Optional<User> changeMail(Long user_id, String mail) {
-        if (mail.matches("^(.+)@(.+)$") && userRepository.findUserByMail(mail).isEmpty() && userRepository.changeMail(user_id, mail) == 1)
-            return userRepository.findById(user_id);
+        Optional<User> changeMail = userRepository.findById(user_id);
+        if (changeMail.isPresent() && mail.matches("^(.+)@(.+)$") && userRepository.changeMail(user_id, mail) == 1)
+            return changeMail;
         return Optional.empty();
     }
 
     public Optional<User> changePassword(Long user_id, String password) {
-        if (password.matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}")) {
+        Optional<User> changePassword = userRepository.findById(user_id);
+        if (changePassword.isPresent() && password.matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}")) {
             String passwordEncoded = bCryptPasswordEncoder.encode(password);
             if (userRepository.changePassword(user_id, passwordEncoded) == 1)
-                return userRepository.findById(user_id);
+                return changePassword;
         }
         return Optional.empty();
     }
