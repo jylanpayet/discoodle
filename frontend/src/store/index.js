@@ -16,6 +16,13 @@ export default createStore({
             color5: "#F4F4F4",
             color6: "#FFFFFF"
         },
+
+        // This object is responsible of all the stream information.
+        webRTC: {
+            mainStream: null,
+            waiting: [],
+            showPIP: false
+        }
     },
     mutations: {
         SET_CONV_UUID(state, uuid) {
@@ -48,7 +55,6 @@ export default createStore({
             context.commit('ADD_FRIEND', user);
         },
         setGroup(context, groups) {
-            console.log(groups);
             context.commit('SET_GROUP', groups);
         },
         setFriends(context, friends) {

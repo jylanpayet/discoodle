@@ -94,7 +94,7 @@ export default {
                if (document.querySelector(".login > div > label > input[type=checkbox]").checked)
                   vueCookie.set("username", document.querySelector("input[name=userlog]").value, {expires: '1Y'});
 
-               axios.get(`http://localhost:8080/api/users/${document.querySelector("input[name=userlog]").value}`).then(response => {
+               axios.get(`http://localhost:8080/api/users/findByUserName?username=${document.querySelector("input[name=userlog]").value}`).then(response => {
                   this.setUser(response.data);
                   this.$emit("logSuccess")
                }).catch(error => {

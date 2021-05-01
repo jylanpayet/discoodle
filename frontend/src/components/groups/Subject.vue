@@ -17,12 +17,23 @@
 
 <script>
 import {mapGetters} from "vuex";
+import axios from "axios";
 
 export default {
    name: "Subject",
    computed: {
       ...mapGetters(['getGroup', 'getUser'])
-   }
+   },
+   mounted() {
+      axios.get(`http://localhost:8080/getRoleByGroupAndUser/${this.getGroup.groups_id}/${this.getUser.id}`).then(response => {
+         console.log(response);
+      })
+   },
+   beforeRouteUpdate() {
+      axios.get(`http://localhost:8080/getRoleByGroupAndUser/${this.getGroup.groups_id}/${this.getUser.id}`).then(response => {
+         console.log(response);
+      })
+   },
 }
 </script>
 
@@ -77,6 +88,11 @@ export default {
    height: 2px;
    background-color: #F4F4F4;
    animation: width 0.4s ease-in-out;
+}
+
+.content {
+   height: calc(100% - 100px);
+   width: 100%;
 }
 
 

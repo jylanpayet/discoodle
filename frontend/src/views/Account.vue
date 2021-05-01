@@ -6,10 +6,13 @@
             <div class="container-content">
                <div class="logo-and-text top-part">
                   <label class="logo">
-                     <input ref="uploadImage" type="file" style="width: 0; height: 0;" @change="imageUpload()" v-if="getUser.link_to_avatar === null">
-                     <span style="font-size: 55px; font-weight: 600; color: #F4F4F4" v-if="getUser.link_to_avatar === null">{{ getUser.name.charAt(0).toUpperCase() }}</span>
+                     <input ref="uploadImage" type="file" style="width: 0; height: 0;" @change="imageUpload()"
+                            v-if="getUser.link_to_avatar === null">
+                     <span style="font-size: 55px; font-weight: 600; color: #F4F4F4"
+                           v-if="getUser.link_to_avatar === null">{{ getUser.name.charAt(0).toUpperCase() }}</span>
                      <img :src="getUser.link_to_avatar" alt="" v-else class="custom-image avatar">
-                     <span class="upload-image" @click="removeLinkToAvatar" :style="getUser.link_to_avatar === null ? { backgroundColor: '#F4F4F4' } : { backgroundColor: 'rgba(232, 92, 92, 0.8)', color: '#F4F4F4 !important' }">
+                     <span class="upload-image" @click="removeLinkToAvatar"
+                           :style="getUser.link_to_avatar === null ? { backgroundColor: '#F4F4F4' } : { backgroundColor: 'rgba(232, 92, 92, 0.8)', color: '#F4F4F4 !important' }">
                         {{ getUser.link_to_avatar === null ? "+" : "x" }}
                      </span>
                   </label>
@@ -38,7 +41,9 @@
          <div class="container cursus">
             <span>Scolarité :</span>
             <div class="container-content">
-               <div class="select-groups">
+
+
+               <div class="select-groups" v-if="!alreadyRegistered">
                   <SelectGroup @selected="showGroup" :groups="establishments.map(elt => {
                      return {
                         label: elt.name,
@@ -56,11 +61,22 @@
                   })" :placeholder="typeTranslation[elt.childs[0]?.type]" :index="elt.index+1"/>
                </div>
 
+               <div class="select-groups" v-else>
+                  <div :key="elt.index" v-for="elt in groups" class="selected">
+                     <span>Votre {{ typeTranslation[elt.group.type].toLowerCase() }} :</span>
+                     <div>
+                        {{ elt.group.name }}
+                     </div>
+                  </div>
+               </div>
+
+
                <div class="submit-delete">
-                  <w-button class="ma1" bg-color="error" lg @click="resetSelects(true, true)">
+                  <w-button class="ma1" bg-color="error" lg @click="confirmCancel.show = true">
                      Effacer
                   </w-button>
-                  <w-button class="ma1" bg-color="success" lg @click="confirmRegister.show = true">
+                  <w-button class="ma1" bg-color="success" lg @click="confirmRegister.show = true"
+                            :disabled="alreadyRegistered">
                      Mettre à jour !
                   </w-button>
                </div>
@@ -79,7 +95,7 @@
       </div>
    </div>
    <div style="width: 100%; height: 100%;" v-else>
-      <Authentication @logSuccess="isAuthentificated = true; $emit('logSuccess')" />
+      <Authentication @logSuccess="isAuthentificated = true; $emit('logSuccess')"/>
    </div>
 
    <w-dialog
@@ -87,10 +103,11 @@
          title="Êtes-vous sûr(e) de vouloir vous inscrire dans ces groupes ?"
          persistent
          :width="550">
-      Vous pourrez à tout moment changer cette inscription, mais il faudra vous munir des clés de connection fournies par votre établissement.
+      Vous pourrez à tout moment changer cette inscription, mais il faudra vous munir des clés de connection fournies
+      par votre établissement.
 
       <template #actions>
-         <div class="spacer" />
+         <div class="spacer"/>
          <w-button
                class="mr2"
                @click="confirmRegister.show = false"
@@ -101,6 +118,47 @@
                @click="registerInGroups"
                bg-color="success">
             Je m'inscris !
+         </w-button>
+      </template>
+   </w-dialog>
+
+   <w-dialog
+         v-model="confirmCancel.show"
+         title="Êtes-vous sûr(e) de vouloir vous effacer l'inscription ?"
+         :width="550">
+      <w-alert bg-color="warning" color="white">
+         N'oubliez pas de cliquer sur mettre à jour si vous souhaitez effacer les groupes.
+      </w-alert>
+
+      Vous pourrez à tout moment refaire cette inscription, mais il faudra vous munir des clés de connection fournies
+      par votre établissement.
+
+      <template #actions>
+         <div class="spacer"/>
+         <w-button
+               @click="resetSelects(true, true); confirmCancel.show = false;"
+               bg-color="success">
+            J'efface les groupes selectionnés.
+         </w-button>
+      </template>
+   </w-dialog>
+
+   <w-dialog
+         v-if="!fullRegister"
+         persistent
+         :width="300"
+
+         style="padding: 10px;"
+   >
+      De nouveaux groupes sont disponibles pour votre cursus.
+      Cliquer sur le bouton suivant pour mettre à jour vos matières.
+
+      <template #actions>
+         <div class="spacer"/>
+         <w-button
+               @click="registerInGroups(true); fullRegister = true;"
+               bg-color="success">
+            Mettre à jour !
          </w-button>
       </template>
    </w-dialog>
@@ -130,7 +188,7 @@ export default {
       imageUpload() {
          let file = this.$refs.uploadImage.files[0];
          let temp = new FormData();
-         temp.append("file",file);
+         temp.append("file", file);
          axios({
             url: `http://localhost:8080/api/uploadAvatar/${this.getUser.id}`,
             method: 'POST',
@@ -139,7 +197,7 @@ export default {
                Accept: 'application/json',
                'Content-type': 'multipart/form-data'
             }
-         }).then(response =>{
+         }).then(response => {
             this.setLinkToAvatar(response.data);
          })
       },
@@ -170,7 +228,6 @@ export default {
                childs: rep.data
             })
          });
-         console.log(this.groups);
       },
 
       updateEstablishment(res) {
@@ -194,7 +251,10 @@ export default {
       },
       checkEntry(res) {
          if (res.token === this.groupSelected.group.token) {
-            this.updateGroup(this.groupSelected);
+            if (this.groupSelected.group.type === "ESTABLISHMENT")
+               this.updateEstablishment(this.groupSelected)
+            else
+               this.updateGroup(this.groupSelected);
          } else {
             this.showAlert = true;
             this.message = "Mauvaise clé de groupe."
@@ -203,6 +263,7 @@ export default {
       },
 
       resetSelects(reset_est, reset_grp) {
+         this.alreadyRegistered = false;
          if (reset_grp)
             this.groups = [];
          if (reset_est) {
@@ -224,7 +285,7 @@ export default {
             ))
             setTimeout(() => {
                this.groups.push(temp);
-            }, 20)
+            }, 50)
          }
       },
       removeLast() {
@@ -233,11 +294,11 @@ export default {
          this.clearAfter(this.groupSelected.index);
       },
 
-      registerInGroups() {
+      registerInGroups(update = false) {
          let noErr = true;
          this.confirmRegister.show = false;
          this.groups.forEach(elt => {
-            if (elt.group.type === "GRADE" || elt.group.type === "COURSE") {
+            if (elt.group.type === "GRADE" || elt.group.type === "OTHER") {
                elt.childs.forEach(group => {
                   if (group.type === "SUBJECTS") {
                      axios.post(
@@ -248,11 +309,12 @@ export default {
                   }
                })
             }
-            axios.post(
-                  `http://localhost:8080/api/groups/addNewMemberInGroup/${elt.group.groups_id}?user_id=${this.getUser.id}&token=${elt.group.token}`
-            ).catch(() => {
-               noErr = false;
-            })
+            if (!update)
+               axios.post(
+                     `http://localhost:8080/api/groups/addNewMemberInGroup/${elt.group.groups_id}?user_id=${this.getUser.id}&token=${elt.group.token}`
+               ).catch(() => {
+                  noErr = false;
+               })
          })
 
          if (noErr) {
@@ -295,7 +357,12 @@ export default {
          message: "",
          confirmRegister: {
             show: false
-         }
+         },
+         confirmCancel: {
+            show: false,
+         },
+         alreadyRegistered: false,
+         fullRegister: true
       }
    },
    mounted() {
@@ -304,26 +371,53 @@ export default {
          axios.get("http://localhost:8080/api/groups/findIDOfDiscoodle").then(response => {
             axios.get(`http://localhost:8080/api/groups/underGroup/${response.data}`).then(rep => {
                this.establishments = rep.data;
+               console.log(rep.data);
             })
          })
 
-         axios.get(`http://localhost:8080/api/users/seeAllGroups/${this.getUser.id}`).then(response => {
+         axios.get(`http://localhost:8080/api/users/seeAllGroups?user_id=${this.getUser.id}`).then(response => {
             const groups = response.data.sort((a, b) => (
-               a.depth - b.depth
+                  a.depth - b.depth
             )).filter(elt => (
                   elt.type !== "SUBJECTS" && elt.type !== "DISCOODLE" && elt.type !== "OTHER"
             ))
-            console.log(groups);
+            let c = 0;
             groups.forEach(elt => {
                this.getUnderGroups(elt.groups_id).then(rep => {
-                  console.log(rep);
                   this.groups.push({
                      index: this.groups.length,
                      group: elt,
                      childs: rep.data
                   })
                })
+               c++;
             })
+            setTimeout(() => {
+               this.groups = this.groups.sort((a, b) => (
+                     a.group.depth - b.group.depth
+               ))
+            }, 200)
+            this.alreadyRegistered = c > 0;
+
+
+            // TODO : Améliorer cet algo.
+            setTimeout(() => {
+               this.groups.forEach(elt => {
+                  if (elt.group.type === "GRADE" || elt.group.type === "OTHER") {
+                     elt.childs.forEach(e => {
+                        if (this.fullRegister) {
+                           let temp = false;
+                           response.data.forEach(item => {
+                              if (JSON.stringify(item) === JSON.stringify(e))
+                                 temp = true;
+                           })
+                           if (!temp)
+                              this.fullRegister = false;
+                        }
+                     });
+                  }
+               });
+            }, 500)
          });
       }
    }
@@ -514,5 +608,34 @@ export default {
 
 .cursus > span {
    margin-bottom: 10px;
+}
+
+.selected {
+   display: flex;
+   flex-direction: column;
+   align-items: flex-start;
+   justify-content: space-between;
+   width: 100%;
+   height: 55px;
+   color: #F4F4F4;
+   font-weight: 600;
+   font-size: 18px;
+   margin-bottom: 10px;
+}
+
+.selected > div {
+   width: 100%;
+   height: 28px;
+   background-color: #c1c1c1;
+   color: #797979;
+   border-radius: 4px 4px 0 0;
+   display: flex;
+   align-items: center;
+   justify-content: flex-start;
+   padding-left: 10px;
+   font-size: 13px;
+   font-weight: 500;
+   border-bottom: #8F8F8F solid 1px;
+   cursor: not-allowed;
 }
 </style>

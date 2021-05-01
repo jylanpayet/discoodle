@@ -36,7 +36,7 @@ export default {
             this.$emit('desactivatePopUp');
       },
       addRoom(event, name=document.querySelector('.add-conv-box > div > input').value) {
-         axios.post(`http://localhost:8080/api/room/addNewRoom`, {
+         axios.post(`http://localhost:8080/api/rooms/addNewRoom`, {
             room_name: name,
             room_members: [this.getUser.id],
             link_picture: null

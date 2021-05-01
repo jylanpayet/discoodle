@@ -79,7 +79,7 @@ export default {
    methods: {
       ...mapActions(['setConvUUID']),
       getRoomsFromDB() {
-         axios.get(`http://localhost:8080/api/users/seeAllRooms/${this.getUser.id}`).then(response => {
+         axios.get(`http://localhost:8080/api/users/seeAllRooms?user_id=${this.getUser.id}`).then(response => {
             this.convList = response.data
          });
       },
@@ -95,7 +95,7 @@ export default {
          if (this.new_name === "")
             return
          const conv_uuid = this.getCurrentConv;
-         axios.put(`http://localhost:8080/api/room/renameRoom/${conv_uuid}?new_name=${this.new_name}`).then(() => {
+         axios.put(`http://localhost:8080/api/rooms/renameRoom?room_id=${conv_uuid}&new_name=${this.new_name}`).then(() => {
             this.convList.filter(elt => elt.room_id === conv_uuid).map(elt => elt.room_name = this.new_name);
             this.editRoom.show = false;
             this.modifying = false;
@@ -104,7 +104,7 @@ export default {
       },
       deleteRoom() {
          const conv_uuid = this.getCurrentConv
-         axios.delete(`http://localhost:8080/api/room/removeRoom/${conv_uuid}`).then(() => {
+         axios.delete(`http://localhost:8080/api/rooms/removeRoom?room_id=${conv_uuid}`).then(() => {
             this.convList = this.convList.filter(elt => elt.room_id !== conv_uuid);
             this.editRoom.show = false;
             this.modifying = false;
@@ -112,16 +112,12 @@ export default {
       },
       exitRoom() {
          const conv_uuid = this.getCurrentConv;
-         axios.delete(`http://localhost:8080/api/room/removeMember/${conv_uuid}?user_id=${this.getUser.id}`).then(() => {
+         axios.delete(`http://localhost:8080/api/rooms/removeMember?room_id=${conv_uuid}&user_id=${this.getUser.id}`).then(() => {
             this.convList = this.convList.filter(elt => elt.room_id !== conv_uuid);
             this.editRoom.show = false;
             this.modifying = false;
          })
       },
-
-      showRoute() {
-         console.log(this.$route);
-      }
    },
    data() {
       return {

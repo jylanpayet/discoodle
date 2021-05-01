@@ -4,12 +4,23 @@
          <span v-if="edited" style="color: #7f7f7f; margin-left: 20px; margin-right: 20px; font-weight: 500; font-size: 11px;">
             (Modifié)
          </span>
-         <div v-if="!messageEdit" :class="mention ? 'message-content mention' : 'message-content'" v-html="displayMessage(content, true, true, true)" :style="belong_to_myself ? { marginRight: '10px', backgroundColor: '#e85c5c', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: '#C4C4C4' }">
+         <w-tooltip :left="belong_to_myself" :right="!belong_to_myself" v-if="!messageEdit" :class="mention ? 'message-content mention' : 'message-content'" :style="belong_to_myself ? { marginRight: '10px', backgroundColor: '#e85c5c', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: '#C4C4C4' }">
+            <template #activator="{ on }">
+               <div v-on="on" v-html="displayMessage(content, true, true, true)" >
 
-         </div>
-         <div v-else :class="mention ? 'message-content mention' : 'message-content'" :style="belong_to_myself ? { marginRight: '10px', backgroundColor: '#e85c5c', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: '#F4F4F4' }">
-            <input type="text" :value="content" autocomplete="off" @keydown="actionInput">
-         </div>
+               </div>
+            </template>
+            {{ sender }}
+         </w-tooltip>
+         <w-tooltip :right="!belong_to_myself" :left="belong_to_myself" v-else :class="mention ? 'message-content mention' : 'message-content'" :style="belong_to_myself ? { marginRight: '10px', backgroundColor: '#e85c5c', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: '#F4F4F4' }">
+            <template #activator="{ on }">
+               <div v-on="on">
+                  <input type="text" :value="content" autocomplete="off" @keydown="actionInput">
+               </div>
+            </template>
+            {{ sender }}
+         </w-tooltip>
+
          <div class="buttons" v-if="showPin" :style="belong_to_myself ? { left: 0 } : { right: 0 }">
             <button class="pin-message" @click="pinMessage">
                <img src="../../assets/pin.png" alt="">
@@ -35,8 +46,6 @@ import {mapGetters} from "vuex";
 import emojis from "@/assets/emojis_uncathegorized";
 import marked from "marked";
 import axios from "axios";
-
-// TODO : charger l'image de l'user dont l'username est user
 
 export default {
    name: "Message",
@@ -132,7 +141,7 @@ export default {
       },
 
       actionInput(event) {
-         const input = document.querySelector(".message-content > input")
+         const input = document.querySelector(".message-content > div > input")
          if (event.keyCode === 13) {
             if (input.value === "")
                this.deleteMessage();
@@ -157,7 +166,7 @@ export default {
       }
    },
    mounted() {
-      axios.get(`http://localhost:8080/api/users/${this.sender}`).then(response => {
+      axios.get(`http://localhost:8080/api/users/findByUserName?username=${this.sender}`).then(response => {
          this.user = response.data;
       })
    }
@@ -280,7 +289,7 @@ export default {
    color: #f4f4f4;
 }
 
-.message-content > input {
+.message-content > div > input {
    border: none;
    outline: none;
    background-color: #ff8888;

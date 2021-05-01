@@ -55,7 +55,7 @@ export default {
    },
    mounted() {
       if (vueCookie.get("username") !== null && vueCookie.get("username") !== "") {
-         axios.get(`http://localhost:8080/api/users/${vueCookie.get("username")}`).then(response => {
+         axios.get(`http://localhost:8080/api/users/findByUserName?username=${vueCookie.get("username")}`).then(response => {
             const user = response.data;
             console.log(user);
             this.setUser(user);
@@ -79,7 +79,9 @@ export default {
 }
 
 #nav {
-   min-width: 270px;
+   width: 20%;
+   min-width: 220px;
+   max-width: 300px;
    height: 100%;
 }
 
@@ -251,7 +253,9 @@ label[for="switch"]:after {
 
 
 #content {
-   width: calc(100% - 270px);
+   max-width: calc(100% - 220px);
+   width: 80%;
+   min-width: calc(100% - 300px);
    height: 100%;
 }
 
