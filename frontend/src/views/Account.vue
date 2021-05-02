@@ -95,7 +95,7 @@
       </div>
    </div>
    <div style="width: 100%; height: 100%;" v-else>
-      <Authentication @logSuccess="isAuthentificated = true; $emit('logSuccess')"/>
+      <Authentication @logSuccess="isAuthentificated = true; updateEstablishment(); $emit('logSuccess');"/>
    </div>
 
    <w-dialog
@@ -115,7 +115,7 @@
             Je modifie ce que j'ai choisi.
          </w-button>
          <w-button
-               @click="registerInGroups"
+               @click="registerInGroups(false)"
                bg-color="success">
             Je m'inscris !
          </w-button>
@@ -190,7 +190,7 @@ export default {
          let temp = new FormData();
          temp.append("file", file);
          axios({
-            url: `http://localhost:8080/api/uploadAvatar/${this.getUser.id}`,
+            url: `http://localhost:8080/api/uploadfile/uploadAvatar?user_id=${this.getUser.id}`,
             method: 'POST',
             data: temp,
             headers: {
@@ -203,7 +203,7 @@ export default {
       },
       removeLinkToAvatar() {
          if (this.getUser.link_to_avatar !== null) {
-            axios.delete(`http://localhost:8080/api/deleteAvatar/${this.getUser.id}`).then(response => {
+            axios.delete(`http://localhost:8080/api/uploadfile/deleteAvatar?user_id=${this.getUser.id}`).then(response => {
                if (response.data) {
                   this.setLinkToAvatar(null);
                }
@@ -211,7 +211,7 @@ export default {
          }
       },
       getUnderGroups(parent_id) {
-         return axios.get(`http://localhost:8080/api/groups/underGroup/${parent_id}`)
+         return axios.get(`http://localhost:8080/api/groups/underGroup?group_id=${parent_id}`)
       },
       updateGroup(res) {
          this.getUnderGroups(res.group.groups_id).then(rep => {
@@ -230,15 +230,12 @@ export default {
          });
       },
 
-      updateEstablishment(res) {
-         this.groups = [];
-         this.getUnderGroups(res.group.groups_id).then(rep => {
-            this.groups.push({
-               index: res.index,
-               group: res.group,
-               childs: rep.data
+      updateEstablishment() {
+         axios.get("http://localhost:8080/api/groups/findIDOfDiscoodle").then(response => {
+            axios.get(`http://localhost:8080/api/groups/underGroup?group_id=${response.data}`).then(rep => {
+               this.establishments = rep.data;
             })
-         });
+         })
       },
 
       showGroup(res) {
@@ -269,7 +266,7 @@ export default {
          if (reset_est) {
             this.establishments = [];
             axios.get("http://localhost:8080/api/groups/findIDOfDiscoodle").then(response => {
-               axios.get(`http://localhost:8080/api/groups/underGroup/${response.data}`).then(rep => {
+               axios.get(`http://localhost:8080/api/groups/underGroup?group_id=${response.data}`).then(rep => {
                   this.establishments = rep.data;
                })
             })
@@ -294,27 +291,30 @@ export default {
          this.clearAfter(this.groupSelected.index);
       },
 
-      registerInGroups(update = false) {
+      registerInGroups(update) {
          let noErr = true;
          this.confirmRegister.show = false;
          this.groups.forEach(elt => {
+            console.log(elt);
             if (elt.group.type === "GRADE" || elt.group.type === "OTHER") {
                elt.childs.forEach(group => {
                   if (group.type === "SUBJECTS") {
                      axios.post(
-                           `http://localhost:8080/api/groups/addNewMemberInGroup/${group.groups_id}?user_id=${this.getUser.id}&token=${group.token}`
+                           `http://localhost:8080/api/groups/addNewMemberInGroup?group_id=${group.groups_id}&user_id=${this.getUser.id}&token=${group.token}`
                      ).catch(() => {
                         noErr = false;
                      })
                   }
                })
             }
-            if (!update)
+            console.log(update);
+            if (!update) {
                axios.post(
-                     `http://localhost:8080/api/groups/addNewMemberInGroup/${elt.group.groups_id}?user_id=${this.getUser.id}&token=${elt.group.token}`
+                     `http://localhost:8080/api/groups/addNewMemberInGroup?group_id=${elt.group.groups_id}&user_id=${this.getUser.id}&token=${elt.group.token}`
                ).catch(() => {
                   noErr = false;
                })
+            }
          })
 
          if (noErr) {
@@ -368,12 +368,7 @@ export default {
    mounted() {
       this.isAuthentificated = (JSON.stringify(this.getUser) !== JSON.stringify({}));
       if (this.isAuthentificated) {
-         axios.get("http://localhost:8080/api/groups/findIDOfDiscoodle").then(response => {
-            axios.get(`http://localhost:8080/api/groups/underGroup/${response.data}`).then(rep => {
-               this.establishments = rep.data;
-               console.log(rep.data);
-            })
-         })
+         this.updateEstablishment();
 
          axios.get(`http://localhost:8080/api/users/seeAllGroups?user_id=${this.getUser.id}`).then(response => {
             const groups = response.data.sort((a, b) => (

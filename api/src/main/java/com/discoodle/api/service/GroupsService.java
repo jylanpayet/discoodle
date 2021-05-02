@@ -14,6 +14,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -46,7 +47,7 @@ public class GroupsService {
         );
         Roles role_student = new Roles(
                 "Etudiant",
-                "-"
+                "sr"
         );
         Roles finalRole_admin = rolesRepository.save(role_admin);
         Roles finalRole_student = rolesRepository.save(role_student);
@@ -87,10 +88,9 @@ public class GroupsService {
         Optional<Groups> tempGroup = groupsRepository.findGroupsByID(groups_id);
         Optional<User> tempUser = userService.getUserByID(user_id);
         if (tempGroup.isPresent() && tempUser.isPresent() && (tempGroup.get().getToken().equals(token)) && !tempGroup.get().getUsers().contains(tempUser.get())) {
+            System.out.println("---------------------------------------------------------");
             groupsRepository.addNewMemberInGroup(user_id, groups_id);
-            Optional<Roles> role = rolesRepository.getRolesByNameAnAndGroupsId("Etudiant",groups_id);
-            if(role.isPresent())
-                groupsRepository.addRoleForUser(user_id, role.get().getRole_id());
+            groupsRepository.addRoleForUser(user_id, tempGroup.get().getRoles().stream().filter((e) -> e.getName().equals("Etudiant")).collect(Collectors.toList()).get(0).getRole_id());
             if(tempGroup.get().getType().equals(Groups.TypeOfGroup.SUBJECTS))
                 serverService.addNewMember(tempGroup.get().getServer().getServer_id(), user_id);
             return tempGroup;

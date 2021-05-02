@@ -18,6 +18,20 @@ import java.util.List;
 @Table(name = "roles")
 public class Roles {
 
+    /*
+
+    Roles are represented by String.
+    Each char of the String symbolize a right.
+
+    - s allow user to send messages in the server.
+    - r allow user to read messages of the server.
+    - p allow user to modify the group
+    - c allow user to modify channels
+    - n allow user to add/remove/modify notes
+    - l allow user to stream in the group
+
+     */
+
     public Roles(String name, String rights) {
         this.name = name;
         this.rights = rights;

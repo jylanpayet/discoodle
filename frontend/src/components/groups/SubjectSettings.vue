@@ -111,7 +111,7 @@ export default {
       },
       uploadFile() {
          axios({
-            url: `http://localhost:8080/api/uploadSubject/${this.getGroup.groups_id}`,
+            url: `http://localhost:8080/api/uploadfile/uploadSubject?group_id=${this.getGroup.groups_id}`,
             method: 'POST',
             data: this.formData,
             headers: {

@@ -382,7 +382,7 @@ export default {
          let temp = new FormData();
          temp.append("file", file);
          axios({
-            url: `http://localhost:8080/api/uploadImageInChat/${this.getCurrentConv}`,
+            url: `http://localhost:8080/api/uploadfile/uploadImageInChat?room_id=${this.getCurrentConv}`,
             method: 'POST',
             data: temp,
             headers: {

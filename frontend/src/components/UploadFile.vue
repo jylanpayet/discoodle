@@ -43,7 +43,7 @@ export default {
     },
     startUpload() {
       axios({
-        url: `http://localhost:8080/api/upload/1007`,
+        url: `http://localhost:8080/api/uploadfile/upload?group_id=1007`,
         method: 'POST',
         data: this.formData,
         headers: {
@@ -56,7 +56,7 @@ export default {
     },
     startImageUpload() {
       axios({
-        url: `http://localhost:8080/api/uploadAvatar/1`,
+        url: `http://localhost:8080/api/uploadfile/uploadAvatar?user_id=1`,
         method: 'POST',
         data: this.formData,
         headers: {
