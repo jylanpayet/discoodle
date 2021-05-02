@@ -13,7 +13,8 @@ import java.util.List;
 import java.util.Optional;
 
 @AllArgsConstructor
-@RestController("api/groups")
+@RestController
+@RequestMapping("api/groups")
 public class GroupsController {
 
     private final GroupsService groupsService;
