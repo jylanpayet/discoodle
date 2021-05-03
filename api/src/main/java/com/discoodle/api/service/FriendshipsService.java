@@ -16,7 +16,10 @@ public class FriendshipsService {
     private final UserRepository userRepository;
 
     public List<Friendships> getAllInvitations(Long user_id) {
-        return friendshipsRepository.getAllInvitations(user_id);
+        if (userRepository.existsById(user_id)){
+            return friendshipsRepository.getAllInvitations(user_id);
+        }
+        return null;
     }
 
     public void acceptInvitation(Long sender_id, Long receiver_id) {

@@ -42,20 +42,20 @@
     <!-- Devteam with emails -->
     <developers>
         <developer>
-            <name>Moïse CLIPAL</name>
-            <email>elymo.mc@gmail.com</email>
-        </developer>
-        <developer>
-            <name>Jylan PAYET</name>
-            <email>jylanpayet@gmail.com</email>
-        </developer>
-        <developer>
             <name>Dylan ALEXANDRE</name>
             <email>dylan_alexandre@outlook.fr</email>
         </developer>
         <developer>
             <name>Bastian SOMON</name>
             <email>bastian.somon@gmail.com</email>
+        </developer>
+        <developer>
+            <name>Jylan PAYET</name>
+            <email>jylanpayet@gmail.com</email>
+        </developer>
+        <developer>
+            <name>Moïse CLIPAL</name>
+            <email>elymo.mc@gmail.com</email>
         </developer>
     </developers>
 

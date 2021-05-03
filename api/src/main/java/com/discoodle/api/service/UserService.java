@@ -58,7 +58,7 @@ public class UserService implements UserDetailsService {
 
     public void deleteUser(Long user_id) {
         Optional<User> delete = userRepository.findById(user_id);
-        if(delete.isPresent()) {
+        if (delete.isPresent()) {
             userRepository.removeToken(user_id);
             for (Room test_room : delete.get().getRooms()) {
                 roomService.removeMember(test_room.getRoom_id(), user_id);
@@ -124,7 +124,7 @@ public class UserService implements UserDetailsService {
     }
 
     public List<User> getFriendList(Long user_id) {
-        if(!userRepository.existsById(user_id))
+        if (!userRepository.existsById(user_id))
             return List.of();
         List<Long> list = userRepository.getFriendListForReceiver(user_id);
         list.addAll(userRepository.getFriendListForSender(user_id));
@@ -156,20 +156,29 @@ public class UserService implements UserDetailsService {
     }
 
     public Optional<User> changeName(Long user_id, String name) {
-        if (userRepository.changeName(user_id, name) == 1)
-            return userRepository.findById(user_id);
+        Optional<User> changeName = userRepository.findById(user_id);
+        if (changeName.isPresent()) {
+            userRepository.changeName(user_id, name);
+            return changeName;
+        }
         return Optional.empty();
     }
 
     public Optional<User> changeLastName(Long user_id, String last_name) {
-        if (userRepository.changeLastName(user_id, last_name) == 1)
-            return userRepository.findById(user_id);
+        Optional<User> changeLastName = userRepository.findById(user_id);
+        if (changeLastName.isPresent()) {
+            userRepository.changeLastName(user_id, last_name);
+            return changeLastName;
+        }
         return Optional.empty();
     }
 
     public Optional<User> changeLinkToAvatar(Long user_id, String link_to_avatar) {
-        if (userRepository.changeLinkToAvatar(user_id, link_to_avatar) == 1)
-            return userRepository.findById(user_id);
+        Optional<User> changeLinkToAvatar = userRepository.findById(user_id);
+        if (changeLinkToAvatar.isPresent()) {
+            userRepository.changeLinkToAvatar(user_id, link_to_avatar);
+            return changeLinkToAvatar;
+        }
         return Optional.empty();
     }
 }
