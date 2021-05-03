@@ -4,6 +4,7 @@ import com.discoodle.api.model.Groups;
 import com.discoodle.api.model.Room;
 import com.discoodle.api.model.Server;
 import com.discoodle.api.model.User;
+import com.discoodle.api.repository.RoomRepository;
 import com.discoodle.api.repository.ServerRepository;
 import com.discoodle.api.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,7 @@ public class ServerService {
     ServerRepository serverRepository;
     UserRepository userRepository;
     RoomService roomService;
+    RoomRepository roomRepository;
 
     public Server createNewServ(String server_name, List<Long> server_members) {
         Server serv = new Server(
@@ -38,10 +40,13 @@ public class ServerService {
     }
 
     public Optional<Server> addNewMember(Long server_id, Long user_id) {
-        if(serverRepository.existsById(server_id) && userRepository.existsById(user_id)){
+        Optional<User> user=userRepository.findById(user_id);
+        Optional<Server> server=serverRepository.findById(server_id);
+
+        if(server.isPresent() && user.isPresent() && !server.get().getUsers().contains(user.get())){
             serverRepository.addNewMember(server_id, user_id);
-            Server server = serverRepository.findById(server_id).get();
-            for (Room room : server.getRooms()) {
+
+            for (Room room : server.get().getRooms()) {
                 roomService.addNewMember(room.getRoom_id(), user_id);
             }
             return serverRepository.findById(server_id);
@@ -49,7 +54,7 @@ public class ServerService {
         return Optional.empty();
     }
 
-    public Optional<Server> addNewRoom(Long server_id, String name) {
+    public Optional<Room> addNewRoom(Long server_id, String name) {
         if (serverRepository.existsById(server_id)) {
             Optional<Server> server = serverRepository.findById(server_id);
             List<Long> users_id = new LinkedList<>();
@@ -59,7 +64,7 @@ public class ServerService {
             Room newRoom = roomService.createNewRoom(name, users_id);
             newRoom.setRoom_link(true);
             serverRepository.addNewRoomInServ(server_id, newRoom.getRoom_id());
-            return server;
+            return roomRepository.findById(newRoom.getRoom_id());
         }
         return Optional.empty();
     }

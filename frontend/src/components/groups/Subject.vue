@@ -25,12 +25,14 @@ export default {
       ...mapGetters(['getGroup', 'getUser'])
    },
    mounted() {
-      axios.get(`http://localhost:8080/getRoleByGroupAndUser/${this.getGroup.groups_id}/${this.getUser.id}`).then(response => {
+      console.log(this.getGroup);
+      axios.get(`http://localhost:8080/api/groups/getRoleByGroupAndUser?group_id=${this.getGroup.groups_id}&user_id=${this.getUser.id}`).then(response => {
          console.log(response);
       })
    },
    beforeRouteUpdate() {
-      axios.get(`http://localhost:8080/getRoleByGroupAndUser/${this.getGroup.groups_id}/${this.getUser.id}`).then(response => {
+      console.log(this.getGroup);
+      axios.get(`http://localhost:8080/api/groups/getRoleByGroupAndUser?group_id=${this.getGroup.groups_id}&user_id=${this.getUser.id}`).then(response => {
          console.log(response);
       })
    },

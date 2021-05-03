@@ -35,6 +35,11 @@
       <button class="hangupButton" disabled>
          Hangup
       </button>
+      <br><br>
+
+      <button @click="logInfo">
+         Check active
+      </button>
    </div>
 </template>
 
@@ -192,6 +197,14 @@ export default {
                }
             });
          });
+      },
+
+      logInfo() {
+         navigator.mediaDevices.enumerateDevices().then(response => {
+            console.log(response);
+         });
+         console.log(this.localStream, this.localStream.getTracks());
+         console.log(this.remoteStream, this.remoteStream.getTracks());
       }
    },
    data() {
@@ -215,6 +228,19 @@ export default {
    },
    mounted() {
       this.pc = new RTCPeerConnection(this.servers)
+   },
+   unmounted() {
+      this.localStream?.getTracks().forEach(function(track) {
+         if (track.readyState === 'live') {
+            track.stop();
+         }
+      });
+
+      this.remoteStream?.getTracks().forEach(function(track) {
+         if (track.readyState === 'live') {
+            track.stop();
+         }
+      });
    }
 }
 </script>

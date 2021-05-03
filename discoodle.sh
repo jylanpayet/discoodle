@@ -14,7 +14,7 @@ if [ $# == 2 ] || [ $# == 1 ]; then
   clear
   if [ $# == 2 ] && [ $2 != "no-bdd" ] || [ $# == 1 ]; then
     echo "Quel est votre mot de passe mariadb ? :"
-    mariadb -u $1 -p -e 'create database if not exists discoodle'
+    mariadb -u $1 -p -e 'CREATE DATABASE IF NOT EXISTS discoodle  DEFAULT CHARSET = utf8mb4 DEFAULT COLLATE = utf8mb4_unicode_ci'
     if [ $? != 0 ]; then
       echo -e "\033[32;1m[ERREUR] Impossible d'exécuter le script SQL. Veuillez rééssayer.\033[m"
       exit
