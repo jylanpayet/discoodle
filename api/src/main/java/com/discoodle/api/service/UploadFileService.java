@@ -29,7 +29,7 @@ public class UploadFileService {
     private final GroupsRepository groupsRepository;
     private final RoomRepository roomRepository;
 
-    // Changement upload de file pour message
+    // Skeleton of our upload method.
     public String uploadFile(MultipartFile file, Long group_id) {
         if(!groupsRepository.existsById(group_id))
             return "le group n'existe pas !";
@@ -72,6 +72,7 @@ public class UploadFileService {
         return "http://localhost:8080/common/images/rooms/" + uuid + "." + extension;
     }
 
+    //Remove the verification of Subjects
     public String uploadSubject(MultipartFile file, Long group_id) {
         Optional<Groups> group=groupsRepository.findGroupsByID(group_id);
         if(!group.isPresent() || !group.get().getType().equals("SUBJECTS"))
