@@ -29,12 +29,32 @@ public class UserTests {
     }
 
     @Test
+    public void testLogin() {
+
+    }
+
+    @Test
     public void testChangeUsername() {
 
     }
 
     @Test
+    public void testChangeMail() {
+
+    }
+
+    @Test
     public void testChangePassword() {
+
+    }
+
+    @Test
+    public void testChangeName() {
+
+    }
+
+    @Test
+    public void testChangeLastName() {
 
     }
 

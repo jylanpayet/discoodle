@@ -50,8 +50,8 @@ public class UserController {
     }
 
     @DeleteMapping("/delete")
-    public void deleteUser(@RequestParam("user_id") Long user_id) {
-        userService.deleteUser(user_id);
+    public boolean deleteUser(@RequestParam("user_id") Long user_id) {
+       return userService.deleteUser(user_id);
     }
 
     @GetMapping("/seeAllRooms")

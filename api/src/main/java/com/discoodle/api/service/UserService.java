@@ -56,7 +56,7 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
-    public void deleteUser(Long user_id) {
+    public boolean deleteUser(Long user_id) {
         Optional<User> delete = userRepository.findById(user_id);
         if (delete.isPresent()) {
             userRepository.removeToken(user_id);
@@ -70,7 +70,9 @@ public class UserService implements UserDetailsService {
                 friendshipsRepository.deleteById(test_friendships.getFriendships_id());
             }
             userRepository.deleteById(user_id);
+            return true;
         }
+        return false;
     }
 
     @Override

@@ -15,6 +15,28 @@ public class FriendshipsService {
     private final FriendshipsRepository friendshipsRepository;
     private final UserRepository userRepository;
 
+    public String inviteMembers(Long user_id, List<Long> friends_id) {
+        if(userRepository.existsById(user_id)) {
+            for (Long aLong : friends_id) {
+                if (userRepository.existsById(aLong)) {
+                    if (!userRepository.getFriendListCompleteForSender(user_id).contains(aLong) && !userRepository.getFriendListCompleteForReceiver(aLong).contains(user_id)) {
+                        System.out.println(userRepository.getFriendListForReceiver(aLong));
+                        System.out.println(userRepository.getFriendListForSender(user_id));
+                        Friendships friendships = new Friendships(
+                                user_id,
+                                aLong
+                        );
+                        friendshipsRepository.save(friendships);
+                        return "Votre invitation a été envoyé avec succès !";
+                    }
+                    return "Vous êtes déjà ami ou vous avez déjà une invitation avec cet utilisateur.";
+                }
+                return "L'utilisateur n'existe pas.";
+            }
+        }
+        return "";
+    }
+
     public List<Friendships> getAllInvitations(Long user_id) {
         if (userRepository.existsById(user_id)){
             return friendshipsRepository.getAllInvitations(user_id);
@@ -32,25 +54,4 @@ public class FriendshipsService {
             friendshipsRepository.refuseInvitation(sender_id, receiver_id);
     }
 
-    public String inviteMembers(Long user_id, List<Long> friends_id) {
-        if(userRepository.existsById(user_id)) {
-            for (Long aLong : friends_id) {
-                if (userRepository.existsById(aLong)) {
-                    if (!userRepository.getFriendListCompleteForSender(user_id).contains(aLong) && !userRepository.getFriendListCompleteForReceiver(aLong).contains(user_id)) {
-                        System.out.println(userRepository.getFriendListForReceiver(aLong));
-                        System.out.println(userRepository.getFriendListForSender(user_id));
-                        Friendships friendships = new Friendships(
-                              user_id,
-                              aLong
-                        );
-                        friendshipsRepository.save(friendships);
-                        return "Votre invitation a été envoyé avec succès !";
-                    }
-                    return "Vous êtes déjà ami ou vous avez déjà une invitation avec cet utilisateur.";
-                }
-                return "L'utilisateur n'existe pas.";
-            }
-        }
-        return "";
-    }
 }
