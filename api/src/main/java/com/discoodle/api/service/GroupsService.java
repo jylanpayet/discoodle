@@ -31,7 +31,7 @@ public class GroupsService {
         // Generate a UUID token for this new Group.
         String token = UUID.randomUUID().toString().replaceAll("-", "").substring(0, 8);
         // If the depth is 1, check if a group already has the same name in this depth.
-        if(request.getDepth()==1 && groupsRepository.findAllGroupsByNameAndDepth(request.getName(), request.getDepth()).isPresent()){
+        if(request.getType().equals(Groups.TypeOfGroup.ESTABLISHMENT) && groupsRepository.findAllGroupsByNameAndDepth(request.getName(), request.getDepth()).isPresent()){
             return Optional.empty();
         }
         // Create a new object Group.

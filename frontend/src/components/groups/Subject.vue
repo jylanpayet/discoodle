@@ -6,11 +6,11 @@
             <router-link class="navbar-links" :to="`/groupes/subject/${getGroup.groups_id}/cours`"><div>Cours</div></router-link>
             <router-link class="navbar-links" :to="`/groupes/subject/${getGroup.groups_id}/discussion`"><div>Chat</div></router-link>
             <router-link class="navbar-links" :to="`/groupes/subject/${getGroup.groups_id}/notes`"><div>Notes</div></router-link>
-            <router-link class="navbar-links" :to="`/groupes/subject/${getGroup.groups_id}/parametres`" v-if="getUser.role === 'TEACHER'"><div>Paramètres</div></router-link>
+            <router-link class="navbar-links" :to="`/groupes/subject/${getGroup.groups_id}/parametres`" v-if="rights.canChangeGroup"><div>Paramètres</div></router-link>
          </div>
       </div>
       <div class="content">
-         <router-view />
+         <router-view @groupAdded="$emit('groupAdded', $event);" />
       </div>
    </div>
 </template>
@@ -24,16 +24,86 @@ export default {
    computed: {
       ...mapGetters(['getGroup', 'getUser'])
    },
+   data() {
+      return {
+         rights: {
+            canSendMessage: false,
+            canReadMessage: false,
+            canChangeGroup: false,
+            canModifyRoom: false,
+            canModifyNotes: false,
+            canStream: false,
+         }
+      }
+   },
    mounted() {
-      console.log(this.getGroup);
-      axios.get(`http://localhost:8080/api/groups/getRoleByGroupAndUser?group_id=${this.getGroup.groups_id}&user_id=${this.getUser.id}`).then(response => {
-         console.log(response);
+      // Get rights of user in this group.
+      axios.get(`http://localhost:8080/api/groups/getRoleByGroupAndUser?user_id=${this.getUser.id}&group_id=${this.getGroup.groups_id}`).then(response => {
+         let fullRights = false;
+         response.data.forEach(elt => {
+            if (elt.rights === "*")
+               fullRights = true;
+         });
+
+         if (fullRights) {
+            this.rights = {
+               canSendMessage: true,
+               canReadMessage: true,
+               canChangeGroup: true,
+               canModifyRoom: true,
+               canModifyNotes: true,
+               canStream: true,
+            }
+         } else {
+            response.data.sort((a, b) => {
+               return a.rights.length - b.rights.length;
+            });
+
+            const temp = response.data[response.data.length - 1].rights;
+            this.rights = {
+               canSendMessage: temp.includes("s"),
+               canReadMessage: temp.includes("r"),
+               canChangeGroup: temp.includes("p"),
+               canModifyRoom: temp.includes("c"),
+               canModifyNotes: temp.includes("n"),
+               canStream: temp.includes("l"),
+            }
+         }
       })
    },
    beforeRouteUpdate() {
-      console.log(this.getGroup);
-      axios.get(`http://localhost:8080/api/groups/getRoleByGroupAndUser?group_id=${this.getGroup.groups_id}&user_id=${this.getUser.id}`).then(response => {
-         console.log(response);
+      // Get rights of user in this group.
+      axios.get(`http://localhost:8080/api/groups/getRoleByGroupAndUser?user_id=${this.getUser.id}&group_id=${this.getGroup.groups_id}`).then(response => {
+         let fullRights = false;
+         response.data.forEach(elt => {
+            if (elt.rights === "*")
+               fullRights = true;
+         });
+
+         if (fullRights) {
+            this.rights = {
+               canSendMessage: true,
+               canReadMessage: true,
+               canChangeGroup: true,
+               canModifyRoom: true,
+               canModifyNotes: true,
+               canStream: true,
+            }
+         } else {
+            response.data.sort((a, b) => {
+               return a.rights.length - b.rights.length;
+            });
+
+            const temp = response.data[response.data.length - 1].rights;
+            this.rights = {
+               canSendMessage: temp.includes("s"),
+               canReadMessage: temp.includes("r"),
+               canChangeGroup: temp.includes("p"),
+               canModifyRoom: temp.includes("c"),
+               canModifyNotes: temp.includes("n"),
+               canStream: temp.includes("l"),
+            }
+         }
       })
    },
 }

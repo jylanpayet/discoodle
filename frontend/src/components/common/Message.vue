@@ -1,18 +1,24 @@
 <template>
    <div class="Message" :style="belong_to_myself ? { justifyContent: 'flex-end' } : { justifyContent: 'flex-start' }">
-      <div @mouseover="showPin = true" @mouseleave="showPin = false" class="content" :style="!belong_to_myself ? { flexDirection: 'row-reverse' } : { flexDirection: 'row' }">
-         <span v-if="edited" style="color: #7f7f7f; margin-left: 20px; margin-right: 20px; font-weight: 500; font-size: 11px;">
+      <div @mouseover="showPin = true" @mouseleave="showPin = false" class="content"
+           :style="!belong_to_myself ? { flexDirection: 'row-reverse' } : { flexDirection: 'row' }">
+         <span v-if="edited"
+               style="color: #7f7f7f; margin-left: 20px; margin-right: 20px; font-weight: 500; font-size: 11px;">
             (Modifié)
          </span>
-         <w-tooltip :left="belong_to_myself" :right="!belong_to_myself" v-if="!messageEdit" :class="mention ? 'message-content mention' : 'message-content'" :style="belong_to_myself ? { marginRight: '10px', backgroundColor: '#e85c5c', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: '#C4C4C4' }">
+         <w-tooltip :left="belong_to_myself" :right="!belong_to_myself" v-if="!messageEdit"
+                    :class="mention ? 'message-content mention' : 'message-content'"
+                    :style="belong_to_myself ? { marginRight: '10px', backgroundColor: '#e85c5c', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: '#C4C4C4' }">
             <template #activator="{ on }">
-               <div v-on="on" v-html="displayMessage(content, true, true, true)" >
+               <div v-on="on" v-html="displayMessage(content, true, true, true)">
 
                </div>
             </template>
             {{ sender }}
          </w-tooltip>
-         <w-tooltip :right="!belong_to_myself" :left="belong_to_myself" v-else :class="mention ? 'message-content mention' : 'message-content'" :style="belong_to_myself ? { marginRight: '10px', backgroundColor: '#e85c5c', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: '#F4F4F4' }">
+         <w-tooltip :right="!belong_to_myself" :left="belong_to_myself" v-else
+                    :class="mention ? 'message-content mention' : 'message-content'"
+                    :style="belong_to_myself ? { marginRight: '10px', backgroundColor: '#e85c5c', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: '#F4F4F4' }">
             <template #activator="{ on }">
                <div v-on="on">
                   <input type="text" :value="content" autocomplete="off" @keydown="actionInput">
@@ -21,14 +27,14 @@
             {{ sender }}
          </w-tooltip>
 
-         <div class="buttons" v-if="showPin" :style="belong_to_myself ? { left: 0 } : { right: 0 }">
-            <button class="pin-message" @click="pinMessage">
+         <div class="buttons" v-if="showPin" :style="belong_to_myself ? { left: '-50px' } : { right: '50px' }">
+            <button class="pin-message" @click="pinMessage" v-if="canPin">
                <img src="../../assets/pin.png" alt="">
             </button>
-            <button class="edit-message" @click="messageEdit = true" v-if="belong_to_myself">
+            <button class="edit-message" @click="messageEdit = true" v-if="belong_to_myself && canEdit">
                <img src="../../assets/pen.svg" alt="Pen">
             </button>
-            <button class="delete-message" @click="deleteMessage" v-if="belong_to_myself">
+            <button class="delete-message" @click="deleteMessage" v-if="canRemove">
                X
             </button>
          </div>
@@ -74,14 +80,26 @@ export default {
          type: Boolean,
          required: true,
          default: false,
+      },
+      canRemove: {
+         type: Boolean,
+         default: true
+      },
+      canEdit: {
+         type: Boolean,
+         default: true
+      },
+      canPin: {
+         type: Boolean,
+         default: true,
       }
    },
    methods: {
-      filterEmoji(content){
+      filterEmoji(content) {
          // Regex to match with the emoji string encode ( ':xxxxx_xxx_xxx_xxx:' where '_' is optionnal )
          const regex = ":[a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*:";
          const emoji = [...content.matchAll(regex)];
-         if(emoji && emoji.length > 0) {
+         if (emoji && emoji.length > 0) {
             emoji.forEach(elt => {
                if (emojis[elt[0].replaceAll(":", "")])
                   content = content.replace(elt[0], emojis[elt[0].replaceAll(":", "")]);
@@ -89,7 +107,7 @@ export default {
          }
          return content;
       },
-      filterMarkdown(content){
+      filterMarkdown(content) {
          return marked(content);
       },
       filterPing(content) {
@@ -195,7 +213,7 @@ export default {
 
 .message-content {
    padding: 15px;
-   max-width: calc(80% - 42px - 10px - 30px);
+   max-width: calc(100% - 50px);
 
    hyphens: manual;
    word-wrap: break-word;
@@ -245,6 +263,7 @@ export default {
    background-color: #454150;
    border-radius: 12px;
    height: 30px;
+   bottom: 5px;
 
    display: flex;
    flex-direction: row;
@@ -277,13 +296,16 @@ export default {
    background-color: #E85C5C;
    color: #f4f4f4;
 }
+
 .delete-message {
    font-weight: 600;
    color: #f4f4f4;
 }
+
 .delete-message:hover {
    color: #E85C5C;
 }
+
 .delete-message:active {
    background-color: #E85C5C;
    color: #f4f4f4;

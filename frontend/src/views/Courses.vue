@@ -6,7 +6,7 @@
                <router-link :key="group.groups_id" v-for="group in groups"
                             @click="setGroup(group)" :to="group.type === 'SUBJECTS' ? `/groupes/subject/${group.groups_id}` : `/groupes/${group.groups_id}`">
                   <div class="group">
-                     {{ group.name }}
+                     {{ group.description }}
                   </div>
                </router-link>
             </div>
@@ -16,7 +16,7 @@
             </button>
          </div>
       </div>
-      <router-view/>
+      <router-view @groupAdded="pushInGroups($event);" />
    </div>
    <Account @logSuccess="getRooms(getUser.role)" v-else/>
 
@@ -50,7 +50,6 @@ export default {
          } else {
             axios.get(`http://localhost:8080/api/users/seeAllGroups?user_id=${this.getUser.id}`).then(response => {
                this.groups = response.data;
-               console.log(this.groups);
             })
          }
       },
@@ -69,7 +68,9 @@ export default {
                this.groups.push(response.data);
             });
          }
-
+      },
+      pushInGroups(group) {
+         this.groups.push(group);
       }
    },
    mounted() {

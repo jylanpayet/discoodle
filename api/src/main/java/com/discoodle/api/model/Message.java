@@ -21,7 +21,8 @@ public class Message {
     @Column(name = "conv_uuid")
     private String conv_uuid;
 
-    @Column(name = "content")
+    @Lob
+    @Column(name = "content", columnDefinition = "text")
     private String content;
 
     @Column(name = "sender")

@@ -1,5 +1,5 @@
 <template>
-   <div class="Group" v-if="getGroup.type === 'SUBJECTS'"><Subject /></div>
+   <div class="Group" v-if="getGroup.type === 'SUBJECTS'"><Subject @groupAdded="$emit('groupAdded', $event);" /></div>
    <div class="Group" v-else-if="getGroup.type === 'DISCOODLE'"><Discoodle /></div>
    <div class="Group" v-else>
 

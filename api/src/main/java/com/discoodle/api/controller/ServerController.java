@@ -7,9 +7,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @AllArgsConstructor
-@RestController("api/server")
+@RestController
+@RequestMapping("api/server")
 public class ServerController {
 
     ServerService serverService;
@@ -23,8 +25,8 @@ public class ServerController {
     }
 
     @PostMapping(path = "/addRoom")
-    public void addNewRoom(@RequestParam(value="server_id")  Long server_id, @RequestParam(value = "name") String name) {
-        serverService.addNewRoom(server_id, name);
+    public Optional<Room> addNewRoom(@RequestParam(value="server_id")  Long server_id, @RequestParam(value = "name") String name) {
+        return serverService.addNewRoom(server_id, name);
     }
 
     @GetMapping("/seeAllServRooms")

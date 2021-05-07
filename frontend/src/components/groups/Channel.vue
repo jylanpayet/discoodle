@@ -27,34 +27,33 @@
                            <img src="../../../../assets/crown.svg" style="height: 80%; margin-right: 10px;" alt=""
                                 v-if="user.id === room.room_admin">
                            {{ user.name }} {{ user.last_name.toUpperCase() }}
-                           <div>
-                              <button v-if="user.id !== getUser.id && getUser.id === room.room_admin"
-                                      style="margin-right: 6px;" @click="promoteAdmin(user.id)">
-                                 <img src="../../../../assets/crown.svg" style="height: 70%" alt="">
-                              </button>
-                              <button v-if="getUser.id === room.room_admin && user.id !== getUser.id && user.id !== room.room_admin"
-                                      @click="removerUser(user.id)">
-                                 X
-                              </button>
-                           </div>
                         </div>
                      </div>
                   </div>
                </w-drawer>
             </div>
 
-            <div class="pinned-message" v-if="showPinned">
-               <div>
-                  {{ pinned.length === 0 ? "Aucun message épinglé" : "" }}
-                  <div class="pinned-message-content" :key="messages" v-for="messages in pinned">
-                     {{ messages.sender }} : <br>
-                     {{ messages.content }} <br>
-                     <button class="unpin-message" @click="unpinMessage(messages.message_id)">
+            <w-dialog
+                  :width="500"
+                  v-model="showPinned"
+                  style="overflow-y: auto;"
+            >
+               <div style="max-height: 70vh;">
+                  <h3 style="margin-bottom: 10px;">
+                     {{ pinned.length === 0 ? "Aucun message épinglé" : "Liste des messages épinglés :" }}</h3>
+                  <w-divider style="margin-bottom: 10px;"></w-divider>
+                  <div :key="messages" v-for="messages in pinned" class="message-pinned">
+                     <div>
+                        <strong style="text-decoration: underline">{{ messages.sender }}</strong> : <br>
+                        {{ messages.content }} - {{ new Date(messages.message_date).toLocaleDateString() }} <br>
+                     </div>
+                     <button class="unpin-message" v-if="rights.canModifyRoom"
+                             @click="unpinMessage(messages.message_id)">
                         X
                      </button>
                   </div>
                </div>
-            </div>
+            </w-dialog>
          </div>
       </div>
 
@@ -70,6 +69,8 @@
                   :message_date="message.message_date"
                   :message_id="message.message_id"
                   :edited="message.edited"
+                  :can-pin="rights.canModifyRoom"
+                  :can-remove="rights.canModifyRoom"
                   @pinnedMessage="pinnedMessage"
                   @deletedMessage="deletedMessage"
                   @editedMessage="editedMessage"
@@ -132,7 +133,16 @@ export default {
          showUserList: false,
          pinAdd: false,
          showPinned: false,
-         showEmoji: false
+         showEmoji: false,
+
+         rights: {
+            canSendMessage: false,
+            canReadMessage: false,
+            canChangeGroup: false,
+            canModifyRoom: false,
+            canModifyNotes: false,
+            canStream: false,
+         }
       }
    },
 
@@ -324,7 +334,7 @@ export default {
          let temp = new FormData();
          temp.append("file", file);
          axios({
-            url: `http://localhost:8080/api/uploadImageInChat/${this.getCurrentConv}`,
+            url: `http://localhost:8080/api/uploadfile/uploadImageInChat?room_id=${this.getCurrentConv}`,
             method: 'POST',
             data: temp,
             headers: {
@@ -433,7 +443,40 @@ export default {
          this.room = response.data;
          this.getMessagesFromJSON();
          this.connect();
-         console.log(this.room);
+      })
+
+      // Get rights of user in this group.
+      axios.get(`http://localhost:8080/api/groups/getRoleByGroupAndUser?user_id=${this.getUser.id}&group_id=${this.getGroup.groups_id}`).then(response => {
+         let fullRights = false;
+         response.data.forEach(elt => {
+            if (elt.rights === "*")
+               fullRights = true;
+         });
+
+         if (fullRights) {
+            this.rights = {
+               canSendMessage: true,
+               canReadMessage: true,
+               canChangeGroup: true,
+               canModifyRoom: true,
+               canModifyNotes: true,
+               canStream: true,
+            }
+         } else {
+            response.data.sort((a, b) => {
+               return a.rights.length - b.rights.length;
+            });
+
+            const temp = response.data[response.data.length - 1].rights;
+            this.rights = {
+               canSendMessage: temp.includes("s"),
+               canReadMessage: temp.includes("r"),
+               canChangeGroup: temp.includes("p"),
+               canModifyRoom: temp.includes("c"),
+               canModifyNotes: temp.includes("n"),
+               canStream: temp.includes("l"),
+            }
+         }
       })
    },
    beforeRouteUpdate() {
@@ -444,6 +487,40 @@ export default {
          console.log(this.room);
       })
       this.connect();
+
+      // Get rights of user in this group.
+      axios.get(`http://localhost:8080/api/groups/getRoleByGroupAndUser?user_id=${this.getUser.id}&group_id=${this.getGroup.groups_id}`).then(response => {
+         let fullRights = false;
+         response.data.forEach(elt => {
+            if (elt.rights === "*")
+               fullRights = true;
+         });
+
+         if (fullRights) {
+            this.rights = {
+               canSendMessage: true,
+               canReadMessage: true,
+               canChangeGroup: true,
+               canModifyRoom: true,
+               canModifyNotes: true,
+               canStream: true,
+            }
+         } else {
+            response.data.sort((a, b) => {
+               return a.rights.length - b.rights.length;
+            });
+
+            const temp = response.data[response.data.length - 1].rights;
+            this.rights = {
+               canSendMessage: temp.includes("s"),
+               canReadMessage: temp.includes("r"),
+               canChangeGroup: temp.includes("p"),
+               canModifyRoom: temp.includes("c"),
+               canModifyNotes: temp.includes("n"),
+               canStream: temp.includes("l"),
+            }
+         }
+      })
    },
    unmounted() {
       this.disconnect();
@@ -581,6 +658,22 @@ button {
    width: 70px;
 }
 
+.message-pinned {
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   margin-top: 10px;
+}
+
+.message-pinned > div {
+   background-color: #4f4b5a;
+   color: #F4F4F4;
+   padding: 10px;
+   width: 90%;
+
+   border-radius: 4px;
+}
+
 .submit-file {
    background-color: #454150;
    height: 32px;
@@ -618,53 +711,6 @@ button {
    color: #909090;
 }
 
-
-.pinned-message {
-   animation: appear-opacity ease-in-out 0.5s;
-
-   position: absolute;
-
-   z-index: 500;
-
-   padding: 10px 10px 0 10px;
-   border-radius: 12px;
-   right: 80px;
-   top: 170px;
-   min-width: 350px;
-   background-color: #909090;
-}
-
-.pinned-message > div {
-   position: relative;
-   width: 100%;
-
-   display: flex;
-   flex-direction: column;
-   align-items: center;
-   justify-content: flex-start;
-}
-
-.pinned-message > div::before {
-   content: "";
-   position: absolute;
-   right: 0;
-   top: 0;
-   width: 13px;
-   height: 13px;
-   background-color: #909090;
-   transform: rotate(45deg) translateY(-9px) translateX(-15px);
-}
-
-.pinned-message-content {
-   position: relative;
-   padding: 10px;
-   margin-bottom: 10px;
-   width: 100%;
-   background-color: #C4C4C4;
-   color: #454150;
-   border-radius: 12px;
-}
-
 #pin > img {
    width: 20px;
    height: 20px;
@@ -683,11 +729,10 @@ button {
 }
 
 .unpin-message {
-   position: absolute;
-   right: 5px;
-   top: 5px;
-   height: 20px;
-   width: 20px;
+   height: 30px;
+   width: 30px;
+   font-weight: 600;
+   font-size: 17px;
    border-radius: 29px;
    background-color: #454150;
    color: #f4f4f4;
@@ -696,6 +741,7 @@ button {
 
 .unpin-message:hover {
    transform: scale(1.1);
+   background-color: #E85C5C;
 }
 
 .emojiPicker {

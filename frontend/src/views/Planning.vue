@@ -11,34 +11,29 @@
       </div>
 
       <button class="webcamButton" @click="startWebcam">
-         Start webcam
+         Webcam
       </button>
       <button class="screenshareButton" @click="startScreenshare">
-         Start screenshare
+         Partage d'écran
       </button>
 
       <br><br>
 
       <button class="callButton" @click="createCall" disabled>
-         Create call
+         Démarrer le stream
       </button>
 
       <br><br>
 
       <input type="text" id="callInput" v-model="model.callInput">
       <button class="answerButton" disabled @click="answerCall">
-         Answer
+         Rejoindre le stream
       </button>
 
-      <br><br>
-
-      <button class="hangupButton" disabled>
-         Hangup
-      </button>
       <br><br>
 
       <button @click="logInfo">
-         Check active
+         Afficher les informations
       </button>
    </div>
 </template>
@@ -91,7 +86,6 @@ export default {
 
          document.querySelector(".callButton").disabled = false;
          document.querySelector(".answerButton").disabled = false;
-         document.querySelector(".hangupButton").disabled = true;
       },
 
       async startScreenshare() {
@@ -117,7 +111,6 @@ export default {
 
          document.querySelector(".callButton").disabled = false;
          document.querySelector(".answerButton").disabled = false;
-         document.querySelector(".hangupButton").disabled = true;
       },
 
       async createCall() {
@@ -125,8 +118,7 @@ export default {
          const offerCandidates = callDoc.collection('offerCandidates');
          const answerCandidates = callDoc.collection('answerCandidates');
 
-         this.callInput = callDoc.id;
-         console.log(callDoc.id);
+         this.model.callInput = callDoc.id;
 
          this.pc.onicecandidate = (event) => {
             event.candidate && offerCandidates.add(event.candidate.toJSON());
@@ -159,7 +151,6 @@ export default {
             });
          });
 
-         document.querySelector(".hangupButton").disabled = false;
       },
 
       async answerCall() {
@@ -265,5 +256,27 @@ button {
 video {
    max-height: 100%;
    max-width: 50%;
+}
+
+button {
+   background-color: #F4F4F4;
+   color: #4f4b5a;
+   border: none;
+   outline: none;
+
+   cursor: pointer;
+
+   height: 30px;
+}
+
+button:hover {
+   background-color: #E85C5C;
+   color: #F4F4F4;
+}
+
+button[disabled] {
+   background-color: #454545;
+   color: #999999;
+   cursor: not-allowed;
 }
 </style>

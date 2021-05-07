@@ -78,7 +78,7 @@ public class UploadFileService {
         if(!group.isPresent() || !group.get().getType().equals("SUBJECTS"))
             return "le group n'existe pas ou n'est pas une matière!";
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-        if (!extension.equals("md")) {
+        if (!extension.equals("md") && !extension.equals(".txt")) {
             return "L'extension n'est pas un fichier md, il ne peut donc pas être upload";
         }
         String path = String.format("%sstatic/common/groups/%d/cours.md", ApiApplication.RESSOURCES, group_id);

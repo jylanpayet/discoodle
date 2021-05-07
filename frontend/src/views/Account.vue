@@ -295,7 +295,6 @@ export default {
          let noErr = true;
          this.confirmRegister.show = false;
          this.groups.forEach(elt => {
-            console.log(elt);
             if (elt.group.type === "GRADE" || elt.group.type === "OTHER") {
                elt.childs.forEach(group => {
                   if (group.type === "SUBJECTS") {
@@ -307,7 +306,6 @@ export default {
                   }
                })
             }
-            console.log(update);
             if (!update) {
                axios.post(
                      `http://localhost:8080/api/groups/addNewMemberInGroup?group_id=${elt.group.groups_id}&user_id=${this.getUser.id}&token=${elt.group.token}`

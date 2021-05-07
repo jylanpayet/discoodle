@@ -5,7 +5,7 @@
             :items="table.items"
             :selectable-rows="table.selectableRows"
             @row-select="table.noteSelection = $event"
-
+            v-if="getUser.role === 'STUDENT'"
             class="notes"
       >
          <template #no-data>
@@ -13,7 +13,7 @@
          </template>
       </w-table>
 
-      <w-button class="ma1" bg-color="error" @click="addNote = true">Ajouter une note</w-button>
+      <w-button class="ma1" bg-color="error" @click="addNote = true" v-if="rights.canModifyNotes">Ajouter une note</w-button>
 
       <!--
          TODO : Implémenter les rôles dans les notes, le serveur, la page Subject et le WebRTC.
@@ -105,6 +105,14 @@ export default {
          maxNote: 20,
          validators: {
             required: value => !!value || 'Vous devez entrer une valeur ici.'
+         },
+         rights: {
+            canSendMessage: false,
+            canReadMessage: false,
+            canChangeGroup: false,
+            canModifyRoom: false,
+            canModifyNotes: false,
+            canStream: false,
          }
       }
    },
@@ -144,9 +152,42 @@ export default {
    computed: {
       ...mapGetters(['getGroup', 'getUser']),
    },
-   mounted() {
-      console.log(this.getGroup);
+   beforeRouteUpdate() {
+      // Get rights of user in this group.
+      axios.get(`http://localhost:8080/api/groups/getRoleByGroupAndUser?user_id=${this.getUser.id}&group_id=${this.getGroup.groups_id}`).then(response => {
+         let fullRights = false;
+         response.data.forEach(elt => {
+            if (elt.rights === "*")
+               fullRights = true;
+         });
 
+         if (fullRights) {
+            this.rights = {
+               canSendMessage: true,
+               canReadMessage: true,
+               canChangeGroup: true,
+               canModifyRoom: true,
+               canModifyNotes: true,
+               canStream: true,
+            }
+         } else {
+            response.data.sort((a, b) => {
+               return a.rights.length - b.rights.length;
+            });
+
+            const temp = response.data[response.data.length - 1].rights;
+            this.rights = {
+               canSendMessage: temp.includes("s"),
+               canReadMessage: temp.includes("r"),
+               canChangeGroup: temp.includes("p"),
+               canModifyRoom: temp.includes("c"),
+               canModifyNotes: temp.includes("n"),
+               canStream: temp.includes("l"),
+            }
+         }
+      })
+   },
+   mounted() {
       axios.get(`http://localhost:8080/api/note/getUserNoteByGroupId?group_id=${this.getGroup.groups_id}&user_id=${this.getUser.id}`).then(response => {
          this.table.items = response.data.map(e => {
             return {
@@ -169,6 +210,40 @@ export default {
                coef: "-",
                note: moyenne.toFixed(2)
             })
+         }
+      })
+
+      // Get rights of user in this group.
+      axios.get(`http://localhost:8080/api/groups/getRoleByGroupAndUser?user_id=${this.getUser.id}&group_id=${this.getGroup.groups_id}`).then(response => {
+         let fullRights = false;
+         response.data.forEach(elt => {
+            if (elt.rights === "*")
+               fullRights = true;
+         });
+
+         if (fullRights) {
+            this.rights = {
+               canSendMessage: true,
+               canReadMessage: true,
+               canChangeGroup: true,
+               canModifyRoom: true,
+               canModifyNotes: true,
+               canStream: true,
+            }
+         } else {
+            response.data.sort((a, b) => {
+               return a.rights.length - b.rights.length;
+            });
+
+            const temp = response.data[response.data.length - 1].rights;
+            this.rights = {
+               canSendMessage: temp.includes("s"),
+               canReadMessage: temp.includes("r"),
+               canChangeGroup: temp.includes("p"),
+               canModifyRoom: temp.includes("c"),
+               canModifyNotes: temp.includes("n"),
+               canStream: temp.includes("l"),
+            }
          }
       })
    }
