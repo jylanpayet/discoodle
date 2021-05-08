@@ -122,8 +122,42 @@ mvn spring-boot:run
 
 ## <div id="issues">Feuille de route des issues</div>
 
-Regardez [les issues](https://gaufre.informatique.univ-paris-diderot.fr/somon/discoodle/issues) créées afin de prendre connaissance du travail réalisé, des améliorations déjà effectuées 
+#### <ins>_DISCOO-START_</ins> :
+Nous avons lors du premier sprint...
+
+#### <ins>_DISCOO-WEBRTC_</ins> :
+Durant ce second sprint, ...
+
+#### <ins>_DISCOO-API_</ins> :
+Nous avons durant ce troisième sprint, ...
+
+#### <ins>_DISCOO-WEBRTC_</ins> :
+Lors de ce quatrième sprint, ...
+
+#### <ins>_DISCOO-BUILD_</ins> :
+Le cinquième sprint rime avec "dint" (signifiant force) car nous voyons le rendu final de notre 
+travail : ...
+
+#### <ins>_DISCOO-HAPPY-END_</ins> :
+Il s'est avéré que ce dernier sprint fut l'élément manquant car ...
+
+Regardez, de manière plus détaillée, [les issues](https://gaufre.informatique.univ-paris-diderot.fr/somon/discoodle/issues) créées afin de prendre connaissance du travail réalisé, des améliorations déjà effectuées 
 ainsi que des problèmes rencontrés.
+
+
+## <div id="issues">TODO</div>
+#### <ins>_Les différentes idées possibles à intégrer_</ins> :
+- améliorer le webrtc en faisant en sorte que le système fonctionne pour des 
+  conversations entre différents utilisateurs (au sein d'une conversation...).
+- faire en sorte que l'application soit fonctionnelle sous forme d'application bureau (et 
+  toujours web évidemment) afin de faciliter son utilisation.
+- améliorer la sécurité en instaurant un système de tokens lorsqu'une action s'effectue 
+  côté back afin de prévenir des failles CSRF.
+- intégrer un système d'authentification grâce gmail afin de rendre plus intuitive 
+  l'inscription à la plateforme.
+- améliorer l'api en rajoutant quelques fonctionnalités pour l'intégration des patterns, 
+  l'auto-sauvegarde régulière des BDDs...
+- rajouter des limitations à l'upload des fichiers avec timers prédéfinis...
 
 ## <div id="auteurs">Auteurs</div>
 
