@@ -26,6 +26,7 @@ public class GroupsService {
     private final ServerService serverService;
     private final UserService userService;
     private final RolesRepository rolesRepository;
+    private final NoteService noteService;
 
     public Optional<Groups> createNewGroup(GroupsRequest request) {
         // Generate a UUID token for this new Group.
@@ -219,4 +220,17 @@ public class GroupsService {
         return groupsRepository.findIDOfDiscoodle();
     }
 
+
+    public Boolean deleteUser(Long user_id, Long group_id) {
+        if (userRepository.existsById(user_id) && groupsRepository.existsById(group_id)) {
+            List<Roles> roles=this.getRoleByGroupAndUser(group_id,user_id);
+            for(Roles r:roles){
+                rolesRepository.deleteLinkRoleToUser(user_id,r.getRole_id());
+            }
+            serverService.removeMember(groupsRepository.findById(group_id).get().getServer().getServer_id(),user_id);
+            groupsRepository.deleteLinkGroupsToUser(group_id,user_id);
+            return true;
+        }
+        return false;
+    }
 }

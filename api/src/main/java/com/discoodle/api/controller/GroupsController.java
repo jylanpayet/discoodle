@@ -91,4 +91,9 @@ public class GroupsController {
         return groupsService.deleteRole(role_id);
     }
 
+    @DeleteMapping("/deleteUser")
+    public Boolean deleteUser(@RequestParam("user_id") Long user_id,@RequestParam("group_id") Long group_id) {
+        return groupsService.deleteUser(user_id,group_id);
+    }
+
 }

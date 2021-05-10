@@ -39,6 +39,11 @@ public interface GroupsRepository extends JpaRepository<Groups, Long> {
 
     @Transactional
     @Modifying
+    @Query(value = "DELETE r FROM link_groups_to_user as r where r.groups_id = :groups_id AND r.user_id = :user_id", nativeQuery = true)
+    void deleteLinkGroupsToUser(@Param("groups_id") Long groups_id, @Param("user_id") Long user_id);
+
+    @Transactional
+    @Modifying
     @Query(value = "DELETE r FROM link_groups_to_group as r where r.groups_id = :groups_id AND r.son_id = :son_id", nativeQuery = true)
     void deleteLinkGroupsToGroup(@Param("groups_id") Long groups_id, @Param("son_id") Long son_id);
 
