@@ -23,4 +23,9 @@ public interface ServerRepository extends JpaRepository<Server, Long> {
     @Transactional
     void addNewMember(@Param("server_id") Long server_id, @Param("user_id") Long user_id);
 
+    @Transactional
+    @Modifying
+    @Query(value = "DELETE r FROM link_server_users as r where r.server_id = :server_id AND r.user_id = :user_id", nativeQuery = true)
+    void removeMember(@Param("server_id") Long server_id, @Param("user_id") Long user_id);
+
 }

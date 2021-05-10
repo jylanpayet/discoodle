@@ -79,4 +79,16 @@ public class ServerService {
         }
         return rooms;
     }
+
+    public Boolean removeMember(Long server_id, Long user_id) {
+        if (serverRepository.existsById(server_id) && userRepository.existsById(user_id)) {
+            List<Room> all = serverRepository.findById(server_id).get().getRooms();
+            for (Room room : all) {
+                roomService.removeMember(room.getRoom_id(),user_id);
+            }
+            serverRepository.removeMember(server_id,user_id);
+            return true;
+        }
+        return false;
+    }
 }
