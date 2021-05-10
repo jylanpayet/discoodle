@@ -75,7 +75,7 @@ public class UploadFileService {
     //Remove the verification of Subjects
     public String uploadSubject(MultipartFile file, Long group_id) {
         Optional<Groups> group=groupsRepository.findGroupsByID(group_id);
-        if(!group.isPresent() || !group.get().getType().equals("SUBJECTS"))
+        if(group.isEmpty() || !group.get().getType().equals(Groups.TypeOfGroup.SUBJECTS))
             return "le group n'existe pas ou n'est pas une matière!";
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
         if (!extension.equals("md") && !extension.equals(".txt")) {

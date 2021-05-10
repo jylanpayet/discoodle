@@ -72,6 +72,23 @@ const routes = [
                 path: ":id",
                 name: "Group",
                 component: () =>import(/* webpackChunkName: "courses/subject" */'../components/groups/Group'),
+                children: [
+                    {
+                        path: "",
+                        name: "Default Subjects",
+                        redirect: { name: 'Group chat' }
+                    },
+                    {
+                        path: "discussion",
+                        name: "Group chat",
+                        component: () => import('../components/groups/SubjectChat')
+                    },
+                    {
+                        path: "parametres",
+                        name: "Group settings",
+                        component: () => import('../components/groups/SubjectSettings')
+                    },
+                ]
             }
         ]
     },

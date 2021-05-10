@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -128,6 +129,10 @@ public class GroupsService {
         return Optional.empty();
     }
 
+    public void removeMember(Long group_id, Long user_id) {
+        groupsRepository.removeMember(group_id, user_id);
+    }
+
     public Optional<Server> serverOfGroup(Long groups_id) {
         // Get the group in database.
         Optional<Groups> tempGroup = groupsRepository.findGroupsByID(groups_id);
@@ -184,6 +189,12 @@ public class GroupsService {
         return Optional.empty();
     }
 
+    public Optional<Roles> removeRoleForUser(Long user_id, Long role_id) {
+        if (rolesRepository.findById(role_id).isPresent() && userRepository.findById(user_id).isPresent())
+            groupsRepository.removeRoleForUser(user_id, role_id);
+        return Optional.empty();
+    }
+
     public List<Roles> getRoleByGroupAndUser(Long group_id, Long user_id) {
         List<Roles> roles = userRepository.findById(user_id).get().getRoles();
         List<Roles> res = new java.util.ArrayList<>();
@@ -207,9 +218,20 @@ public class GroupsService {
 
     public Boolean deleteRole(Long role_id) {
         // If the role exist.
-        if (rolesRepository.existsById(role_id)) {
-            // Delete this role.
+        Optional<Roles> role = rolesRepository.findById(role_id);
+        if (role.isPresent()) {
+
+            for (User user : role.get().getUsers()) {
+                List<Roles> roles = this.getRoleByGroupAndUser(role.get().getGroups_id().getGroups_id(), user.getId());
+                if (roles.size() == 1 && roles.get(0).getRole_id().equals(role_id)) {
+                    groupsRepository.addRoleForUser(user.getId(), role.get().getGroups_id().getRoles().stream().filter(
+                          e -> e.getName().equals("Etudiant")
+                    ).collect(Collectors.toList()).get(0).getRole_id());
+                }
+            }
+
             rolesRepository.deleteById(role_id);
+
             return true;
         }
         return false;

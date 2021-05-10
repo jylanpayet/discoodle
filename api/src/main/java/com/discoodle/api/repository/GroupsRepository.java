@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
@@ -58,6 +59,11 @@ public interface GroupsRepository extends JpaRepository<Groups, Long> {
     void addNewGroupsInGroup(@Param("groups_id") Long groups_ID, @Param("son_id") Long son_ID);
 
     @Modifying
+    @Query(value = "DELETE r FROM link_groups_to_user AS r WHERE r.groups_id = :group_id AND r.user_id = :user_id", nativeQuery = true)
+    @Transactional
+    void removeMember(@Param("group_id") Long group_id, @Param("user_id") Long user_id);
+
+    @Modifying
     @Query(value = "insert into link_groups_to_server (groups_id, server_id) VALUES (:groups_id,:server_id)", nativeQuery = true)
     @Transactional
     void addNewServInGroup(@Param("groups_id") Long groups_id, @Param("server_id") Long server_id);
@@ -71,6 +77,11 @@ public interface GroupsRepository extends JpaRepository<Groups, Long> {
     @Query(value = "insert into link_role_to_users (user_id, role_id) VALUES (:user_id,:role_id)", nativeQuery = true)
     @Transactional
     void addRoleForUser(@Param("user_id") Long user_id, @Param("role_id") Long role_id);
+
+    @Modifying
+    @Query(value = "DELETE r FROM link_role_to_users AS r WHERE r.user_id = :user_id AND r.role_id = :role_id", nativeQuery = true)
+    @Transactional
+    void removeRoleForUser(@Param("user_id") Long user_id, @Param("role_id") Long role_id);
 
     @Transactional
     @Modifying

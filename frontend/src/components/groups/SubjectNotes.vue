@@ -5,7 +5,6 @@
             :items="table.items"
             :selectable-rows="table.selectableRows"
             @row-select="table.noteSelection = $event"
-            v-if="getUser.role === 'STUDENT'"
             class="notes"
       >
          <template #no-data>
@@ -14,10 +13,8 @@
       </w-table>
 
       <w-button class="ma1" bg-color="error" @click="addNote = true" v-if="rights.canModifyNotes">Ajouter une note</w-button>
+      <w-button class="ma1" bg-color="error" @click="removeNote" v-if="rights.canModifyNotes">Supprimer la note</w-button>
 
-      <!--
-         TODO : Implémenter les rôles dans les notes, le serveur, la page Subject et le WebRTC.
-       -->
       <w-dialog
             v-model="addNote"
             title="Ajouter une ou plusieurs notes"
@@ -144,15 +141,61 @@ export default {
                note: (Number(this.inputNote.note) / this.maxNote) * 20,
                coef: Number(this.inputNote.coef),
                titre: this.inputNote.name
+            }).then(response => {
+               this.table.items.push({
+                  id: response.data.note_id,
+                  name: response.data.titre,
+                  coef: response.data.coef,
+                  note: response.data.note
+               })
             });
          }
          this.addNote = false;
-      }
+      },
+      removeNote() {
+         console.log(this.table.noteSelection);
+         if (this.table.noteSelection.item?.id >= 0) {
+            axios.delete(`http://localhost:8080/api/note/deleteNoteById?note_id=${this.table.noteSelection.item.id}`).then(() => {
+               this.table.items = this.table.items.filter(e => {
+                  return e.id !== this.table.noteSelection.item.id;
+               });
+            });
+         }
+      },
    },
    computed: {
       ...mapGetters(['getGroup', 'getUser']),
    },
    beforeRouteUpdate() {
+      if (this.getUser.role === "STUDENT") {
+         axios.get(`http://localhost:8080/api/note/getUserNoteByGroupId?group_id=${this.getGroup.groups_id}&user_id=${this.getUser.id}`).then(response => {
+            this.table.items = response.data.map(e => {
+               return {
+                  id: e.note_id,
+                  name: e.titre,
+                  coef: e.coef,
+                  note: e.note
+               }
+            });
+
+            if (response.data.length > 0) {
+               let moyenne = 0;
+               let coefSumm = 0;
+               this.table.items.forEach(elt => {
+                  moyenne += (elt.note * elt.coef);
+                  coefSumm += elt.coef;
+               })
+               moyenne = moyenne / coefSumm;
+               this.table.items.push({
+                  id: -1,
+                  name: "Moyenne générale".toUpperCase(),
+                  coef: "-",
+                  note: moyenne.toFixed(2)
+               })
+            }
+         })
+      }
+
       // Get rights of user in this group.
       axios.get(`http://localhost:8080/api/groups/getRoleByGroupAndUser?user_id=${this.getUser.id}&group_id=${this.getGroup.groups_id}`).then(response => {
          let fullRights = false;
@@ -184,34 +227,68 @@ export default {
                canModifyNotes: temp.includes("n"),
                canStream: temp.includes("l"),
             }
+         }
+
+         if (this.rights.canModifyNotes) {
+            axios.get(`http://localhost:8080/api/note/getAllNoteByGroupId?group_id=${this.getGroup.groups_id}`).then(response => {
+               console.log(response);
+               this.table.items = response.data.map(e => {
+                  return {
+                     id: e.id,
+                     name: e.titre,
+                     coef: e.coef,
+                     note: e.note
+                  }
+               });
+
+               if (response.data.length > 0) {
+                  let moyenne = 0;
+                  let coefSumm = 0;
+                  this.table.items.forEach(elt => {
+                     moyenne += (elt.note * elt.coef);
+                     coefSumm += elt.coef;
+                  })
+                  moyenne = moyenne / coefSumm;
+                  this.table.items.push({
+                     id: -1,
+                     name: "Moyenne de la classe :".toUpperCase(),
+                     coef: "-",
+                     note: moyenne.toFixed(2)
+                  })
+               }
+            })
          }
       })
    },
    mounted() {
-      axios.get(`http://localhost:8080/api/note/getUserNoteByGroupId?group_id=${this.getGroup.groups_id}&user_id=${this.getUser.id}`).then(response => {
-         this.table.items = response.data.map(e => {
-            return {
-               name: e.titre,
-               coef: e.coef,
-               note: e.note
-            }
-         });
+      if (this.getUser.role === "STUDENT") {
+         axios.get(`http://localhost:8080/api/note/getUserNoteByGroupId?group_id=${this.getGroup.groups_id}&user_id=${this.getUser.id}`).then(response => {
+            this.table.items = response.data.map(e => {
+               return {
+                  id: e.note_id,
+                  name: e.titre,
+                  coef: e.coef,
+                  note: e.note
+               }
+            });
 
-         if (response.data.length > 0) {
-            let moyenne = 0;
-            let coefSumm = 0;
-            this.table.items.forEach(elt => {
-               moyenne += (elt.note * elt.coef);
-               coefSumm += elt.coef;
-            })
-            moyenne = moyenne / coefSumm;
-            this.table.items.push({
-               name: "Moyenne générale".toUpperCase(),
-               coef: "-",
-               note: moyenne.toFixed(2)
-            })
-         }
-      })
+            if (response.data.length > 0) {
+               let moyenne = 0;
+               let coefSumm = 0;
+               this.table.items.forEach(elt => {
+                  moyenne += (elt.note * elt.coef);
+                  coefSumm += elt.coef;
+               })
+               moyenne = moyenne / coefSumm;
+               this.table.items.push({
+                  id: -1,
+                  name: "Moyenne générale".toUpperCase(),
+                  coef: "-",
+                  note: moyenne.toFixed(2)
+               })
+            }
+         })
+      }
 
       // Get rights of user in this group.
       axios.get(`http://localhost:8080/api/groups/getRoleByGroupAndUser?user_id=${this.getUser.id}&group_id=${this.getGroup.groups_id}`).then(response => {
@@ -244,6 +321,35 @@ export default {
                canModifyNotes: temp.includes("n"),
                canStream: temp.includes("l"),
             }
+         }
+
+         if (this.rights.canModifyNotes) {
+            axios.get(`http://localhost:8080/api/note/getAllNoteByGroupId?group_id=${this.getGroup.groups_id}`).then(response => {
+               this.table.items = response.data.map(e => {
+                  return {
+                     id: e.note_id,
+                     name: e.titre,
+                     coef: e.coef,
+                     note: e.note
+                  }
+               });
+
+               if (response.data.length > 0) {
+                  let moyenne = 0;
+                  let coefSumm = 0;
+                  this.table.items.forEach(elt => {
+                     moyenne += (elt.note * elt.coef);
+                     coefSumm += elt.coef;
+                  })
+                  moyenne = moyenne / coefSumm;
+                  this.table.items.push({
+                     id: -1,
+                     name: "Moyenne de la classe :".toUpperCase(),
+                     coef: "-",
+                     note: moyenne.toFixed(2)
+                  })
+               }
+            })
          }
       })
    }

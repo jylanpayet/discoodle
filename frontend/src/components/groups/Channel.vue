@@ -57,7 +57,7 @@
          </div>
       </div>
 
-      <div class="conv-messages">
+      <div class="conv-messages" v-if="rights.canReadMessage">
          <span v-if="messages.length === 0"
                style="align-self: center; font-size: 15px; font-weight: 500; color: #F4F4F4"> Soyez le premier à envoyer un message à {{
                $route.query.name
@@ -77,11 +77,15 @@
          />
       </div>
 
+      <div class="conv-messages" v-else>
+         <span style="align-self: center; font-size: 17px; font-weight: 600; color: #F4F4F4">Vous n'avez pas la permission de lire les messages.</span>
+      </div>
+
       <div class="conv-input">
          <span>
             {{ getWritersAsText() }}
          </span>
-         <div>
+         <div v-if="rights.canSendMessage">
             <input type="text" autocomplete="off" :placeholder="`Envoyer un message à ${ $route.query.name }`"
                    @keydown="actionInput">
             <div class="right-side-input">
@@ -96,6 +100,9 @@
                </label>
             </div>
          </div>
+         <span v-else style="font-size: 17px; font-weight: 600">
+            Vous n'avez pas la permission d'envoyer des messages.
+         </span>
       </div>
    </div>
 </template>
