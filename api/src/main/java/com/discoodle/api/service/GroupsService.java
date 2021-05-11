@@ -88,7 +88,7 @@ public class GroupsService {
             System.out.println("Dossier du groups non crée !");
         }
         // Return this new group.
-        return Optional.of(finalGroup);
+        return groupsRepository.findById(finalGroup.getGroups_id());
     }
 
     public Optional<Groups> editGroup(EditGroupRequest request) {
