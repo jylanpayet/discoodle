@@ -188,7 +188,9 @@ public class GroupsService {
     }
 
     public Optional<Roles> removeRoleForUser(Long user_id, Long role_id) {
+        // Check if the role and the user are present.
         if (rolesRepository.findById(role_id).isPresent() && userRepository.findById(user_id).isPresent())
+            // Remove user role.
             groupsRepository.removeRoleForUser(user_id, role_id);
         return Optional.empty();
     }
@@ -242,12 +244,17 @@ public class GroupsService {
 
 
     public Boolean deleteUser(Long user_id, Long group_id) {
+        // Check if the group and user exist.
         if (userRepository.existsById(user_id) && groupsRepository.existsById(group_id)) {
             List<Roles> roles=this.getRoleByGroupAndUser(group_id,user_id);
+            // Remove all user links with group roles.
             for(Roles r:roles){
                 rolesRepository.deleteLinkRoleToUser(user_id,r.getRole_id());
             }
+            // Remove the user from the server of this group.
             serverService.removeMember(groupsRepository.findById(group_id).get().getServer().getServer_id(),user_id);
+
+            // Delete the user of this group.
             groupsRepository.deleteLinkGroupsToUser(group_id,user_id);
             return true;
         }

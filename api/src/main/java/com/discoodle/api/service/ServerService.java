@@ -36,10 +36,10 @@ public class ServerService {
                 serverRepository.addNewMember(finalServ.getServer_id(), server_member);
         }
         // Create a new room for this server with the name "Géneral".
-        Room room = roomService.createNewRoom("Géneral", server_members);
+        Optional<Room> room = roomService.createNewRoom("Géneral", server_members);
         // Indicates that the room is linked to a server and link this with the server.
-        room.setRoom_link(true);
-        serverRepository.addNewRoomInServ(finalServ.getServer_id(), room.getRoom_id());
+        room.get().setRoom_link(true);
+        serverRepository.addNewRoomInServ(finalServ.getServer_id(), room.get().getRoom_id());
         // Return the final server.
         return serverRepository.findById(finalServ.getServer_id());
     }
@@ -73,13 +73,13 @@ public class ServerService {
                 users_id.add(user.getId());
             }
             // Create a new Room with the list of user.
-            Room newRoom = roomService.createNewRoom(name, users_id);
+            Optional<Room> newRoom = roomService.createNewRoom(name, users_id);
 
             // Indicates that the room is linked to a server and link this with the server.
-            newRoom.setRoom_link(true);
-            serverRepository.addNewRoomInServ(server_id, newRoom.getRoom_id());
+            newRoom.get().setRoom_link(true);
+            serverRepository.addNewRoomInServ(server_id, newRoom.get().getRoom_id());
             // Return the final room.
-            return roomRepository.findById(newRoom.getRoom_id());
+            return roomRepository.findById(newRoom.get().getRoom_id());
         }
         return Optional.empty();
     }
