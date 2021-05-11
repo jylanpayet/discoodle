@@ -5,10 +5,8 @@ import com.discoodle.api.repository.MessagesRepository;
 import com.discoodle.api.repository.RoomRepository;
 import com.discoodle.api.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import org.aspectj.weaver.ast.Test;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 

@@ -1,7 +1,6 @@
 package com.discoodle.api.controller;
 
 import com.discoodle.api.model.Room;
-import com.discoodle.api.repository.ServerRepository;
 import com.discoodle.api.service.ServerService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;

@@ -9,9 +9,7 @@ import com.discoodle.api.repository.GroupsRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -77,9 +75,9 @@ public class GroupsService {
         // Add the creator in this new group.
         groupsRepository.addNewMemberInGroup(request.getUser_id(), finalGroup.getGroups_id());
         // Create a new server for this new group.
-        Server server = serverService.createNewServ("Serveur de " + finalGroup.getName(), List.of(request.getUser_id()));
+        Optional<Server> server = serverService.createNewServ("Serveur de " + finalGroup.getName(), List.of(request.getUser_id()));
         // Create link with this server and this new group.
-        groupsRepository.addNewServInGroup(finalGroup.getGroups_id(), server.getServer_id());
+        groupsRepository.addNewServInGroup(finalGroup.getGroups_id(), server.get().getServer_id());
         try {
             File dossier = new File((String.format("%sstatic/common/groups/%d", ApiApplication.RESSOURCES, finalGroup.getGroups_id())));
             // If the directory of this file does not exist, we create it.
