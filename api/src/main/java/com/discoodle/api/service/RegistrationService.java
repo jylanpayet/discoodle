@@ -9,7 +9,9 @@ import com.discoodle.api.security.token.ConfirmationTokenService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 @Service
@@ -21,25 +23,28 @@ public class RegistrationService {
     private final MailSender mailSender;
 
     public String register(RegistrationRequest request) {
-        if (request.getPassword().matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}")) {
-            if (request.getMail().matches("^(.+)@(.+)$")) {
-                String token = userService.signUpUser(
-                        new User(
-                                request.getMail(),
-                                request.getUsername(),
-                                request.getPassword(),
-                                request.getName(),
-                                request.getLast_name(),
-                                User.Role.STUDENT
-                        )
-                );
-            /*String link = "http://localhost:8080/api/registration/confirm?token=" + token;
-            mailSender.send(request.getMail(),
-                    buildMail(request.getName(), link));*/
-                return token;
+        if(userService.getUserByUserName(request.getUsername()).isEmpty() && userService.getUserByMail(request.getMail()).isEmpty()) {
+            if (request.getPassword().matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}")) {
+                if (request.getMail().matches("^(.+)@(.+)$")) {
+                    String token = userService.signUpUser(
+                            new User(
+                                    request.getMail(),
+                                    request.getUsername(),
+                                    request.getPassword(),
+                                    request.getName(),
+                                    request.getLast_name(),
+                                    User.Role.STUDENT
+                            )
+                    );
+                    /*String link = "http://localhost:8080/api/registration/confirm?token=" + token;
+                    mailSender.send(request.getMail(),
+                            buildMail(request.getName(), link));*/
+                    return token;
+                }
+                return "Votre mail n'est pas valide.\n";
             }
-            return "Votre mail n'est pas valide.\n";
         }
+
         return """
                 Votre mot de passe doit contenir :
                 - au moins 8 caractères
@@ -52,11 +57,14 @@ public class RegistrationService {
     }
 
     public String login(RegistrationRequest request) {
-        return userService.login(request.getUsername(), request.getPassword());
+        //if(userService.getUserByUserName(request.getUsername()).get().isEnabled()) {
+            return userService.login(request.getUsername(), request.getPassword());
+        //}
+        //return "Votre compte n'est pas activé ou il n'existe pas.";
     }
 
     @Transactional
-    public String confirmToken(String token) {
+    public String confirmToken(String token, HttpServletResponse response) throws IOException {
         ConfirmationToken confirmationToken = confirmationTokenService
                 .getToken(token)
                 .orElseThrow(() ->
@@ -75,6 +83,7 @@ public class RegistrationService {
         confirmationTokenService.setConfirmedAt(token);
         userService.enableUser(
                 confirmationToken.getUser().getMail());
+        response.sendRedirect("http://localhost:8081/compte");
         return "Vous pouvez désormais vous connecter à notre plateforme discoodle ! :)";
     }
 

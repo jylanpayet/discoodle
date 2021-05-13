@@ -5,6 +5,9 @@ import com.discoodle.api.service.RegistrationService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
 @RestController
 @RequestMapping("/api/registration")
 @AllArgsConstructor
@@ -23,7 +26,7 @@ public class RegistrationController {
     }
 
     @GetMapping( "/confirm")
-    public String confirm(@RequestParam("token") String token) {
-        return registrationService.confirmToken(token);
+    public String confirm(@RequestParam("token") String token, HttpServletResponse response) throws IOException {
+        return registrationService.confirmToken(token, response);
     }
 }
