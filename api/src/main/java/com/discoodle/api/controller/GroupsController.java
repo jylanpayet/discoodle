@@ -50,6 +50,11 @@ public class GroupsController {
         return groupsService.addNewMemberInGroup(group_id, user_id, token);
     }
 
+    @DeleteMapping("/removeMember")
+    public void removeMember(@RequestParam("group_id") Long group_id, @RequestParam("user_id") Long user_id) {
+        groupsService.removeMember(group_id, user_id);
+    }
+
 
     @GetMapping( "/serverGroup")
     public Optional<Server> serverOfGroup(@RequestParam("group_id") Long group_id) {
@@ -76,9 +81,19 @@ public class GroupsController {
         return groupsService.addRoleForGroup(group_id, role_name, rights);
     }
 
-    @PostMapping("/addRoleForUser")
-    public Optional<Roles> addRoleForUsers(@RequestParam(value = "users") List<Long> user_id, @RequestParam("role_id") Long role_id) {
+    @PostMapping("/addRoleForUsers")
+    public Optional<Roles> addRoleForUsers(@RequestParam(value = "users_id") List<Long> user_id, @RequestParam("role_id") Long role_id) {
         return groupsService.addRoleForUsers(user_id, role_id);
+    }
+
+    @PostMapping("/addRoleForUser")
+    public Optional<Roles> addRoleForUser(@RequestParam(value = "user_id") Long user_id, @RequestParam("role_id") Long role_id) {
+        return this.addRoleForUsers(List.of(user_id), role_id);
+    }
+
+    @DeleteMapping("/removeRoleForUser")
+    public Optional<Roles> removeRoleForUser(@RequestParam("user_id") Long user_id, @RequestParam("role_id") Long role_id) {
+        return groupsService.removeRoleForUser(user_id, role_id);
     }
 
     @PutMapping("/modifyRightsForRole")
@@ -89,6 +104,11 @@ public class GroupsController {
     @DeleteMapping("/deleteRole")
     public Boolean deleteRole(@RequestParam("role_id") Long role_id) {
         return groupsService.deleteRole(role_id);
+    }
+
+    @DeleteMapping("/deleteUser")
+    public Boolean deleteUser(@RequestParam("user_id") Long user_id,@RequestParam("group_id") Long group_id) {
+        return groupsService.deleteUser(user_id,group_id);
     }
 
 }

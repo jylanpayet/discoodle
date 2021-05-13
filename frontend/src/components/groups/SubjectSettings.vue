@@ -3,13 +3,23 @@
       <div class="row">
          <div class="group-info card">
             <span class="card-title">Informations du groupe :</span>
-            <w-alert info plain>Ce sont ces informations que vous devez transmettre pour vous connecter au groupe</w-alert>
+            <w-alert info plain>Ce sont ces informations que vous devez transmettre pour vous connecter au groupe
+            </w-alert>
             <span>Identifiant du groupe : <strong>{{ getGroup.groups_id }}</strong></span>
             <span>Clé de connection au groupe : <strong>{{ getGroup.token }}</strong></span>
          </div>
 
          <div class="users-list card">
-            <span class="card-title" style="height: 12%; max-height: 12%;">Utilisateurs du groupes : (vous exclus)</span>
+            <span class="card-title"
+                  style="height: 12%; max-height: 12%;">Utilisateurs du groupes : (vous exclus)</span>
+            <w-alert info plain v-if="viewedInfo">
+               La rôle utilisateur n'est PAS le rôle que vous affectez à un utilisateur. C'est le statut qu'il a
+               vis-à-vis du site
+               <button @click="viewedInfo = false"
+                       style="cursor: pointer; text-decoration: underline; background: none; outline: none; border: none; color: #F4F4F4; margin-left: 5px;">
+                  Compris !
+               </button>
+            </w-alert>
             <div style="height: 75%; width: 100%; max-height: 75%;">
                <w-table
                      class="users-table"
@@ -17,6 +27,7 @@
                      :items="users.list"
                      :selectable-rows="true"
                      @row-select="users.selection = $event.selectedRows"
+                     sort="+role"
                >
                   <template #no-data>
                      Il n'y a pas d'utilisateurs dans le groupe.
@@ -24,8 +35,65 @@
                </w-table>
             </div>
             <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; height: 7%; max-height: 7%">
-               <w-button class="ma1" bg-color="error" :disabled="users.selection.length === 0" @click="removeUsers">Supprimer la sélection</w-button>
-               <w-button class="ma1" bg-color="error" :disabled="users.list.length === 0" @click="removeAll">Effacer tout</w-button>
+               <w-button class="ma1" bg-color="error" :disabled="users.selection.length === 0" @click="removeUsers">
+                  Supprimer la sélection
+               </w-button>
+               <w-button class="ma1" bg-color="error" :disabled="users.selection.length !== 1"
+                         @click="prepareModifyRoles">Modifier le rôle
+               </w-button>
+               <w-button class="ma1" bg-color="error" :disabled="users.list.length === 0" @click="removeAll">Effacer
+                  tout
+               </w-button>
+
+
+               <w-dialog
+                     v-model="modifyRole.show"
+                     :width="500"
+               >
+                  <div class="add-role">
+                     <h3 style="color: #2d2d2d">
+                        Rôle(s) de {{ users.selection[0].name }} {{ users.selection[0].last_name }}:
+                     </h3>
+                     <div class="user-roles">
+                        <span :key="role.value.role_id" v-for="role in modifyRole.userRoles.sort((a, b) => {
+                           if (a.value.rights === '*')
+                              return -1;
+                           if (b.value.rights === '*')
+                              return 1;
+                           if (a.value.rights === '-')
+                              return 1;
+                           if (b.value.rights === '-')
+                              return -1;
+                           return a.value.rights.length - b.value.rights.length;
+                        })">
+                           {{ role.label }}
+                           <w-button bg-color="error" :disabled="modifyRole.userRoles.length <= 1" @click="deleteRoleForUser(role.value)">
+                              Enlever
+                           </w-button>
+                        </span>
+                     </div>
+
+                     <w-select
+                           :items="modifyRole.groupRoles.filter(e => {
+                           return !userHaveRole(users.selection[0].id, e.role_id)
+                           }).map(e => {
+                              return {
+                                 label: e.name,
+                                 value: e
+                              }
+                           })"
+                           v-model="modifyRole.rolesToAdd"
+                           label="Rôle(s) à ajouter :"
+                           :multiple="modifyRole.groupRoles.length > 1"
+                     >
+
+                     </w-select>
+
+                     <w-button plain bg-color="success" :disabled="modifyRole.rolesToAdd.length === 0"
+                               @click="addRoleForUser">Ajouter le(s) rôle(s) sélectionnés
+                     </w-button>
+                  </div>
+               </w-dialog>
             </div>
          </div>
 
@@ -35,7 +103,9 @@
          <div class="card option-panel">
             <span class="card-title">Configuration :</span>
 
-            <w-button bg-color="error" @click="addGroup.show = true" style="align-self: flex-start">Ajouter un sous-groupe</w-button>
+            <w-button bg-color="error" @click="addGroup.show = true" style="align-self: flex-start">Ajouter un
+               sous-groupe
+            </w-button>
             <w-dialog
                   v-model="addGroup.show"
                   :fullscreen="addGroup.fullscreen"
@@ -45,15 +115,18 @@
             >
                <div class="addGroup">
                   <span style="margin-bottom: 10px; font-size: 19px; font-weight: 600; color: #454150">Créer un groupe :</span>
-                  <w-input autocomplete="off" color="grey-dark3" required style="margin-bottom: 10px; width: 90%" v-model="addGroup.data.name">
+                  <w-input autocomplete="off" color="grey-dark3" required style="margin-bottom: 10px; width: 90%"
+                           v-model="addGroup.data.name">
                      Nom du sous-groupe.
                   </w-input>
-                  <w-input autocomplete="off" color="grey-dark3" required style="margin-bottom: 10px; width: 90%" v-model="addGroup.data.init">
+                  <w-input autocomplete="off" color="grey-dark3" required style="margin-bottom: 10px; width: 90%"
+                           v-model="addGroup.data.init">
                      Initiales du groupe
                   </w-input>
 
                   <span style="color: #565656">Type de groupe :</span>
-                  <w-select color="grey-dark3" required style="margin-bottom: 10px; width: 90%; z-index: 500" v-model="addGroup.data.type"
+                  <w-select color="grey-dark3" required style="margin-bottom: 10px; width: 90%; z-index: 500"
+                            v-model="addGroup.data.type"
                             :items="groupTypes.map(e => {
                          return {
                             label: typeTranslation[e.label]
@@ -68,7 +141,8 @@
 
             <div class="uploadFile">
                <label for="fileUp">Ajouter une page d'accueil </label>
-               <input id="fileUp" ref="uploadInput" type="file" accept=".md,.txt" @change="onSubjectUpload(); uploaded = true">
+               <input id="fileUp" ref="uploadInput" type="file" accept=".md,.txt"
+                      @change="onSubjectUpload(); uploaded = true">
                <button class="validate" v-if="uploaded" @click="uploadFile(); uploaded = false">✔</button>
                <button class="cancel" v-if="uploaded" @click="uploaded = false">X</button>
             </div>
@@ -84,15 +158,42 @@
 
             <div class="role-nav">
                <div class="roles-list">
-                  <button :key="role.role_id"
+                  <button class="role-button" :key="role.role_id"
                           v-for="role in getGroup.roles"
                           :style="role.name === roleToEdit.role.name ? { color: '#f65555', fontWeight: 600 } : {}"
                           @click="changeRoleShown(role)">
                      {{ role.name }}
                   </button>
+                  <w-button style="margin-top: 10px;" bg-color="error" @click="createRole.show = true">
+                     Nouveau
+                  </w-button>
+
+                  <w-dialog
+                     :width="500"
+                     v-model="createRole.show"
+                  >
+                     <h2 style="color: #2d2d2d">Créer un nouveau rôle :</h2>
+                     <w-form
+                        @success="addNewRole"
+                     >
+                        <w-input v-model="createRole.value" style="margin-bottom: 10px;" :validators="[createRole.validators.required]">Nom du rôle :</w-input>
+
+                        <w-button type="submit">Créer</w-button>
+                     </w-form>
+                  </w-dialog>
                </div>
                <div class="rights" v-if="JSON.stringify({}) !== JSON.stringify(roleToEdit.role)">
-                  <span style="font-size: 18px; font-weight: 600;">Rôle : {{ roleToEdit.role.name }}</span>
+                  <div style="display: flex; align-items: center; justify-content: space-between">
+                     <span style="font-size: 16px; font-weight: 600;">Rôle : {{ roleToEdit.role.name }}</span>
+
+                     <w-button
+                        bg-color="error"
+                        :disabled="roleToEdit.role.name === 'Etudiant' || roleToEdit.role.name === 'Admin'"
+                        @click="deleteRole"
+                     >
+                        Supprimer le rôle
+                     </w-button>
+                  </div>
 
                   <div class="right">
                      <span>Permission d'envoyer des messages : </span>
@@ -102,6 +203,7 @@
                            color="success"
                            v-model="roleToEdit.rights.canSendMessage"
                            @input="roleEdited = true"
+                           :disabled="roles_idList.includes(roleToEdit.role.role_id)"
                      >
                      </w-switch>
                   </div>
@@ -114,6 +216,7 @@
                            color="success"
                            v-model="roleToEdit.rights.canReadMessage"
                            @input="roleEdited = true"
+                           :disabled="roles_idList.includes(roleToEdit.role.role_id)"
                      >
                      </w-switch>
                   </div>
@@ -126,6 +229,7 @@
                            color="success"
                            v-model="roleToEdit.rights.canChangeGroup"
                            @input="roleEdited = true"
+                           :disabled="roles_idList.includes(roleToEdit.role.role_id)"
                      >
                      </w-switch>
                   </div>
@@ -138,6 +242,7 @@
                            color="success"
                            v-model="roleToEdit.rights.canModifyRoom"
                            @input="roleEdited = true"
+                           :disabled="roles_idList.includes(roleToEdit.role.role_id)"
                      >
                      </w-switch>
                   </div>
@@ -150,6 +255,7 @@
                            color="success"
                            v-model="roleToEdit.rights.canModifyNotes"
                            @input="roleEdited = true"
+                           :disabled="roles_idList.includes(roleToEdit.role.role_id)"
                      >
                      </w-switch>
                   </div>
@@ -162,6 +268,7 @@
                            color="success"
                            v-model="roleToEdit.rights.canStream"
                            @input="roleEdited = true"
+                           :disabled="roles_idList.includes(roleToEdit.role.role_id)"
                      >
                      </w-switch>
                   </div>
@@ -169,8 +276,8 @@
                   <w-alert class="alert" v-if="roleEdited" color="success">
                      Enregistrer les modifications ?
                      <w-button
-                        bg-color="success"
-                        @click="editRole"
+                           bg-color="success"
+                           @click="editRole"
                      >
                         Oui !
                      </w-button>
@@ -203,15 +310,15 @@ export default {
                name: "",
                init: "",
                type: "",
-            }
+            },
          },
          users: {
             list: [],
             headers: [
-               { label: 'Nom', key: 'last_name' },
-               { label: 'Prénom', key: 'name' },
-               { label: 'Pseudo', key: 'username' },
-               { label: 'Rôle', key: 'role' }
+               {label: 'Nom', key: 'last_name'},
+               {label: 'Prénom', key: 'name'},
+               {label: 'Pseudo', key: 'username'},
+               {label: 'Statut', key: 'role'}
             ],
             selection: []
          },
@@ -224,6 +331,11 @@ export default {
             "SUBJECTS": "Matière",
             "OTHER": "Autres"
          },
+         roleTranslation: {
+            "STUDENT": "Étudiant",
+            "TEACHER": "Enseignant",
+            "ADMIN": "Administrateur"
+         },
          types: [
             {label: "ESTABLISHMENT", order: 1},
             {label: "FACULTY", order: 1},
@@ -235,14 +347,25 @@ export default {
          uploaded: false,
          formData: null,
          roleToEdit: {
-            rights: {
-
-            },
-            role: {
-
-            }
+            rights: {},
+            role: {}
          },
-         roleEdited: false
+         roleEdited: false,
+         roles_idList: [],
+         viewedInfo: true,
+         modifyRole: {
+            show: false,
+            groupRoles: [],
+            userRoles: [],
+            rolesToAdd: [],
+         },
+         createRole: {
+            show: false,
+            validators: {
+               required: value => !!value || "Entrez un nom de rôle"
+            },
+            value: ""
+         }
       }
    },
    methods: {
@@ -267,10 +390,13 @@ export default {
       removeUsers() {
          this.users.selection.forEach(elt => {
             this.users.list.splice(this.users.list.indexOf(elt), 1);
-            // TODO : remove du groupe, le user en question.
+            axios.delete(`http://localhost:8080/api/groups/deleteUser?user_id=${elt.id}&group_id=${this.getGroup.groups_id}`)
          })
       },
       removeAll() {
+         this.users.list.forEach(elt => {
+            axios.delete(`http://localhost:8080/api/groups/deleteUser?user_id=${elt.id}&group_id=${this.getGroup.groups_id}`)
+         })
          this.users.list = [];
       },
       getOrder(type) {
@@ -325,7 +451,6 @@ export default {
       },
       editRole() {
          this.roleEdited = false
-         console.log(this.roleToEdit);
          let right = "";
          if (this.roleToEdit.rights.canSendMessage)
             right += "s";
@@ -342,14 +467,94 @@ export default {
          if (right.length === 0)
             right = "-"
          axios.put(`http://localhost:8080/api/groups/modifyRightsForRole?role_id=${this.roleToEdit.role.role_id}&rights=${right}`)
+      },
+
+      prepareModifyRoles() {
+         this.modifyRole.show = true;
+         this.modifyRole.rolesToAdd = []
+         this.loadRoles();
+      },
+      async loadRoles() {
+         await axios.get(`http://localhost:8080/api/groups/getRoleByGroupAndUser?group_id=${this.getGroup.groups_id}&user_id=${this.users.selection[0].id}`).then(response => {
+            this.modifyRole.userRoles = response.data.map(e => {
+               return {
+                  label: e.name,
+                  value: e,
+                  color: 'success'
+               }
+            });
+         });
+         await axios.get(`http://localhost:8080/api/groups/getAllRolesByGroup?group_id=${this.getGroup.groups_id}`).then(response => {
+            this.modifyRole.groupRoles = response.data;
+         });
+      },
+      userHaveRole(user_id, role_id) {
+         let haveRole = false;
+         this.modifyRole.userRoles.forEach(elt => {
+            if (elt.value.role_id === role_id)
+               haveRole = true;
+         })
+         return haveRole;
+      },
+      addRoleForUser() {
+         this.modifyRole.rolesToAdd.forEach(elt => {
+            axios.post(`http://localhost:8080/api/groups/addRoleForUser?user_id=${this.users.selection[0].id}&role_id=${elt.role_id}`)
+         });
+         this.modifyRole.rolesToAdd.forEach(elt => {
+            this.modifyRole.userRoles.push({
+               label: elt.name,
+               value: elt,
+               color: 'success'
+            });
+         })
+         this.modifyRole.rolesToAdd = []
+      },
+      deleteRoleForUser(role) {
+         axios.delete(`http://localhost:8080/api/groups/removeRoleForUser?user_id=${this.users.selection[0].id}&role_id=${role.role_id}`).then(() => {
+            this.modifyRole.userRoles = this.modifyRole.userRoles.filter(e => {
+               return e.value.role_id !== role.role_id;
+            })
+         })
+      },
+
+      addNewRole() {
+         axios.post(`http://localhost:8080/api/groups/addRoleForGroup?group_id=${this.getGroup.groups_id}&role_name=${this.createRole.value}&rights=sr`).then(response => {
+            this.getGroup.roles.push(response.data);
+         })
+
+         this.createRole.value = "";
+         this.createRole.show = false;
+      },
+      deleteRole() {
+         axios.delete(`http://localhost:8080/api/groups/deleteRole?role_id=${this.roleToEdit.role.role_id}`).then(response => {
+            console.log(response);
+            this.getGroup.roles = this.getGroup.roles.filter(e => {
+               return e.role_id !== this.roleToEdit.role.role_id;
+            })
+            this.roleToEdit = {
+               role: {},
+               rights: {}
+            }
+         })
       }
    },
    computed: {
       ...mapGetters(['getGroup', 'getUser'])
    },
    mounted() {
+      // TODO : actualiser le groupe à chaque fois qu'on rentre dans mounted
       this.groupTypes = this.types.filter(elt => elt.order > this.getOrder(this.getGroup.type));
-      this.users.list = this.getGroup.users.filter(e => e.id !== this.getUser.id).sort((a, b) => {
+      this.users.list = this.getGroup.users.filter(e => {
+         return e.id !== this.getUser.id
+      }).map(e => {
+         return {
+            id: e.id,
+            last_name: e.last_name,
+            name: e.name,
+            username: e.username,
+            role: this.roleTranslation[e.role]
+         }
+      }).sort((a, b) => {
          if (a.last_name < b.last_name)
             return -1;
          if (a.last_name > b.last_name)
@@ -357,7 +562,11 @@ export default {
          if (a.last_name === b.last_name)
             return 0;
       });
-      console.log(this.getGroup);
+      axios.get(`http://localhost:8080/api/groups/getRoleByGroupAndUser?group_id=${this.getGroup.groups_id}&user_id=${this.getUser.id}`).then(response => {
+         this.roles_idList = response.data.map(e => {
+            return e.role_id
+         })
+      })
    }
 }
 </script>
@@ -508,10 +717,11 @@ label[for="fileUp"] {
    max-width: 20%;
    width: 20%;
 
+   overflow-x: hidden;
    overflow-y: auto;
 }
 
-.roles-list > button {
+.role-button {
    background-color: transparent;
    outline: none;
    border: none;
@@ -551,5 +761,62 @@ label[for="fileUp"] {
    display: flex;
    align-items: center;
    justify-content: space-between;
+}
+
+.add-role {
+   display: flex;
+   flex-direction: column;
+   align-items: flex-start;
+   justify-content: flex-start;
+}
+
+.add-role > * {
+   width: 100%;
+   margin-bottom: 10px;
+}
+
+.user-roles {
+   display: flex;
+   flex-direction: column;
+   align-items: flex-start;
+   justify-content: flex-start;
+   width: 100%;
+   max-height: 300px;
+}
+
+.user-roles > span {
+   width: 100%;
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   height: 35px;
+   color: #F4F4F4;
+   padding: 10px;
+   background-color: #4f4b5a;
+   font-size: 17px;
+   font-weight: 600;
+   margin-bottom: 10px;
+   border-radius: 5px;
+}
+
+.deleteRole {
+   font-weight: 600;
+   font-size: 12px;
+   background-color: #F4F4F4;
+   color: #E85C5C;
+   width: 20px;
+   height: 20px;
+   border-radius: 50%;
+   border: none;
+   outline: none;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   cursor: pointer;
+}
+
+.deleteRole:hover {
+   background-color: #E85C5C;
+   color: #F4F4F4;
 }
 </style>

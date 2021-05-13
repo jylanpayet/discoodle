@@ -9,7 +9,6 @@ import com.discoodle.api.repository.GroupsRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +25,7 @@ public class GroupsService {
     private final ServerService serverService;
     private final UserService userService;
     private final RolesRepository rolesRepository;
+    private final NoteService noteService;
 
     public Optional<Groups> createNewGroup(GroupsRequest request) {
         // Generate a UUID token for this new Group.
@@ -75,9 +75,9 @@ public class GroupsService {
         // Add the creator in this new group.
         groupsRepository.addNewMemberInGroup(request.getUser_id(), finalGroup.getGroups_id());
         // Create a new server for this new group.
-        Server server = serverService.createNewServ("Serveur de " + finalGroup.getName(), List.of(request.getUser_id()));
+        Optional<Server> server = serverService.createNewServ("Serveur de " + finalGroup.getName(), List.of(request.getUser_id()));
         // Create link with this server and this new group.
-        groupsRepository.addNewServInGroup(finalGroup.getGroups_id(), server.getServer_id());
+        groupsRepository.addNewServInGroup(finalGroup.getGroups_id(), server.get().getServer_id());
         try {
             File dossier = new File((String.format("%sstatic/common/groups/%d", ApiApplication.RESSOURCES, finalGroup.getGroups_id())));
             // If the directory of this file does not exist, we create it.
@@ -86,7 +86,7 @@ public class GroupsService {
             System.out.println("Dossier du groups non crée !");
         }
         // Return this new group.
-        return Optional.of(finalGroup);
+        return groupsRepository.findById(finalGroup.getGroups_id());
     }
 
     public Optional<Groups> editGroup(EditGroupRequest request) {
@@ -125,6 +125,10 @@ public class GroupsService {
             return tempGroup;
         }
         return Optional.empty();
+    }
+
+    public void removeMember(Long group_id, Long user_id) {
+        groupsRepository.removeMember(group_id, user_id);
     }
 
     public Optional<Server> serverOfGroup(Long groups_id) {
@@ -183,6 +187,14 @@ public class GroupsService {
         return Optional.empty();
     }
 
+    public Optional<Roles> removeRoleForUser(Long user_id, Long role_id) {
+        // Check if the role and the user are present.
+        if (rolesRepository.findById(role_id).isPresent() && userRepository.findById(user_id).isPresent())
+            // Remove user role.
+            groupsRepository.removeRoleForUser(user_id, role_id);
+        return Optional.empty();
+    }
+
     public List<Roles> getRoleByGroupAndUser(Long group_id, Long user_id) {
         List<Roles> roles = userRepository.findById(user_id).get().getRoles();
         List<Roles> res = new java.util.ArrayList<>();
@@ -205,10 +217,24 @@ public class GroupsService {
     }
 
     public Boolean deleteRole(Long role_id) {
+
+        Optional<Roles> role = rolesRepository.findById(role_id);
         // If the role exist.
-        if (rolesRepository.existsById(role_id)) {
+        if (role.isPresent()) {
+
+            // Remove all links between this role and its users.
+            for (User user : role.get().getUsers()) {
+                List<Roles> roles = this.getRoleByGroupAndUser(role.get().getGroups_id().getGroups_id(), user.getId());
+                // If the user has no more roles, give him the student role by default.
+                if (roles.size() == 1 && roles.get(0).getRole_id().equals(role_id)) {
+                    groupsRepository.addRoleForUser(user.getId(), role.get().getGroups_id().getRoles().stream().filter(
+                          e -> e.getName().equals("Etudiant")
+                    ).collect(Collectors.toList()).get(0).getRole_id());
+                }
+            }
             // Delete this role.
             rolesRepository.deleteById(role_id);
+
             return true;
         }
         return false;
@@ -219,4 +245,22 @@ public class GroupsService {
         return groupsRepository.findIDOfDiscoodle();
     }
 
+
+    public Boolean deleteUser(Long user_id, Long group_id) {
+        // Check if the group and user exist.
+        if (userRepository.existsById(user_id) && groupsRepository.existsById(group_id)) {
+            List<Roles> roles=this.getRoleByGroupAndUser(group_id,user_id);
+            // Remove all user links with group roles.
+            for(Roles r:roles){
+                rolesRepository.deleteLinkRoleToUser(user_id,r.getRole_id());
+            }
+            // Remove the user from the server of this group.
+            serverService.removeMember(groupsRepository.findById(group_id).get().getServer().getServer_id(),user_id);
+
+            // Delete the user of this group.
+            groupsRepository.deleteLinkGroupsToUser(group_id,user_id);
+            return true;
+        }
+        return false;
+    }
 }

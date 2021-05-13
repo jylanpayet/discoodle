@@ -11,6 +11,7 @@ import org.springframework.web.filter.CorsFilter;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.List;
 
 @SpringBootApplication
 public class ApiApplication {
@@ -28,7 +29,7 @@ public class ApiApplication {
       CorsConfiguration config = new CorsConfiguration();
       config.setAllowCredentials(true);
       // *** URL below needs to match the Vue client URL and port ***
-      config.setAllowedOrigins(Collections.singletonList("http://localhost:8081"));
+      config.setAllowedOrigins(List.of("http://82.123.93.44:8080", "http://localhost:8081"));
       config.setAllowedMethods(Collections.singletonList("*"));
       config.setAllowedHeaders(Collections.singletonList("*"));
       source.registerCorsConfiguration("/**", config);

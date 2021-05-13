@@ -57,7 +57,6 @@ export default {
          const inputValue = document.querySelector(".input-user > input").value;
          if (inputValue !== "" && !this.usersToAdd.includes(inputValue))
             this.usersToAdd.push(inputValue);
-         // TODO : Push seulement si ami. sinon alert d'erreur.
          document.querySelector(".input-user > input").value = "";
       },
       removeUser(username) {

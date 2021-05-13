@@ -39,6 +39,11 @@ public interface GroupsRepository extends JpaRepository<Groups, Long> {
 
     @Transactional
     @Modifying
+    @Query(value = "DELETE r FROM link_groups_to_user as r where r.groups_id = :groups_id AND r.user_id = :user_id", nativeQuery = true)
+    void deleteLinkGroupsToUser(@Param("groups_id") Long groups_id, @Param("user_id") Long user_id);
+
+    @Transactional
+    @Modifying
     @Query(value = "DELETE r FROM link_groups_to_group as r where r.groups_id = :groups_id AND r.son_id = :son_id", nativeQuery = true)
     void deleteLinkGroupsToGroup(@Param("groups_id") Long groups_id, @Param("son_id") Long son_id);
 
@@ -51,6 +56,11 @@ public interface GroupsRepository extends JpaRepository<Groups, Long> {
     @Query(value = "insert into link_groups_to_group (groups_id, son_id) VALUES (:groups_id,:son_id)", nativeQuery = true)
     @Transactional
     void addNewGroupsInGroup(@Param("groups_id") Long groups_ID, @Param("son_id") Long son_ID);
+
+    @Modifying
+    @Query(value = "DELETE r FROM link_groups_to_user AS r WHERE r.groups_id = :group_id AND r.user_id = :user_id", nativeQuery = true)
+    @Transactional
+    void removeMember(@Param("group_id") Long group_id, @Param("user_id") Long user_id);
 
     @Modifying
     @Query(value = "insert into link_groups_to_server (groups_id, server_id) VALUES (:groups_id,:server_id)", nativeQuery = true)
@@ -66,6 +76,11 @@ public interface GroupsRepository extends JpaRepository<Groups, Long> {
     @Query(value = "insert into link_role_to_users (user_id, role_id) VALUES (:user_id,:role_id)", nativeQuery = true)
     @Transactional
     void addRoleForUser(@Param("user_id") Long user_id, @Param("role_id") Long role_id);
+
+    @Modifying
+    @Query(value = "DELETE r FROM link_role_to_users AS r WHERE r.user_id = :user_id AND r.role_id = :role_id", nativeQuery = true)
+    @Transactional
+    void removeRoleForUser(@Param("user_id") Long user_id, @Param("role_id") Long role_id);
 
     @Transactional
     @Modifying
