@@ -217,19 +217,22 @@ public class GroupsService {
     }
 
     public Boolean deleteRole(Long role_id) {
-        // If the role exist.
+
         Optional<Roles> role = rolesRepository.findById(role_id);
+        // If the role exist.
         if (role.isPresent()) {
 
+            // Remove all links between this role and its users.
             for (User user : role.get().getUsers()) {
                 List<Roles> roles = this.getRoleByGroupAndUser(role.get().getGroups_id().getGroups_id(), user.getId());
+                // If the user has no more roles, give him the student role by default.
                 if (roles.size() == 1 && roles.get(0).getRole_id().equals(role_id)) {
                     groupsRepository.addRoleForUser(user.getId(), role.get().getGroups_id().getRoles().stream().filter(
                           e -> e.getName().equals("Etudiant")
                     ).collect(Collectors.toList()).get(0).getRole_id());
                 }
             }
-
+            // Delete this role.
             rolesRepository.deleteById(role_id);
 
             return true;
