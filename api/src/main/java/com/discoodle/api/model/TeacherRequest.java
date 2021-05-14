@@ -28,7 +28,7 @@ public class TeacherRequest {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private Status status;
+    private TeacherRequest.Status status;
 
     public enum Status {
         ACCEPTEE,
