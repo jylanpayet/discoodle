@@ -16,16 +16,22 @@ public class FriendshipsService {
     private final UserRepository userRepository;
 
     public String inviteMembers(Long user_id, List<Long> friends_id) {
+        // Check if user exists.
         if(userRepository.existsById(user_id)) {
+            // Pick up one by one all IDs from list friends_id (which embodies all members the user has invited).
             for (Long aLong : friends_id) {
+                // Check if every members, specified with their ID in the list, exist.
                 if (userRepository.existsById(aLong)) {
+                    // Check if the relation doesn't already exist already :
+                    // - the user has already sent an invitation to this member.
+                    // - or the member specified in friends_id has already sent an invitation to user_id.
                     if (!userRepository.getFriendListCompleteForSender(user_id).contains(aLong) && !userRepository.getFriendListCompleteForReceiver(aLong).contains(user_id)) {
-                        System.out.println(userRepository.getFriendListForReceiver(aLong));
-                        System.out.println(userRepository.getFriendListForSender(user_id));
+                        // Creation of the friendship.
                         Friendships friendships = new Friendships(
                                 user_id,
                                 aLong
                         );
+                        // Save the friendship in database.
                         friendshipsRepository.save(friendships);
                         return "Votre invitation a été envoyé avec succès !";
                     }
@@ -38,18 +44,22 @@ public class FriendshipsService {
     }
 
     public List<Friendships> getAllInvitations(Long user_id) {
+        // Check if user exists.
         if (userRepository.existsById(user_id)){
+            // Bring back all friendships received by the user but not accepted.
             return friendshipsRepository.getAllInvitations(user_id);
         }
         return null;
     }
 
     public void acceptInvitation(Long sender_id, Long receiver_id) {
+        // Check if users exist.
         if(userRepository.existsById(sender_id) && userRepository.existsById(receiver_id))
             friendshipsRepository.acceptInvitation(sender_id, receiver_id);
     }
 
     public void refuseInvitation(Long sender_id, Long receiver_id) {
+        // Check if users exist.
         if(userRepository.existsById(sender_id) && userRepository.existsById(receiver_id))
             friendshipsRepository.refuseInvitation(sender_id, receiver_id);
     }

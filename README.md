@@ -158,6 +158,7 @@ ainsi que des problèmes rencontrés.
 - améliorer l'api en rajoutant quelques fonctionnalités pour l'intégration des patterns, 
   l'auto-sauvegarde régulière des BDDs...
 - rajouter des limitations à l'upload des fichiers avec timers prédéfinis...
+- rajouter l'option de bloquer des utilisateurs entre eux
 
 ## <div id="auteurs">Auteurs</div>
 

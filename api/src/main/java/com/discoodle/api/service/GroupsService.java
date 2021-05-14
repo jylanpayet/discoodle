@@ -28,7 +28,7 @@ public class GroupsService {
     private final NoteService noteService;
 
     public Optional<Groups> createNewGroup(GroupsRequest request) {
-        // Generate a UUID token for this new Group.
+        // Generate an UUID token for this new Group.
         String token = UUID.randomUUID().toString().replaceAll("-", "").substring(0, 8);
         // If the depth is 1, check if a group already has the same name in this depth.
         if(request.getType().equals(Groups.TypeOfGroup.ESTABLISHMENT) && groupsRepository.findAllGroupsByNameAndDepth(request.getName(), request.getDepth()).isPresent()){
@@ -60,7 +60,7 @@ public class GroupsService {
         Roles finalRole_admin = rolesRepository.save(role_admin);
         Roles finalRole_student = rolesRepository.save(role_student);
 
-        // Create a link with Roles and Group.
+        // Create a link with Roles and Groups.
         groupsRepository.addRoleForGroup(finalGroup.getGroups_id(), finalRole_admin.getRole_id());
         groupsRepository.addRoleForGroup(finalGroup.getGroups_id(), finalRole_student.getRole_id());
 
@@ -118,7 +118,7 @@ public class GroupsService {
             // Create link with the user and group.
             groupsRepository.addNewMemberInGroup(user_id, groups_id);
 
-            // Give the "Étudiant" roles for this user.
+            // Give the "Étudiant" role for this user.
             groupsRepository.addRoleForUser(user_id, tempGroup.get().getRoles().stream().filter((e) -> e.getName().equals("Etudiant")).collect(Collectors.toList()).get(0).getRole_id());
             // Add the user in the server of group.
             serverService.addNewMember(tempGroup.get().getServer().getServer_id(), user_id);
@@ -250,7 +250,7 @@ public class GroupsService {
         // Check if the group and user exist.
         if (userRepository.existsById(user_id) && groupsRepository.existsById(group_id)) {
             List<Roles> roles=this.getRoleByGroupAndUser(group_id,user_id);
-            // Remove all user links with group roles.
+            // Remove all user's links with group roles.
             for(Roles r:roles){
                 rolesRepository.deleteLinkRoleToUser(user_id,r.getRole_id());
             }

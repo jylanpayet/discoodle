@@ -38,6 +38,10 @@ public class UserService implements UserDetailsService {
         return userRepository.getUserByUserName(username);
     }
 
+    public Optional<User> getUserByMail(String mail) {
+        return userRepository.getUserByMail(mail);
+    }
+
     public Optional<User> getUserByID(Long user_id) {
         return userRepository.findById(user_id);
     }
