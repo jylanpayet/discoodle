@@ -90,15 +90,15 @@ public class GroupsService {
     }
 
     public Optional<Groups> editGroup(EditGroupRequest request) {
-        // Check if the group exist.
+        // Check if the group exists.
         if(groupsRepository.existsById(request.getGroups_id()))
-            // If the group exist, we change its parameters.
+            // If the group exists, we change its parameters.
             return groupsRepository.updateNameAndDescGroup(request.getGroups_id(), request.getName(), request.getDescription());
         return Optional.empty();
     }
 
     public void deleteGroupByID(Long groups_id) {
-        // Check if the group exist.
+        // Check if the group exists.
         if (groupsRepository.existsById(groups_id)) {
             Optional<Groups> group = findGroupsByID(groups_id);
             // Delete the link with the parent and this group.
@@ -156,7 +156,7 @@ public class GroupsService {
     }
 
     public Optional<Roles> addRoleForGroup(Long group_id, String role_name, String rights) {
-        // Check if group exist.
+        // Check if group exists.
         if (groupsRepository.existsById(group_id)) {
             // Create new role with the parameters in the function.
             Roles role = new Roles(
@@ -173,7 +173,7 @@ public class GroupsService {
     }
 
     public Optional<Roles> addRoleForUsers(List<Long> user_id, Long role_id) {
-        // Check if this role exist.
+        // Check if this role exists.
         if (rolesRepository.findById(role_id).isPresent()) {
             // We add this role for all the users contained in the list.
             for (Long user : user_id) {
