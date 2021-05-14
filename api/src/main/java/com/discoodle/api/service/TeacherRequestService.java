@@ -53,7 +53,9 @@ public class TeacherRequestService {
             // Modify his role and accept the request.
             user.get().setRole(User.Role.TEACHER);
             Optional<TeacherRequest> teacherRequest= teacherRequestRepository.getTeacherRequestByUser(user_id);
+            // Set the status of the request to "Acceptée".
             teacherRequest.get().setStatus(TeacherRequest.Status.ACCEPTEE);
+            // Save the change.
             teacherRequestRepository.save(teacherRequest.get());
 
             // Return his request.
@@ -66,9 +68,10 @@ public class TeacherRequestService {
         Optional<User> user=userRepository.findById(user_id);
         // Check if user exists.
         if(user.isPresent()){
-            // Refuse the request and return this.
             Optional<TeacherRequest> teacherRequest= teacherRequestRepository.getTeacherRequestByUser(user_id);
+            // Set the status of the request to "Refusée".
             teacherRequest.get().setStatus(TeacherRequest.Status.REFUSEE);
+            // Save the change.
             teacherRequestRepository.save(teacherRequest.get());
 
             // Return his request.
@@ -88,6 +91,7 @@ public class TeacherRequestService {
     }
 
     public List<TeacherRequest> getTeacherRequestBeingProcessed() {
+        // Return the all Teacher Request of discoodle.
         return teacherRequestRepository.findAllBeingProcessed();
     }
 }
