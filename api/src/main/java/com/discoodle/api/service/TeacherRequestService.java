@@ -22,10 +22,17 @@ public class TeacherRequestService {
         Optional <TeacherRequest> test = teacherRequestRepository.getTeacherRequestByUser(user_id);
 
         //If the conditions are not met, return an empty element or the already existing request.
-        if(test.isPresent() && user.isPresent() && ((test.get().getStatus().equals(TeacherRequest.Status
-                .COURS)) || user.get().getRole().equals(User.Role.TEACHER))){
-            return test;
+        if(test.isPresent() && user.isPresent()){
+            if ((test.get().getStatus().equals(TeacherRequest.Status.COURS)) || user.get().getRole().equals(User.Role.TEACHER)){
+                return test;
+            }
+            if(test.get().getStatus().equals(TeacherRequest.Status.REFUSEE)){
+                test.get().setStatus(TeacherRequest.Status.COURS);
+                teacherRequestRepository.save(test.get());
+                return teacherRequestRepository.getTeacherRequestByUser(user_id);
+            }
         }
+
         // Create a new object TeacherRequest.
         TeacherRequest teacherRequest = new TeacherRequest(
                 user_id,
