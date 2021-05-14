@@ -31,7 +31,7 @@ public class UploadFileService {
 
     // Skeleton of our upload method.
     public String uploadFile(MultipartFile file, Long group_id) {
-        // Check if group exist.
+        // Check if group exists.
         if(!groupsRepository.existsById(group_id))
             return "le group n'existe pas !";
         // Create a path with the name of file.
@@ -107,7 +107,7 @@ public class UploadFileService {
 
     // Refer to the uploadFile function.
     public String uploadAvatar(MultipartFile file, Long user_id) {
-        // Check if user exist.
+        // Check if user exists.
         if(!userRepository.existsById(user_id))
             return "l'user n'existe pas !";
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
@@ -134,7 +134,7 @@ public class UploadFileService {
 
     public Boolean deleteAvatar(Long user_id){
         Optional<User> user=userRepository.findById(user_id);
-        // Check if user exist.
+        // Check if user exists.
         if(user.isPresent()) {
             String path = String.format("%sstatic/common/avatar/", ApiApplication.RESSOURCES) + user.get().getLink_to_avatar().substring(36);
             try {
@@ -152,7 +152,7 @@ public class UploadFileService {
 
     // Refer to the uploadFile function.
     public String uploadRoomAvatar(MultipartFile file, String room_id) {
-        // Check if room exist.
+        // Check if room exists.
         if(!roomRepository.existsById(room_id))
             return "la room n'existe pas !";
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
@@ -179,7 +179,7 @@ public class UploadFileService {
 
     public Boolean deleteRoomAvatar(String room_id){
         Optional<Room> room=roomRepository.findById(room_id);
-        // Check if room exist.
+        // Check if room exists.
         if(room.isPresent()) {
             String path = String.format("%sstatic/common/roomAvatar/", ApiApplication.RESSOURCES) + room.get().getLink_picture().substring(40);
             try {

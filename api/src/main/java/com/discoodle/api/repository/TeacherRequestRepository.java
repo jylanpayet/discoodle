@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -13,4 +14,6 @@ public interface TeacherRequestRepository extends JpaRepository<TeacherRequest, 
     @Query("SELECT tr FROM TeacherRequest tr where tr.user_id = :user_id")
     Optional<TeacherRequest> getTeacherRequestByUser(Long user_id);
 
+    @Query("SELECT tr FROM TeacherRequest tr where tr.status = 'COURS' ")
+    List<TeacherRequest> findAllBeingProcessed();
 }

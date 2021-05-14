@@ -5,6 +5,7 @@ import com.discoodle.api.service.TeacherRequestService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -20,13 +21,22 @@ public class TeacherRequestController {
         return teacherRequestService.addNewTeacherRequest(user_id);
     }
 
-    @PostMapping("/AcceptTeacherRequest")
+    @PostMapping("/acceptTeacherRequest")
     public Optional<TeacherRequest> acceptTeacherRequest(@RequestParam("user_id") Long user_id) {
         return teacherRequestService.acceptTeacherRequest(user_id);
     }
 
-    @PostMapping("/RefuseTeacherRequest")
+    @PostMapping("/refuseTeacherRequest")
     public Optional<TeacherRequest> refuseTeacherRequest(@RequestParam("user_id") Long user_id) {
         return teacherRequestService.refuseTeacherRequest(user_id);
+    }
+    @PostMapping("/getTeacherRequestOfUser")
+    public Optional<TeacherRequest> getTeacherRequestOfUser(@RequestParam("user_id") Long user_id){
+        return teacherRequestService.getTeacherRequestOfUser(user_id);
+    }
+
+    @PostMapping("/getTeacherRequestBeingProcessed")
+    public List<TeacherRequest> getTeacherRequestBeingProcessed(){
+        return teacherRequestService.getTeacherRequestBeingProcessed();
     }
 }

@@ -7,6 +7,7 @@ import com.discoodle.api.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -48,8 +49,8 @@ public class TeacherRequestService {
             teacherRequest.get().setStatus(TeacherRequest.Status.ACCEPTEE);
             teacherRequestRepository.save(teacherRequest.get());
 
-            // Return the request.
-            return teacherRequest;
+            // Return his request.
+            return teacherRequestRepository.getTeacherRequestByUser(user_id);
         }
         return Optional.empty();
     }
@@ -63,8 +64,23 @@ public class TeacherRequestService {
             teacherRequest.get().setStatus(TeacherRequest.Status.REFUSEE);
             teacherRequestRepository.save(teacherRequest.get());
 
+            // Return his request.
             return teacherRequestRepository.getTeacherRequestByUser(user_id);
         }
         return Optional.empty();
+    }
+
+    public Optional<TeacherRequest> getTeacherRequestOfUser(Long user_id) {
+        Optional<TeacherRequest> tr = teacherRequestRepository.getTeacherRequestByUser(user_id);
+        // Check if user exists.
+        if(tr.isPresent()){
+            // Return his request.
+            return tr;
+        }
+        return Optional.empty();
+    }
+
+    public List<TeacherRequest> getTeacherRequestBeingProcessed() {
+        return teacherRequestRepository.findAllBeingProcessed();
     }
 }
