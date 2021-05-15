@@ -6,12 +6,12 @@
             <w-alert info plain>Ce sont ces informations que vous devez transmettre pour vous connecter au groupe
             </w-alert>
             <span>Identifiant du groupe : <strong>{{ getGroup.groups_id }}</strong></span>
-            <span>Clé de connection au groupe : <strong>{{ getGroup.token }}</strong></span>
+            <span>Clé de connexion au groupe : <strong>{{ getGroup.token }}</strong></span>
          </div>
 
          <div class="users-list card">
             <span class="card-title"
-                  style="height: 12%; max-height: 12%;">Utilisateurs du groupes : (vous exclus)</span>
+                  style="height: 12%; max-height: 12%;">Utilisateurs du groupe : (vous exclu)</span>
             <w-alert info plain v-if="viewedInfo">
                La rôle utilisateur n'est PAS le rôle que vous affectez à un utilisateur. C'est le statut qu'il a
                vis-à-vis du site
@@ -26,7 +26,7 @@
                      :headers="users.headers"
                      :items="users.list"
                      :selectable-rows="true"
-                     @row-select="users.selection = $event.selectedRows"
+                     @row-select="users.selection = [$event.item]"
                      sort="+role"
                >
                   <template #no-data>
@@ -90,7 +90,7 @@
                      </w-select>
 
                      <w-button plain bg-color="success" :disabled="modifyRole.rolesToAdd.length === 0"
-                               @click="addRoleForUser">Ajouter le(s) rôle(s) sélectionnés
+                               @click="addRoleForUser">Ajouter le(s) rôle(s) sélectionné(s)
                      </w-button>
                   </div>
                </w-dialog>

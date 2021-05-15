@@ -92,6 +92,46 @@
                />
             </div>
          </div>
+
+         <div class="container requests">
+            <span>Mes demandes :</span>
+            <div class="container-content">
+               <span style="font-size: 18px; font-weight: 600; text-decoration: underline">Demande de rôle Enseignant :</span>
+               <div style="width: 100%">
+                  <w-button
+                        @click="requestTeacher"
+                        bg-color="error"
+                        :disabled="requests.teacher.requestState || getUser.role === 'TEACHER'"
+                  >
+                     Demander le rôle Enseignant
+                  </w-button>
+               </div>
+
+               <span>Etat de ma demande :</span>
+
+               <div class="request">
+                  <span v-if="JSON.stringify(requests.teacher.request) === JSON.stringify({})">Aucune demande en cours.</span>
+                  <w-card
+                        v-else
+                        success
+                        :bg-color="{
+                              'ACCEPTEE': 'success',
+                              'COURS': 'warning',
+                              'REFUSEE': 'error'
+                           }[requests.teacher.request.status]"
+                        style="width: 70%; height: 70px; display: flex; align-items: center; justify-content: center"
+                  >
+                     Votre demande {{
+                        {
+                           "ACCEPTEE": "a été accpetée",
+                           "COURS": "est toujours en cours",
+                           "REFUSEE": "a été refusée"
+                        }[requests.teacher.request.status]
+                     }}
+                  </w-card>
+               </div>
+            </div>
+         </div>
       </div>
    </div>
    <div style="width: 100%; height: 100%;" v-else>
@@ -324,7 +364,19 @@ export default {
          }
       },
 
-      ...mapActions(['setLinkToAvatar'])
+      requestTeacher() {
+         axios.post(`http://localhost:8080/api/TeacherRequest/addTeacherRequest?user_id=${this.getUser.id}`).then(response => {
+            if (response.data !== null) {
+               this.requests.teacher.request = response.data;
+               this.requests.teacher.requestState = true;
+            } else {
+               this.requests.teacher.request = {};
+               this.requests.teacher.requestState = false;
+            }
+         });
+      },
+
+      ...mapActions(['setLinkToAvatar', 'setUser'])
    },
    data() {
       return {
@@ -360,12 +412,22 @@ export default {
             show: false,
          },
          alreadyRegistered: false,
-         fullRegister: true
+         fullRegister: true,
+
+         requests: {
+            teacher: {
+               requestState: false,
+               request: {}
+            }
+         }
       }
    },
    mounted() {
       this.isAuthentificated = (JSON.stringify(this.getUser) !== JSON.stringify({}));
       if (this.isAuthentificated) {
+         axios.get(`http://localhost:8080/api/users/findByUserName?username=${this.getUser.username}`).then(response => {
+            this.setUser(response.data);
+         });
          this.updateEstablishment();
 
          axios.get(`http://localhost:8080/api/users/seeAllGroups?user_id=${this.getUser.id}`).then(response => {
@@ -412,6 +474,18 @@ export default {
                });
             }, 500)
          });
+
+         axios.get(`http://localhost:8080/api/TeacherRequest/getTeacherRequestOfUser?user_id=${this.getUser.id}`).then(response => {
+            if (response.data?.status === 'ACCEPTEE')
+               this.getUser.role = "TEACHER";
+            if (response.data) {
+               this.requests.teacher.request = response.data;
+               this.requests.teacher.requestState = response.data.status === "COURS" || response.data.status === "ACCEPTEE";
+            } else {
+               this.requests.teacher.request = {};
+               this.requests.teacher.requestState = false;
+            }
+         })
       }
    }
 }
@@ -496,6 +570,8 @@ export default {
 
    margin-bottom: 10px;
    width: 100%;
+   height: 85%;
+   min-height: 280px;
 }
 
 .logo-and-text {
@@ -630,5 +706,21 @@ export default {
    font-weight: 500;
    border-bottom: #8F8F8F solid 1px;
    cursor: not-allowed;
+}
+
+.requests > div {
+   color: white;
+
+   justify-content: space-between;
+   align-items: flex-start;
+}
+
+.request {
+   width: 100%;
+   height: 120px;
+
+   display: flex;
+   align-items: center;
+   justify-content: center;
 }
 </style>

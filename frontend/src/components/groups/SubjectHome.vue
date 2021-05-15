@@ -5,10 +5,10 @@
 
          <h3>Bienvenue dans votre cours de {{ getGroup.name }} </h3>
          <p>
-            Vous pourrez retrouver ici les documents mis en ligne par votre professeur, comme les devoirs, cours PDF, vidéo de cours, etc.
+            Vous pourrez retrouver ici les documents mis en ligne par votre professeur(e), comme les devoirs, cours PDF, vidéos de cours, etc.
          </p>
          <p>
-            Vous pouvez contacter votre ou vos enseignant(s) à/aux l'adresse(s) mail(s) suivante(s) :
+            Pour contacter le(s) professeur(s) :
          </p>
          <ul>
             <li :key="mails.id" v-for="mails in getGroup.roles[0].users">

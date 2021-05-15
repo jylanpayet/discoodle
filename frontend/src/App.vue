@@ -19,9 +19,6 @@
                         <router-link to="/messages">
                            <div class="navbar-icon"><img src="assets/messages.png" alt="Messages"></div>
                            <span :style="{ color: getColors.color5 }">MESSAGES</span></router-link>
-                        <router-link to="/planning">
-                           <div class="navbar-icon"><img src="assets/planning.png" alt="Planning"></div>
-                           <span :style="{ color: getColors.color5 }">PLANNING</span></router-link>
                         <router-link to="/compte">
                            <div class="navbar-icon"><img src="assets/account.png" alt="Account"></div>
                            <span :style="{ color: getColors.color5 }">COMPTE</span></router-link>
@@ -57,8 +54,8 @@ export default {
       if (vueCookie.get("username") !== null && vueCookie.get("username") !== "") {
          axios.get(`http://localhost:8080/api/users/findByUserName?username=${vueCookie.get("username")}`).then(response => {
             const user = response.data;
-            console.log(user);
-            this.setUser(user);
+            if (!user.locked)
+               this.setUser(user);
          });
       }
    }

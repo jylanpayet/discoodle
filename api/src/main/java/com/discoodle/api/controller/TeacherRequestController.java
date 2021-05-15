@@ -21,21 +21,22 @@ public class TeacherRequestController {
         return teacherRequestService.addNewTeacherRequest(user_id);
     }
 
-    @PostMapping("/acceptTeacherRequest")
+    @PutMapping("/acceptTeacherRequest")
     public Optional<TeacherRequest> acceptTeacherRequest(@RequestParam("user_id") Long user_id) {
         return teacherRequestService.acceptTeacherRequest(user_id);
     }
 
-    @PostMapping("/refuseTeacherRequest")
+    @PutMapping("/refuseTeacherRequest")
     public Optional<TeacherRequest> refuseTeacherRequest(@RequestParam("user_id") Long user_id) {
         return teacherRequestService.refuseTeacherRequest(user_id);
     }
-    @PostMapping("/getTeacherRequestOfUser")
+
+    @GetMapping("/getTeacherRequestOfUser")
     public Optional<TeacherRequest> getTeacherRequestOfUser(@RequestParam("user_id") Long user_id){
         return teacherRequestService.getTeacherRequestOfUser(user_id);
     }
 
-    @PostMapping("/getTeacherRequestBeingProcessed")
+    @GetMapping("/getTeacherRequestBeingProcessed")
     public List<TeacherRequest> getTeacherRequestBeingProcessed(){
         return teacherRequestService.getTeacherRequestBeingProcessed();
     }

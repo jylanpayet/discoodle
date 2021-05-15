@@ -2,7 +2,7 @@
    <div class="SubjectChat">
       <div class="rooms-list">
          <div class="server-name">
-            {{ getGroup.server.name }}
+            {{ getGroup.server?.name }}
          </div>
          <router-link @click="setConvUUID(channel.room_id)" :to="`/groupes/subject/${getGroup.groups_id}/discussion/${channel.room_id}?name=${channel.room_name}`" class="room" :key="channel.room_id" v-for="channel in getGroup.server.rooms">
             # {{ channel.room_name }}
