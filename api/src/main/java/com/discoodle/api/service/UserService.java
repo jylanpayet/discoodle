@@ -39,6 +39,11 @@ public class UserService implements UserDetailsService {
         return userRepository.getUserByUserName(username);
     }
 
+    public Optional<User> getUserByMail(String mail) {
+        // Find user according to the username refered in parameter.
+        return userRepository.getUserByMail(mail);
+    }
+
     public Optional<User> getUserByID(Long user_id) {
         // Find user according to the ID refered in parameter.
         return userRepository.findById(user_id);

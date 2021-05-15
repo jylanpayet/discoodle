@@ -36,42 +36,42 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User.Role> getUserByRole(User.Role role);
 
     @Transactional
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("UPDATE User user SET user.enabled = true WHERE user.mail = :mail")
     int enableUser(String mail);
 
     @Transactional
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("UPDATE User user SET user.username = :username WHERE user.id = :user_id")
     int changeUsername(@Param("user_id") Long user_id, @Param("username") String username);
 
     @Transactional
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("UPDATE User user SET user.mail = :mail WHERE user.id = :user_id")
     int changeMail(@Param("user_id") Long user_id, @Param("mail") String mail);
 
     @Transactional
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("UPDATE User user SET user.password = :password WHERE user.id = :user_id")
     int changePassword(@Param("user_id") Long user_id, @Param("password") String password);
 
     @Transactional
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("UPDATE User user SET user.name = :name WHERE user.id = :user_id")
     int changeName(@Param("user_id") Long user_id, @Param("name") String name);
 
     @Transactional
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("UPDATE User user SET user.last_name = :last_name WHERE user.id = :user_id")
     int changeLastName(@Param("user_id") Long user_id, @Param("last_name") String last_name);
 
     @Transactional
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("UPDATE User user SET user.link_to_avatar = :link_to_avatar WHERE user.id = :user_id")
     int changeLinkToAvatar(@Param("user_id") Long user_id, @Param("link_to_avatar") String link_to_avatar);
 
     @Transactional
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query(value = "DELETE ct FROM confirmation_token as ct where ct.user_id = :user_id", nativeQuery = true)
     void removeToken(@Param("user_id") Long user_id);
 
