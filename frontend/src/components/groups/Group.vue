@@ -29,6 +29,7 @@ export default {
    height: 100%;
 
    overflow-y: auto;
+   overflow-x: hidden;
    display: flex;
    flex-direction: column;
    align-items: center;

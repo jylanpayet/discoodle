@@ -4,7 +4,7 @@
          <div class="router">
             <div>
                <router-link :key="group.groups_id" v-for="group in groups"
-                            @click="setGroup(group)" :to="group.type === 'SUBJECTS' ? `/groupes/subject/${group.groups_id}` : `/groupes/${group.groups_id}`">
+                            @click="setGroup(group)" :to="group.type === 'SUBJECTS' ? `/groupes/subject/${group.groups_id}/accueil` : `/groupes/subject/${group.groups_id}/discussion`">
                   <div class="group">
                      {{ group.description }}
                   </div>
