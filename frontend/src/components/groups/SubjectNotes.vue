@@ -114,9 +114,6 @@ export default {
       }
    },
    methods: {
-      log(event) {
-         console.log(event);
-      },
       changeMaxNote(event) {
          this.maxNote = event;
       },
@@ -153,7 +150,6 @@ export default {
          this.addNote = false;
       },
       removeNote() {
-         console.log(this.table.noteSelection);
          if (this.table.noteSelection.item?.id >= 0) {
             axios.delete(`http://localhost:8080/api/note/deleteNoteById?note_id=${this.table.noteSelection.item.id}`).then(() => {
                this.table.items = this.table.items.filter(e => {
@@ -231,7 +227,6 @@ export default {
 
          if (this.rights.canModifyNotes) {
             axios.get(`http://localhost:8080/api/note/getAllNoteByGroupId?group_id=${this.getGroup.groups_id}`).then(response => {
-               console.log(response);
                this.table.items = response.data.map(e => {
                   return {
                      id: e.id,

@@ -76,7 +76,7 @@ export default {
          let ws = new SockJS("http://localhost:8080/ws");
          stompClient = Stomp.over(ws);
          // Comment the next line if you want to show websocket's logs
-         // stompClient.debug = null
+         stompClient.debug = null
 
          stompClient.connect({}, () => {
             stompClient.subscribe(`/conversations/stream_chat/${this.getGroup.groups_id}`, (sdkEvent) => {
@@ -97,14 +97,10 @@ export default {
       onMessageReceived(payload) {
          const obj = JSON.parse(payload.body);
          if (obj.info === "STREAM_STARTED" && !this.joinedStream) {
-            console.log(obj);
-
-            // TODO rejoidnre le stream
             this.joinStream(obj.callID);
 
             this.joinedStream = true;
          } else if (obj.info === "STREAM_STOPPED") {
-            console.log(obj);
             this.stream = null;
             this.joinedStream = false;
          }
@@ -130,8 +126,6 @@ export default {
          this.peer_connection.onicecandidate = (event) => {
             event.candidate && answerCandidates.add(event.candidate.toJSON());
          };
-
-         console.log((await callDoc.get()));
          const callData = (await callDoc.get()).data();
 
          if (!callData.offer) {
@@ -165,10 +159,8 @@ export default {
    },
 
    mounted() {
-      console.log("MOUNTED");
       this.peer_connection = new RTCPeerConnection(this.servers);
       this.peer_connection.ontrack = event => {
-         console.log(event);
          event.streams[0].getTracks().forEach(track => {
             this.stream.addTrack(track);
          })

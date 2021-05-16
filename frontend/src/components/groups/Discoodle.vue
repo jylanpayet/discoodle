@@ -287,16 +287,14 @@ export default {
       },
 
       acceptEstablishment(er_id) {
-         axios.put(`http://localhost:8080/api/establishmentRequest/acceptEstablishmentRequest?er_id=${er_id}`).then(response => {
-            console.log(response.data);
+         axios.put(`http://localhost:8080/api/establishmentRequest/acceptEstablishmentRequest?er_id=${er_id}`).then(() => {
             this.requests.establishments.list = this.requests.establishments.list.filter(e => {
                return e.er_id !== er_id;
             });
          });
       },
       refuseEstablishment(er_id) {
-         axios.put(`http://localhost:8080/api/establishmentRequest/refuseEstablishmentRequest?er_id=${er_id}`).then(response => {
-            console.log(response.data);
+         axios.put(`http://localhost:8080/api/establishmentRequest/refuseEstablishmentRequest?er_id=${er_id}`).then(() => {
             this.requests.establishments.list = this.requests.establishments.list.filter(e => {
                return e.er_id !== er_id;
             });
@@ -325,7 +323,6 @@ export default {
       })
 
       await axios.get("http://localhost:8080/api/establishmentRequest/getEstablishmentRequestBeingProcessed").then(response => {
-         console.log(response.data);
          this.requests.establishments.list = response.data;
       });
    },

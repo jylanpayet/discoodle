@@ -32,7 +32,7 @@ const routes = [
                     {
                         path: "",
                         name: "Default Subjects",
-                        redirect: { name: 'Home Subjects' }
+                        redirect: { name: "Home Subjects" }
                     },
                     {
                         path: "accueil",

@@ -128,7 +128,6 @@ export default {
 
       async answerCall() {
          const callId = this.model.callInput;
-         console.log(callId);
 
          const callDoc = firestore.collection('calls').doc(callId);
          const answerCandidates = callDoc.collection('answerCandidates');
