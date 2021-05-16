@@ -37,8 +37,6 @@
         <module>api</module>
         <!-- Frontend module -->
         <module>frontend</module>
-        <!-- RTC module -->
-        <module>RTC</module>
     </modules>
 
     <!-- Devteam with emails -->
