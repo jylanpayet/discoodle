@@ -10,12 +10,15 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public class NoteRequest {
+
     private Long user_id;
-    private String userName;
+
     private Long group_id;
+
     private double note;
+
     private double coef;
+
     private String titre;
-    private String note_id;
 
 }

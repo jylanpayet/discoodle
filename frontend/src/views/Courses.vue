@@ -1,95 +1,76 @@
 <template>
    <div class="Courses" v-if="!(JSON.stringify(getUser) === JSON.stringify({}))">
-      <div class="router">
-         <router-link :key="group.groups_id" v-for="group in (getUser.role === 'student' ? subjects : groups)"
-                      @click="setGroup(group)" :to="`/cours/subject/${group.groups_id}/accueil`">
-            <div class="group">
-               {{ group.name }}
+      <div>
+         <div class="router">
+            <div>
+               <router-link :key="group.groups_id" v-for="group in groups"
+                            @click="setGroup(group)" :to="group.type === 'SUBJECTS' ? `/groupes/subject/${group.groups_id}` : `/groupes/${group.groups_id}`">
+                  <div class="group">
+                     {{ group.description }}
+                  </div>
+               </router-link>
             </div>
-         </router-link>
-         <button class="addGroup" @click="joinGroup.show = true">
-            +
-         </button>
+            <JoinGroup v-if="joinGroup" @close="joinGroup = false" @user-entry="addInGroups"/>
+            <button class="addGroup" @click="joinGroup = true">
+               +
+            </button>
+         </div>
       </div>
-      <router-view/>
+      <router-view @groupAdded="pushInGroups($event);" />
    </div>
    <Account @logSuccess="getRooms(getUser.role)" v-else/>
 
-   <w-dialog
-         v-model="joinGroup.show"
-         :fullscreen="joinGroup.fullscreen"
-         :width="joinGroup.width"
-         :persistent="joinGroup.persistent"
-         :persistent-no-animation="joinGroup.persistentNoAnimation"
-   >
-      <div class="joinGroup">
-         <span style="margin-bottom: 10px; font-size: 19px; font-weight: 600; color: #454150">Rejoindre un groupe :</span>
-         <w-input color="darkgray" :model-value="joinContentID" required style="margin-bottom: 10px; width: 90%" name="groupID" @keydown="join">
-            Identifiant du groupe
-         </w-input>
-         <w-input color="darkgray" :model-value="joinContentKey" required style="margin-bottom: 10px; width: 90%" type="password" name="groupKey"
-                  @keydown="join">Clé du groupe
-         </w-input>
-         <button class="submit" @click="join">
-            Rejoindre !
-         </button>
-      </div>
-   </w-dialog>
+
 </template>
 
 <script>
 import Account from "@/views/Account";
 import {mapActions, mapGetters} from "vuex";
 import axios from "axios";
+import JoinGroup from "@/components/groups/JoinGroup";
 
 export default {
    name: "Courses",
-   components: {Account},
+   components: {JoinGroup, Account},
    computed: {
       ...mapGetters(['getUser'])
    },
    data() {
       return {
-         subjects: [],
          groups: [],
-         joinGroup: {
-            show: false,
-            fullscreen: false,
-            persistent: false,
-            persistentNoAnimation: false,
-            width: 300
-         },
-         joinContentID: "",
-         joinContentKey: ""
+         joinGroup: false
       }
    },
    methods: {
       getRooms(role) {
          if (role === "STUDENT") {
-            axios.get(`http://localhost:8080/api/users/seeAllSubjects/${this.getUser.id}`).then(response => {
+            axios.get(`http://localhost:8080/api/users/seeAllSubjects?user_id=${this.getUser.id}`).then(response => {
                this.groups = response.data;
             })
          } else {
-            axios.get(`http://localhost:8080/api/users/seeAllGroups/${this.getUser.id}`).then(response => {
+            axios.get(`http://localhost:8080/api/users/seeAllGroups?user_id=${this.getUser.id}`).then(response => {
                this.groups = response.data;
             })
          }
       },
       ...mapActions(['setGroup']),
-      join(event) {
-         if ((event.type === 'keydown' && event.keyCode === 13) || event.type === 'click') {
-            axios.post(`http://localhost:8080/api/groups/addNewMemberInGroup/${document.querySelector("input[name='groupID']")}
-               ?user_id=${this.getUser.id}
-               &token=${document.querySelector("input[name='groupKey']")}`
-            ).then(response => {
-               console.log(response);
-            });
-         }
-      },
       create(event) {
          if ((event.type === 'keydown' && event.keyCode === 13) || event.type === 'click') {
             console.log(event);
          }
+      },
+      addInGroups(group) {
+         if (!Number(group.id))
+            return
+         if (!this.groups.map(elt => elt.groups_id).includes(Number(group.id))) {
+            axios.post(`http://localhost:8080/api/groups/addNewMemberInGroup?group_id=${group.id}&user_id=${this.getUser.id}&token=${group.token}`
+            ).then(response => {
+               this.groups.push(response.data);
+            });
+         }
+      },
+      pushInGroups(group) {
+         this.groups.push(group);
       }
    },
    mounted() {
@@ -115,7 +96,10 @@ export default {
 .router {
    position: relative;
    width: 150px;
+   height: 100vh;
    padding: 50px;
+
+   overflow-y: auto;
 
    display: flex;
    flex-direction: column;
@@ -173,27 +157,5 @@ export default {
    outline: none;
    border-radius: 6px;
    background-color: #8F8F8F;
-}
-
-.submit {
-   height: 35px;
-   width: 150px;
-   background-color: #E85C5C;
-   font-size: 15px;
-   font-weight: 600;
-   border: none;
-   outline: none;
-   border-radius: 999px;
-   color: #F4F4F4;
-   cursor: pointer;
-}
-
-.joinGroup {
-   height: 175px;
-   width: 100%;
-   display: flex;
-   flex-direction: column;
-   align-items: center;
-   justify-content: center;
 }
 </style>

@@ -12,7 +12,7 @@ import java.util.*;
 @NoArgsConstructor
 @Entity
 @ToString
-@Table(name = "user")
+@Table(name = "users")
 public class User {
 
     public User(String mail, String username, String password, String name, String last_name, Role role) {
@@ -35,6 +35,7 @@ public class User {
     @Column(name = "username")
     private String username;
 
+    @JsonIgnore
     @Column(name = "password")
     private String password;
 
@@ -59,25 +60,32 @@ public class User {
 
     @JsonIgnore
     @ManyToMany
-    @JoinTable( name = "link_rooms_users",
-            joinColumns = @JoinColumn( name = "user_id" ),
-            inverseJoinColumns = @JoinColumn( name = "room_id" )
+    @JoinTable(name = "link_rooms_users",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "room_id")
     )
     private List<Room> rooms = new ArrayList<>();
 
     @JsonIgnore
     @ManyToMany
-    @JoinTable( name = "link_groups_to_user",
-            joinColumns = @JoinColumn( name = "user_id" ),
-            inverseJoinColumns = @JoinColumn( name = "groups_id" ) )
+    @JoinTable(name = "link_groups_to_user",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "groups_id"))
     private List<Groups> groups = new ArrayList<>();
 
     @JsonIgnore
     @ManyToMany
-    @JoinTable( name = "link_server_users",
-            joinColumns = @JoinColumn( name = "user_id" ),
-            inverseJoinColumns = @JoinColumn( name = "server_id" ) )
+    @JoinTable(name = "link_server_users",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "server_id"))
     private List<Server> serv = new ArrayList<>();
+
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(name = "link_role_to_users",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private List<Roles> roles = new ArrayList<>();
 
     public enum Role {
         STUDENT,
@@ -85,24 +93,4 @@ public class User {
         ADMIN
     }
 
-    @Getter
-    @AllArgsConstructor
-    @EqualsAndHashCode
-    @ToString
-    public static class RegistrationRequest {
-
-        private final String mail;
-
-        private final String username;
-
-        private final String password;
-
-        private final String name;
-
-        private final String last_name;
-
-        private final String link_to_avatar;
-
-        private final User.Role role;
-    }
 }

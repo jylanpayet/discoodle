@@ -6,8 +6,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.util.Date;
-
 @Getter
 @AllArgsConstructor
 @EqualsAndHashCode
@@ -22,9 +20,10 @@ public class RegistrationRequest {
 
     private final String name;
 
-    private final String lastName;
+    private final String last_name;
 
-    private final String linkToAvatar;
+    private final String link_to_avatar;
 
     private final User.Role role;
+
 }

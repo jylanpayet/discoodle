@@ -1,29 +1,32 @@
 package com.discoodle.api.controller;
 
-import com.discoodle.api.model.User;
+import com.discoodle.api.request.RegistrationRequest;
 import com.discoodle.api.service.RegistrationService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
 @RestController
-@RequestMapping(path = "/api/registration")
+@RequestMapping("/api/registration")
 @AllArgsConstructor
 public class RegistrationController {
 
     private final RegistrationService registrationService;
 
     @PostMapping
-    public String register(@RequestBody User.RegistrationRequest request) {
+    public String register(@RequestBody RegistrationRequest request) {
         return registrationService.register(request);
     }
 
-    @PostMapping(path="/login")
-    public String login(@RequestBody User.RegistrationRequest request) {
+    @PostMapping("/login")
+    public String login(@RequestBody RegistrationRequest request) {
         return registrationService.login(request);
     }
 
-    @GetMapping(path = "confirm")
-    public String confirm(@RequestParam("token") String token) {
-        return registrationService.confirmToken(token);
+    @GetMapping( "/confirm")
+    public String confirm(@RequestParam("token") String token, HttpServletResponse response) throws IOException {
+        return registrationService.confirmToken(token, response);
     }
 }

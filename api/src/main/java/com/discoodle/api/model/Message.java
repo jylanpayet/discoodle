@@ -1,32 +1,53 @@
 package com.discoodle.api.model;
+
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.UUID;
+import javax.persistence.*;
 
 @Getter
 @Setter
+@Entity
+@NoArgsConstructor
+@Table(name = "messages")
 public class Message {
 
-	private final UUID convUUID;
-	private final Integer id;
-	private String content;
-	private String sender;
-	private String messageDate;
-	private boolean pinned;
-	private boolean edited;
+    @Id
+    @GeneratedValue
+    @Column(name = "message_id", unique = true, nullable = false)
+    private Long message_id;
 
-	private final String type;
+    @Column(name = "conv_uuid")
+    private String conv_uuid;
+
+    @Lob
+    @Column(name = "content", columnDefinition = "text")
+    private String content;
+
+    @Column(name = "sender")
+    private String sender;
+
+    @Column(name = "message_date")
+    private Long message_date;
+
+    @Column(name = "pinned")
+    private boolean pinned;
+
+    @Column(name = "edited")
+    private boolean edited;
+
+    @Column(name = "type")
+    private String type;
 
 
-	public Message(Integer id, String content, String sender, String messageDate, boolean pinned, UUID convUUID) {
-		this.id = id;
-		this.content = content;
-		this.sender = sender;
-		this.messageDate = messageDate;
-		this.pinned = pinned;
-		this.convUUID = convUUID;
-		this.type = "MESSAGE";
-		this.edited = false;
-	}
+    public Message(String content, String sender, Long message_date, String conv_uuid) {
+        this.content = content;
+        this.sender = sender;
+        this.pinned = false;
+        this.message_date = message_date;
+        this.conv_uuid = conv_uuid;
+        this.type = "MESSAGE";
+        this.edited = false;
+    }
 }

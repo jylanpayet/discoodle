@@ -1,4 +1,4 @@
-import {createRouter, createWebHashHistory} from 'vue-router'
+import {createRouter, createWebHistory} from 'vue-router'
 import Home from "@/views/Home";
 
 const routes = [
@@ -15,50 +15,79 @@ const routes = [
         component: () => import(/* webpackChunkName: "home" */ '../views/Home')
     },
     {
-        path: '/cours',
+        path: '/groupes',
         name: 'Cours',
         component: () => import(/* webpackChunkName: "courses" */ '../views/Courses'),
         children: [
             {
                 path: "",
                 name: "DefaultCourses",
-                component: () =>import(/* webpackChunkName: "courses/subject" */'../components/courses/Group'),
+                component: () =>import(/* webpackChunkName: "courses/subject" */'../components/groups/Group'),
             },
             {
                 path: "subject/:id",
                 name: "Subjects",
-                component: () =>import(/* webpackChunkName: "courses/subject" */'../components/courses/Group'),
+                component: () =>import(/* webpackChunkName: "courses/subject" */'../components/groups/Group'),
                 children: [
                     {
                         path: "",
-                        name: "DefaultGroup",
-                        redirect: "accueil"
+                        name: "Default Subjects",
+                        redirect: { name: 'Home Subjects' }
                     },
                     {
                         path: "accueil",
-                        name: "Subject Home",
-                        component: () => import('../components/courses/SubjectHome')
+                        name: "Home Subjects",
+                        component: () => import('../components/groups/SubjectHome')
                     },
                     {
                         path: "cours",
-                        name: "Subject Course",
-                        component: () => import('../components/courses/SubjectCourse')
+                        name: "Course Subjects",
+                        component: () => import('../components/groups/SubjectCourse'),
                     },
                     {
-                        path: "chat",
-                        name: "Subject Chat",
-                        component: () => import('../components/courses/SubjectChat')
+                        path: "discussion",
+                        name: "Server Subjects",
+                        component: () => import('../components/groups/SubjectChat'),
+                        children: [
+                            {
+                                path: ":room_id",
+                                name: "Channel",
+                                component: () => import('../components/groups/Channel')
+                            }
+                        ]
                     },
                     {
                         path: "notes",
-                        name: "Subject Notes",
-                        component: () => import('../components/courses/SubjectNotes')
+                        name: "Notes Subjects",
+                        component: () => import('../components/groups/SubjectNotes')
                     },
                     {
                         path: "parametres",
-                        name: "Subject Settings",
-                        component: () => import('../components/courses/SubjectSettings')
+                        name: "Settings Subjects",
+                        component: () => import('../components/groups/SubjectSettings')
                     }
+                ]
+            },
+            {
+                path: ":id",
+                name: "Group",
+                component: () =>import(/* webpackChunkName: "courses/subject" */'../components/groups/Group'),
+                children: [
+                    {
+                        path: "",
+                        name: "Default Subjects",
+                        redirect: { name: 'Group chat' }
+                    },
+                    {
+                        path: "discussion",
+                        name: "Group chat",
+                        component: () => import('../components/groups/SubjectChat')
+                    },
+                    {
+                        path: "parametres",
+                        name: "Group settings",
+                        component: () => import('../components/groups/SubjectSettings')
+                    },
                 ]
             }
         ]
@@ -74,14 +103,10 @@ const routes = [
             },
             {
                 path: ':id',
+                name: "Discussion",
                 component: () => import(/* webpackChunkName: "messages/:id" */ '../components/ChatContent'),
             },
         ]
-    },
-    {
-        path: '/planning',
-        name: 'Planning',
-        component: () => import(/* webpackChunkName: "planning" */ '../views/Planning')
     },
     {
         path: '/compte',
@@ -106,7 +131,7 @@ const routes = [
 ]
 
 const router = createRouter({
-    history: createWebHashHistory(),
+    history: createWebHistory(),
     routes
 })
 

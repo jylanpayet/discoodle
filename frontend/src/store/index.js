@@ -2,46 +2,29 @@ import {createStore} from 'vuex'
 
 export default createStore({
     state: {
-        theme: {
-            night: {
-                color1: "#13111A",
-                color2: "#454150",
-                color3: "#909090",
-                color4: "#E85C5C",
-                color5: "#F4F4F4",
-                color6: "#FFFFFF"
-            },
-            day: {
-                color1: "#FDFDFD",
-                color2: "#454150",
-                color3: "#909090",
-                color4: "#E85C5C",
-                color5: "#454150",
-                color6: "#FFFFFF"
-            },
-            currentMode: {
-                type: Boolean,
-                default: true
-                // Represents the mode. If currentMode is true, then night mode is enabled, else it's day mode.
-            }
-        },
         messages: {
-            currentConvShown: {
-                type: String,
-            }
+            currentConvShown: ""
         },
-        user: {  },
-        friends: [
+        user: {},
+        friends: [],
+        groups: {},
+        night: {
+            color1: "#13111A",
+            color2: "#454150",
+            color3: "#909090",
+            color4: "#E85C5C",
+            color5: "#F4F4F4",
+            color6: "#FFFFFF"
+        },
 
-        ],
-        groups: {
-
+        // This object is responsible of all the stream information.
+        webRTC: {
+            mainStream: null,
+            waiting: [],
+            showPIP: false
         }
     },
     mutations: {
-        SWITCH_THEME(state) {
-            state.theme.currentMode = !state.theme.currentMode
-        },
         SET_CONV_UUID(state, uuid) {
             state.messages.currentConvShown = uuid;
         },
@@ -53,12 +36,15 @@ export default createStore({
         },
         SET_GROUP(state, groups) {
             state.groups = groups;
+        },
+        SET_FRIENDS(state, friends) {
+            state.friends = friends;
+        },
+        SET_LINK_TO_AVATAR(state, link) {
+            state.user.link_to_avatar = link;
         }
     },
     actions: {
-        switchTheme(context) {
-            context.commit('SWITCH_THEME');
-        },
         setConvUUID(context, uuid) {
             context.commit('SET_CONV_UUID', uuid);
         },
@@ -69,18 +55,19 @@ export default createStore({
             context.commit('ADD_FRIEND', user);
         },
         setGroup(context, groups) {
+            console.log(groups);
             context.commit('SET_GROUP', groups);
+        },
+        setFriends(context, friends) {
+            context.commit('SET_FRIENDS', friends)
+        },
+        setLinkToAvatar(context, link) {
+            context.commit('SET_LINK_TO_AVATAR', link);
         }
     },
     getters: {
         getColors: state => {
-            if (state.theme.currentMode)
-                return state.theme.night;
-            else
-                return state.theme.day;
-        },
-        getTheme: state => {
-            return state.theme.currentMode;
+            return state.night;
         },
         getCurrentConv: state => {
             return state.messages.currentConvShown;
@@ -95,7 +82,5 @@ export default createStore({
             return state.groups;
         }
     },
-    modules: {
-
-    }
+    modules: {}
 })

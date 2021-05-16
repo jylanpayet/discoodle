@@ -13,36 +13,17 @@
                         <router-link to="/accueil">
                            <div class="navbar-icon"><img src=assets/home.png alt="Home"></div>
                            <span :style="{ color: getColors.color5 }">ACCUEIL</span></router-link>
-                        <router-link to="/cours">
+                        <router-link to="/groupes" @click="setGroup({})">
                            <div class="navbar-icon"><img src="assets/courses.png" alt="Courses"></div>
                            <span :style="{ color: getColors.color5 }">COURS</span></router-link>
                         <router-link to="/messages">
                            <div class="navbar-icon"><img src="assets/messages.png" alt="Messages"></div>
                            <span :style="{ color: getColors.color5 }">MESSAGES</span></router-link>
-                        <router-link to="/planning">
-                           <div class="navbar-icon"><img src="assets/planning.png" alt="Planning"></div>
-                           <span :style="{ color: getColors.color5 }">PLANNING</span></router-link>
                         <router-link to="/compte">
                            <div class="navbar-icon"><img src="assets/account.png" alt="Account"></div>
                            <span :style="{ color: getColors.color5 }">COMPTE</span></router-link>
                      </div>
                   </div>
-
-                  <div class="fast-access">
-                     <span class="headerNavbar">ACCÈS RAPIDE</span>
-                     <div class="links">
-                        <!-- Mettre les liens de l'accès rapide ici -->
-                     </div>
-                  </div>
-
-                  <!-- TODO : Implementer l'accès rapide -->
-
-               </div>
-            </div>
-            <div class="theme-switcher">
-               <div>
-                  <input type="checkbox" id="switch" @change="switchTheme" checked/><label for="switch">Toggle</label>
-                  <span class="headerNavbar" style="margin-left: 20px;">{{ getTheme ? "NIGHT" : "DAY" }} MODE</span>
                </div>
             </div>
          </div>
@@ -64,17 +45,17 @@ export default {
 
    },
    methods: {
-      ...mapActions(['switchTheme', 'setUser'])
+      ...mapActions(['setUser', 'setGroup']),
    },
    computed: {
-      ...mapGetters(['getColors', 'getTheme'])
+      ...mapGetters(['getColors'])
    },
    mounted() {
       if (vueCookie.get("username") !== null && vueCookie.get("username") !== "") {
-         axios.get(`http://localhost:8080/api/users/${vueCookie.get("username")}`).then(response => {
+         axios.get(`http://localhost:8080/api/users/findByUserName?username=${vueCookie.get("username")}`).then(response => {
             const user = response.data;
-            console.log(user);
-            this.setUser(user);
+            if (!user.locked)
+               this.setUser(user);
          });
       }
    }
@@ -95,7 +76,9 @@ export default {
 }
 
 #nav {
-   min-width: 270px;
+   width: 20%;
+   min-width: 220px;
+   max-width: 300px;
    height: 100%;
 }
 
@@ -267,7 +250,9 @@ label[for="switch"]:after {
 
 
 #content {
-   width: calc(100% - 270px);
+   max-width: calc(100% - 220px);
+   width: 80%;
+   min-width: calc(100% - 300px);
    height: 100%;
 }
 

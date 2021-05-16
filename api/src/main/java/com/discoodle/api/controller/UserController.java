@@ -3,19 +3,18 @@ package com.discoodle.api.controller;
 import com.discoodle.api.model.Groups;
 import com.discoodle.api.model.Room;
 import com.discoodle.api.model.User;
+import com.discoodle.api.request.RegistrationRequest;
 import com.discoodle.api.service.UserService;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
-
 @RestController
-@RequestMapping(path = "api/users")
+@RequestMapping("api/users")
 public class UserController {
+
     private final UserService userService;
 
     public UserController(UserService userService) {
@@ -27,112 +26,109 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @RequestMapping(value = "{username}", method = GET)
+    @GetMapping("/findByUserName")
     @ResponseBody
-    public Optional<User> getUserByUserName(@PathVariable String username) {
+    public Optional<User> getUserByUserName(@RequestParam("username") String username) {
         return userService.getUserByUserName(username);
     }
 
-    @RequestMapping(value = "/infos/{user_id}", method = GET)
+    @GetMapping("/infos")
     @ResponseBody
-    public Optional<User> getUserByID(@PathVariable Long user_id){
+    public Optional<User> getUserByID(@RequestParam("user_id") Long user_id) {
         return userService.getUserByID(user_id);
     }
 
-    @RequestMapping(value = "/info/{role}", method = GET)
+    @GetMapping("/info/{role}")
     @ResponseBody
-    public Optional<User.Role> findUserByRole(@PathVariable User.Role role){ return userService.findUserByRole(role); }
+    public Optional<User.Role> getUserByRole(@PathVariable User.Role role) {
+        return userService.getUserByRole(role);
+    }
 
     @PostMapping
     public void registerNewUser(@RequestBody User user) {
         userService.addNewUser(user);
     }
 
-    @DeleteMapping(path = "{user_id}")
-    public void deleteUser(@PathVariable("user_id") Long userId) {
-        userService.deleteUser(userId);
+    @DeleteMapping("/delete")
+    public boolean deleteUser(@RequestParam("user_id") Long user_id) {
+       return userService.deleteUser(user_id);
     }
 
-    @GetMapping(path = "/seeAllRooms/{user_id}")
+    @GetMapping("/seeAllRooms")
     @ResponseBody
-    public List<Room> findAllRoomsByUserID(@PathVariable Long user_id) {
-        return userService.getUserByID(user_id).get().getRooms();
-    }
-    @GetMapping(path = "/seeAllRooms0/{user_id}")
-    @ResponseBody
-    public List<Room> findAllRooms0ByUserID(@PathVariable Long user_id) {
+    public List<Room> getAllRoomsByUserID(@RequestParam("user_id") Long user_id) {
         List<Room> all = userService.getUserByID(user_id).get().getRooms();
         List<Room> rooms = new ArrayList<>();
-        for (Room room : all ) {
+        for (Room room : all) {
             if (!room.getRoom_link())
                 rooms.add(room);
         }
         return rooms;
     }
-    @GetMapping(path = "/seeAllRooms1/{user_id}")
-    @ResponseBody
-    public List<Room> findAllRooms1ByUserID(@PathVariable Long user_id) {
-        List<Room> all = userService.getUserByID(user_id).get().getRooms();
-        List<Room> rooms = new ArrayList<>();
-        for (Room room : all ) {
-            if (room.getRoom_link())
-                rooms.add(room);
-        }
-        return rooms;
-    }
 
-    @GetMapping(path = "/seeAllFriends/{user_id}")
+    @GetMapping("/seeAllFriends")
     @ResponseBody
-    public List<User> getFriendList(@PathVariable Long user_id) {
+    public List<User> getFriendList(@RequestParam("user_id") Long user_id) {
         return userService.getFriendList(user_id);
     }
 
-    @PostMapping(path = "changeUsername/{user_id}")
-    public Optional<User> changeUsername(@PathVariable Long user_id, @RequestBody User.RegistrationRequest request) {
+    @PostMapping("/changeUsername")
+    public Optional<User> changeUsername(@RequestParam("user_id") Long user_id, @RequestBody RegistrationRequest request) {
         return userService.changeUsername(user_id, request.getUsername());
     }
 
-    @PostMapping(path = "changeMail/{user_id}")
-    public Optional<User> changeMail(@PathVariable Long user_id, @RequestBody User.RegistrationRequest request) {
+    @PostMapping("/changeMail")
+    public Optional<User> changeMail(@RequestParam("user_id") Long user_id, @RequestBody RegistrationRequest request) {
         return userService.changeMail(user_id, request.getMail());
     }
 
-    @PostMapping(path = "changePassword/{user_id}")
-    public Optional<User> changePassword(@PathVariable Long user_id, @RequestBody User.RegistrationRequest request) {
+    @PostMapping("/changePassword")
+    public Optional<User> changePassword(@RequestParam("user_id") Long user_id, @RequestBody RegistrationRequest request) {
         return userService.changePassword(user_id, request.getPassword());
     }
 
-    @PostMapping(path = "changeName/{user_id}")
-    public Optional<User> changeName(@PathVariable Long user_id, @RequestBody User.RegistrationRequest request) {
+    @PostMapping("/changeName")
+    public Optional<User> changeName(@RequestParam("user_id") Long user_id, @RequestBody RegistrationRequest request) {
         return userService.changeName(user_id, request.getName());
     }
 
-    @PostMapping(path = "changeLastName/{user_id}")
-    public Optional<User> changeLastName(@PathVariable Long user_id, @RequestBody User.RegistrationRequest request) {
+    @PutMapping("/changeRole")
+    public String changeRole(@RequestParam("user_id") Long user_id, @RequestParam("role") User.Role role) {
+        return userService.changeRole(user_id, role);
+    }
+
+    @PutMapping("/lockOrUnlock")
+    public Optional<User> lockOrUnlockUser(@RequestParam("user_id") Long user_id, @RequestParam("lock") Boolean lock) {
+        return userService.lockOrUnlockUser(user_id, lock);
+    }
+
+    @PostMapping("/changeLastName")
+    public Optional<User> changeLastName(@RequestParam("user_id") Long user_id, @RequestBody RegistrationRequest request) {
         return userService.changeLastName(user_id, request.getLast_name());
     }
 
-    @PostMapping(path = "changeLinkToAvar/{user_id}")
-    public Optional<User> changeLinkToAvatar(@PathVariable Long user_id, @RequestBody User.RegistrationRequest request) {
+    @PostMapping("/changeLinkToAvatar")
+    public Optional<User> changeLinkToAvatar(@RequestParam("user_id") Long user_id, @RequestBody RegistrationRequest request) {
         return userService.changeLinkToAvatar(user_id, request.getLink_to_avatar());
     }
 
-    @GetMapping(path = "/seeAllGroups/{user_ID}")
+    @GetMapping("/seeAllGroups")
     @ResponseBody
-    public List<Groups> findAllGroupsByUserID(@PathVariable Long user_ID) {
-        return userService.getUserByID(user_ID).get().getGroups();
+    public List<Groups> getAllGroupsByUserID(@RequestParam("user_id") Long user_id) {
+        return userService.getUserByID(user_id).get().getGroups();
     }
 
-    @GetMapping(path = "/seeAllSubjects/{user_ID}")
+    @GetMapping("/seeAllSubjects")
     @ResponseBody
-    public List<Groups> findAllSubjectsByUserID(@PathVariable Long user_ID) {
-        List<Groups> AllSubjects = userService.getUserByID(user_ID).get().getGroups();
+    public List<Groups> getAllSubjectsByUserID(@RequestParam("user_id") Long user_id) {
+        List<Groups> AllSubjects = userService.getUserByID(user_id).get().getGroups();
         List<Groups> UserSubjects = new ArrayList<>();
-        for (int i = 0; i < AllSubjects.size(); i++) {
-            if (AllSubjects.get(i).getType().equals(Groups.TypeOfGroup.SUBJECTS)) {
-                UserSubjects.add(AllSubjects.get(i));
+        for (Groups allSubject : AllSubjects) {
+            if (allSubject.getType().equals(Groups.TypeOfGroup.SUBJECTS)) {
+                UserSubjects.add(allSubject);
             }
         }
         return UserSubjects;
     }
+
 }

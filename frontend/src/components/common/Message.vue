@@ -1,29 +1,48 @@
 <template>
-   <div class="Message" :style="belongToMyself ? { justifyContent: 'flex-end' } : { justifyContent: 'flex-start' }">
-      <div @mouseover="showPin = true" @mouseleave="showPin = false" class="content" :style="!belongToMyself ? { flexDirection: 'row-reverse' } : { flexDirection: 'row' }">
-         <span v-if="isEdited" style="color: #7f7f7f; margin-left: 20px; margin-right: 20px; font-weight: 500; font-size: 11px;">
+   <div class="Message" :style="belong_to_myself ? { justifyContent: 'flex-end' } : { justifyContent: 'flex-start' }">
+      <div @mouseover="showPin = true" @mouseleave="showPin = false" class="content"
+           :style="!belong_to_myself ? { flexDirection: 'row-reverse' } : { flexDirection: 'row' }">
+         <span v-if="edited"
+               style="color: #7f7f7f; margin-left: 20px; margin-right: 20px; font-weight: 500; font-size: 11px;">
             (Modifié)
          </span>
-         <div v-if="!messageEdit" :class="mention ? 'message-content mention' : 'message-content'" v-html="displayMessage(content, true, true, true)" :style="belongToMyself ? { marginRight: '10px', backgroundColor: '#e85c5c', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: getTheme ? '#C4C4C4' : '#F4F4F4' }">
+         <w-tooltip :left="belong_to_myself" :right="!belong_to_myself" v-if="!messageEdit"
+                    :class="mention ? 'message-content mention' : 'message-content'"
+                    :style="belong_to_myself ? { marginRight: '10px', backgroundColor: '#e85c5c', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: '#C4C4C4' }">
+            <template #activator="{ on }">
+               <div v-on="on" v-html="displayMessage(content, true, true, true)">
 
-         </div>
-         <div v-else :class="mention ? 'message-content mention' : 'message-content'" :style="belongToMyself ? { marginRight: '10px', backgroundColor: '#e85c5c', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: getTheme ? '#C4C4C4' : '#F4F4F4' }">
-            <input type="text" :value="content" @keydown="actionInput">
-         </div>
-         <div class="buttons" v-if="showPin" :style="belongToMyself ? { left: 0 } : { right: 0 }">
-            <button class="pin-message" @click="pinMessage">
+               </div>
+            </template>
+            {{ sender }}
+         </w-tooltip>
+         <w-tooltip :right="!belong_to_myself" :left="belong_to_myself" v-else
+                    :class="mention ? 'message-content mention' : 'message-content'"
+                    :style="belong_to_myself ? { marginRight: '10px', backgroundColor: '#e85c5c', color: '#F4F4F4', fontWeight: 500 } : { marginLeft: '10px', backgroundColor: '#F4F4F4' }">
+            <template #activator="{ on }">
+               <div v-on="on">
+                  <input type="text" :value="content" autocomplete="off" @keydown="actionInput">
+               </div>
+            </template>
+            {{ sender }}
+         </w-tooltip>
+
+         <div class="buttons" v-if="showPin" :style="belong_to_myself ? { left: '-50px' } : { right: '50px' }">
+            <button class="pin-message" @click="pinMessage" v-if="canPin">
                <img src="../../assets/pin.png" alt="">
             </button>
-            <button class="edit-message" @click="messageEdit = true" v-if="belongToMyself">
+            <button class="edit-message" @click="messageEdit = true" v-if="belong_to_myself && canEdit">
                <img src="../../assets/pen.svg" alt="Pen">
             </button>
-            <button class="delete-message" @click="deleteMessage" v-if="belongToMyself">
+            <button class="delete-message" @click="deleteMessage" v-if="canRemove">
                X
             </button>
          </div>
          <div class="user-logo" :style="{ backgroundColor: '#F4F4F4' }">
-            {{ userLogo }}
+            <span v-if="user.link_to_avatar === null">{{ sender.charAt(0).toUpperCase() }}</span>
+            <img :src="user.link_to_avatar" alt="" v-else>
          </div>
+
       </div>
    </div>
 </template>
@@ -41,38 +60,46 @@ export default {
          type: String,
          required: true
       },
-      userLogo: {
+      sender: {
          required: true
       },
-      belongToMyself: {
+      belong_to_myself: {
          type: Boolean,
          required: true,
          default: true
       },
-      messageDate: {
-         type: String,
+      message_date: {
+         type: Number,
          required: true
       },
-      messageID: {
+      message_id: {
          type: Number,
          required: true,
       },
-      isEdited: {
+      edited: {
          type: Boolean,
          required: true,
          default: false,
+      },
+      canRemove: {
+         type: Boolean,
+         default: true
+      },
+      canEdit: {
+         type: Boolean,
+         default: true
+      },
+      canPin: {
+         type: Boolean,
+         default: true,
       }
    },
    methods: {
-      printDate(messageDate) {
-         return new Date().toLocaleString().substr(0, 10) === messageDate.substr(0, 10) ? messageDate.substr(13) : messageDate.substr(0, 10)
-      },
-
-      filterEmoji(content){
+      filterEmoji(content) {
          // Regex to match with the emoji string encode ( ':xxxxx_xxx_xxx_xxx:' where '_' is optionnal )
          const regex = ":[a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*:";
          const emoji = [...content.matchAll(regex)];
-         if(emoji && emoji.length > 0) {
+         if (emoji && emoji.length > 0) {
             emoji.forEach(elt => {
                if (emojis[elt[0].replaceAll(":", "")])
                   content = content.replace(elt[0], emojis[elt[0].replaceAll(":", "")]);
@@ -80,7 +107,7 @@ export default {
          }
          return content;
       },
-      filterMarkdown(content){
+      filterMarkdown(content) {
          return marked(content);
       },
       filterPing(content) {
@@ -99,26 +126,40 @@ export default {
             content = this.filterEmoji(content);
          if (mardkdown)
             content = this.filterMarkdown(content);
-         return content;
+
+         const body = new DOMParser().parseFromString(content, "text/html").querySelector("body");
+
+         const p = body.children[0];
+         if (p && p.children.length === 1) {
+            if (p.children[0].tagName === "CODE") {
+               p.classList.add("code");
+            } else if (p.children[0].tagName === "A") {
+               p.children[0].setAttribute("target", "_blank");
+            }
+         }
+
+         return body.innerHTML;
       },
       pinMessage() {
-         axios.put(`http://localhost:8080/api/room/pinMessage/${this.getCurrentConv}?messageID=${this.messageID}`);
-         this.$emit('pinnedMessage', this.messageID);
+         axios.put(`http://localhost:8080/api/messages/pinMessage?message_id=${this.message_id}`);
+         this.$emit('pinnedMessage', this.message_id);
       },
       deleteMessage() {
-         axios.put(`http://localhost:8080/api/room/deleteMessage/${this.getCurrentConv}?messageID=${this.messageID}`);
-         this.$emit('deletedMessage', this.messageID);
+         axios.delete(`http://localhost:8080/api/messages/deleteMessage?message_id=${this.message_id}`);
+         this.$emit('deletedMessage', this.message_id);
       },
       editMessage(content) {
-         axios.put(`http://localhost:8080/api/room/editMessage/${this.getCurrentConv}`, {
-            messageID: this.messageID,
-            content: content
-         })
-         this.$emit('editedMessage', this.messageID, content);
+         if (content !== this.content) {
+            axios.put(`http://localhost:8080/api/messages/editMessage`, {
+               message_id: this.message_id,
+               content: content
+            })
+            this.$emit('editedMessage', this.message_id, content);
+         }
       },
 
       actionInput(event) {
-         const input = document.querySelector(".message-content > input")
+         const input = document.querySelector(".message-content > div > input")
          if (event.keyCode === 13) {
             if (input.value === "")
                this.deleteMessage();
@@ -127,19 +168,25 @@ export default {
             this.messageEdit = false;
          } else {
             this.messageEdit = event.keyCode !== 27;
-            input.value = this.displayMessage(input.value, false, true, false);
+            input.value = this.displayMessage(input.value, false, false, false);
          }
       }
    },
    computed: {
-      ...mapGetters(['getColors', 'getTheme', 'getUser', 'getCurrentConv'])
+      ...mapGetters(['getColors', 'getUser', 'getCurrentConv'])
    },
    data() {
       return {
          mention: false,
          showPin: false,
-         messageEdit: false
+         messageEdit: false,
+         user: {}
       }
+   },
+   mounted() {
+      axios.get(`http://localhost:8080/api/users/findByUserName?username=${this.sender}`).then(response => {
+         this.user = response.data;
+      })
    }
 }
 </script>
@@ -166,7 +213,7 @@ export default {
 
 .message-content {
    padding: 15px;
-   max-width: calc(80% - 42px - 10px - 30px);
+   max-width: calc(100% - 50px);
 
    hyphens: manual;
    word-wrap: break-word;
@@ -182,8 +229,10 @@ export default {
 }
 
 .user-logo {
-   min-width: 42px;
-   min-height: 42px;
+   min-width: 40px;
+   min-height: 40px;
+   width: 40px;
+   height: 40px;
 
    background-color: #F4F4F4;
    color: #454150;
@@ -195,6 +244,11 @@ export default {
    justify-content: center;
 
    border-radius: 100px;
+}
+
+.user-logo > img {
+   width: 100%;
+   height: 100%;
 }
 
 .mention {
@@ -209,6 +263,7 @@ export default {
    background-color: #454150;
    border-radius: 12px;
    height: 30px;
+   bottom: 5px;
 
    display: flex;
    flex-direction: row;
@@ -241,19 +296,22 @@ export default {
    background-color: #E85C5C;
    color: #f4f4f4;
 }
+
 .delete-message {
    font-weight: 600;
    color: #f4f4f4;
 }
+
 .delete-message:hover {
    color: #E85C5C;
 }
+
 .delete-message:active {
    background-color: #E85C5C;
    color: #f4f4f4;
 }
 
-.message-content > input {
+.message-content > div > input {
    border: none;
    outline: none;
    background-color: #ff8888;

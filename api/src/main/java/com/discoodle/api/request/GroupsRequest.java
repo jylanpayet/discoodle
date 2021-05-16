@@ -11,12 +11,19 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public class GroupsRequest {
+
     private final Long parent_id;
+
     private final Long user_id;
+
     private final Integer depth;
+
     private final String name;
+
     private final String description;
+
     private final Groups.TypeOfGroup type;
+
     private final String text;
 
 }

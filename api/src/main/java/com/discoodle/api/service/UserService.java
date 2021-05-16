@@ -1,6 +1,10 @@
 package com.discoodle.api.service;
 
+import com.discoodle.api.model.Friendships;
+import com.discoodle.api.model.Room;
 import com.discoodle.api.model.User;
+import com.discoodle.api.repository.FriendshipsRepository;
+import com.discoodle.api.repository.TeacherRequestRepository;
 import com.discoodle.api.repository.UserRepository;
 import com.discoodle.api.security.token.ConfirmationToken;
 import com.discoodle.api.security.token.ConfirmationTokenService;
@@ -10,95 +14,129 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class UserService implements UserDetailsService {
+
     private final UserRepository userRepository;
+    private final FriendshipsRepository friendshipsRepository;
+    private final RoomService roomService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final ConfirmationTokenService confirmationTokenService;
+    private final TeacherRequestRepository teacherRequestRepository;
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
     public Optional<User> getUserByUserName(String username) {
-        return userRepository.findUserByUserName(username);
+        // Find user according to the username refered in parameter.
+        return userRepository.getUserByUserName(username);
+    }
+
+    public Optional<User> getUserByMail(String mail) {
+        // Find user according to the username refered in parameter.
+        return userRepository.getUserByMail(mail);
     }
 
     public Optional<User> getUserByID(Long user_id) {
-        return userRepository.findUserByID(user_id);
+        // Find user according to the ID refered in parameter.
+        return userRepository.findById(user_id);
     }
 
-    public Optional<User.Role> findUserByRole(User.Role role){return userRepository.findUserByRole(role); }
+    public Optional<User.Role> getUserByRole(User.Role role) {
+        return userRepository.getUserByRole(role);
+    }
 
     public void addNewUser(User user) {
-        Optional<User> TestPseudo = userRepository.findUserByUserName(user.getUsername());
-        Optional<User> TestMail = userRepository.findUserByMail(user.getMail());
+        Optional<User> TestPseudo = userRepository.getUserByUserName(user.getUsername());
+        Optional<User> TestMail = userRepository.getUserByMail(user.getMail());
 
+        // Check if user or/and mail exist in database.
         if (TestPseudo.isPresent() || TestMail.isPresent()) {
             throw new IllegalStateException("Le pseudo est déjà pris.");
         }
+        // If it doesn't exist, we add the user in database.
         userRepository.save(user);
     }
 
-    public void deleteUser(Long userId) {
-        boolean exists = userRepository.existsById(userId);
-        if (!exists) {
-            throw new IllegalStateException("L'étudiant avec l'id : " + userId + "n'existe pas.");
+    public boolean deleteUser(Long user_id) {
+        Optional<User> delete = userRepository.findById(user_id);
+        // Check if user exists in database.
+        if (delete.isPresent()) {
+            // Remove every elements belong to user : token, all rooms which he is in, all friendships where he is associated and finally remove user from database.
+            userRepository.removeToken(user_id);
+            for (Room test_room : delete.get().getRooms()) {
+                roomService.removeMember(test_room.getRoom_id(), user_id);
+            }
+            List<Long> list = userRepository.getFriendListForSender(user_id);
+            list.addAll(userRepository.getFriendListForReceiver(user_id));
+            List<Friendships> friendships = friendshipsRepository.getALlRelations(user_id);
+            for (Friendships test_friendships : friendships) {
+                friendshipsRepository.deleteById(test_friendships.getFriendships_id());
+            }
+            userRepository.deleteById(user_id);
+            return true;
         }
-        userRepository.deleteById(userId);
+        return false;
     }
 
     @Override
     public UserDetails loadUserByUsername(String mail) throws UsernameNotFoundException {
-        return (UserDetails) userRepository.findUserByMail(mail).orElseThrow(() ->
+        return (UserDetails) userRepository.getUserByMail(mail).orElseThrow(() ->
                 new UsernameNotFoundException("L'utilisateur avec l'email " + mail + " n'a pas été trouvé."));
     }
 
     public String signUpUser(User user) {
-            boolean userExist = userRepository.findUserByMail(user.getMail()).isPresent();
+        boolean userExist = userRepository.getUserByMail(user.getMail()).isPresent();
+        // Check if the mail refered in parameters exists already in database.
+        if (userExist) {
+            return "L'email est déjà utilisé.";
+        }
 
-            if (userExist) {
-                return "L'email est déjà utilisé.";
-            }
+        userExist = userRepository.getUserByUserName(user.getUsername()).isPresent();
 
-            userExist = userRepository.findUserByUserName(user.getUsername()).isPresent();
+        // Check if the username refered in parameters exists already in database.
+        if (userExist) {
+            return "Le nom d'utilisateur est déjà utilisé.";
+        }
 
-            if (userExist) {
-                return "Le nom d'utilisateur est déjà utilisé.";
-            }
+        // Encrypt password with BCrypt (a hash function).
+        String passwordEncoded = bCryptPasswordEncoder.encode(user.getPassword());
+        // Save password encrypted in user's details.
+        user.setPassword(passwordEncoded);
 
-            String passwordEncoded = bCryptPasswordEncoder.encode(user.getPassword());
-            user.setPassword(passwordEncoded);
+        // Save user in database.
+        userRepository.save(user);
 
-            userRepository.save(user);
+        // Generate a token for mail verification required during registration process and information of creation in this token and tme allowed for the user to validate his registration.
+        String token = UUID.randomUUID().toString();
+        ConfirmationToken confirmationToken = new ConfirmationToken(
+                token,
+                LocalDateTime.now(),
+                LocalDateTime.now().plusMinutes(15),
+                user
+        );
 
-            String token = UUID.randomUUID().toString();
-            ConfirmationToken confirmationToken = new ConfirmationToken(
-                    token,
-                    LocalDateTime.now(),
-                    LocalDateTime.now().plusMinutes(15),
-                    user
-            );
-
-            confirmationTokenService.saveConfirmationToken(confirmationToken);
-            return token;
+        // Save token and his details in database.
+        confirmationTokenService.saveConfirmationToken(confirmationToken);
+        return token;
     }
 
     public String login(String username, String password) {
-        if(userRepository.findUserByUserName(username).isPresent() && userRepository.findUserByUserName(username).get().isEnabled()) {
-            if (!bCryptPasswordEncoder.matches(password, userRepository.findUserByUserName(username).get().getPassword()))
+        // Check if user exists.
+        if (userRepository.getUserByUserName(username).isPresent()) {
+            // Check if password refered in the input during the login process matches with the password saved in database during the registration of the user.
+            if (!bCryptPasswordEncoder.matches(password, userRepository.getUserByUserName(username).get().getPassword()))
                 return "Mot de passe ou nom d'utilisateur incorrect";
-            else if(!userRepository.findUserByUserName(username).get().isEnabled())
-                return "Veuillez valider votre compte par mail.";
             else
                 return "";
         }
@@ -106,69 +144,98 @@ public class UserService implements UserDetailsService {
     }
 
     public int enableUser(String mail) {
+        // Enable the account after mail verification if everything matches well.
         return userRepository.enableUser(mail);
     }
 
     public List<User> getFriendList(Long user_id) {
+        // Check user doesn't exist and return an empty list.
+        if (!userRepository.existsById(user_id))
+            return List.of();
+        // In case user exists, we take all friendships where the ID of the user refered in parameters is linked.
         List<Long> list = userRepository.getFriendListForReceiver(user_id);
         list.addAll(userRepository.getFriendListForSender(user_id));
-        List<User> res = new LinkedList<>();
-        for (int i = 0; i < list.size(); i++) {
-            Optional<User> tmp = userRepository.findUserByID(list.get(i));
-            tmp.ifPresent(res::add);
-        }
-        return res;
+        return list.stream().filter(userRepository::existsById).map(elt -> userRepository.findById(elt).get()).collect(Collectors.toList());
     }
 
     public Optional<User> changeUsername(Long user_id, String username) {
-        if(!userRepository.findUserByUserName(username).isPresent() && userRepository.changeUsername(user_id, username) == 1) {
-            return userRepository.findUserByID(user_id);
-        }
-        return null;
+        Optional<User> changeUsername = userRepository.findById(user_id);
+        // Check if user exists and the request to change username worked fine.
+        if (changeUsername.isPresent() && userRepository.changeUsername(user_id, username) == 1)
+            return changeUsername;
+        return Optional.empty();
     }
 
     public Optional<User> changeMail(Long user_id, String mail) {
-        if(mail.matches("^(.+)@(.+)$") && !userRepository.findUserByMail(mail).isPresent() && userRepository.changeMail(user_id, mail) == 1) {
-         return userRepository.findUserByID(user_id);
-        }
-        return null;
+        Optional<User> changeMail = userRepository.findById(user_id);
+        // Check if user exists and the request to change mail processed well.
+        if (changeMail.isPresent() && mail.matches("^(.+)@(.+)$") && userRepository.changeMail(user_id, mail) == 1)
+            return changeMail;
+        return Optional.empty();
     }
 
     public Optional<User> changePassword(Long user_id, String password) {
-        if(password.matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}")) {
+        Optional<User> changePassword = userRepository.findById(user_id);
+        // Check if user exists and the password refered in parameters matches well with the regex which was established.
+        if (changePassword.isPresent() && password.matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}")) {
+            // Encrypt password with BCrypt.
             String passwordEncoded = bCryptPasswordEncoder.encode(password);
-            if(userRepository.changePassword(user_id, passwordEncoded) == 1) {
-                return userRepository.findUserByID(user_id);
-            }
+            // Check if the request to change password worked fine.
+            if (userRepository.changePassword(user_id, passwordEncoded) == 1)
+                return changePassword;
         }
-        return null;
+        return Optional.empty();
     }
 
     public Optional<User> changeName(Long user_id, String name) {
-        if(userRepository.changeName(user_id, name) == 1) {
-            return userRepository.findUserByID(user_id);
+        Optional<User> changeName = userRepository.findById(user_id);
+        // Check if user exists.
+        if (changeName.isPresent()) {
+            userRepository.changeName(user_id, name);
+            return changeName;
         }
-        return null;
+        return Optional.empty();
     }
 
     public Optional<User> changeLastName(Long user_id, String last_name) {
-            if(userRepository.changeLastName(user_id, last_name) == 1) {
-                return userRepository.findUserByID(user_id);
-            }
-        return null;
-    }
-
-    public Optional<User> addFriends(Long user_id, String link_to_avatar) {
-        if(userRepository.changeLinkToAvar(user_id, link_to_avatar) == 1) {
-            return userRepository.findUserByID(user_id);
+        Optional<User> changeLastName = userRepository.findById(user_id);
+        // Check if user exists.
+        if (changeLastName.isPresent()) {
+            userRepository.changeLastName(user_id, last_name);
+            return changeLastName;
         }
-        return null;
+        return Optional.empty();
     }
 
     public Optional<User> changeLinkToAvatar(Long user_id, String link_to_avatar) {
-        if(userRepository.changeLinkToAvar(user_id, link_to_avatar) == 1) {
-            return userRepository.findUserByID(user_id);
+        Optional<User> changeLinkToAvatar = userRepository.findById(user_id);
+        // Check if user exists.
+        if (changeLinkToAvatar.isPresent()) {
+            userRepository.changeLinkToAvatar(user_id, link_to_avatar);
+            return changeLinkToAvatar;
         }
-        return null;
+        return Optional.empty();
+    }
+
+    public String changeRole(Long user_id, User.Role role) {
+        if (userRepository.findById(user_id).isPresent()) {
+            if (role.equals(User.Role.STUDENT) || role.equals(User.Role.TEACHER) || role.equals(User.Role.ADMIN )) {
+                if (role.equals(User.Role.STUDENT) && teacherRequestRepository.getTeacherRequestByUser(user_id).isPresent())
+                    teacherRequestRepository.deleteById(teacherRequestRepository.getTeacherRequestByUser(user_id).get().getTr_id());
+                userRepository.changeRole(user_id, role);
+                return "Rôle modifié";
+            }
+            return "ERR|Rôle introuvable";
+        }
+        return "ERR|Utilisateur introuvable";
+    }
+
+    public Optional<User> lockOrUnlockUser(Long user_id, Boolean lock) {
+        Optional<User> temp = userRepository.findById(user_id);
+        if (temp.isPresent()) {
+            userRepository.lockOrUnlockUser(user_id, lock);
+            return temp;
+        }
+        return Optional.empty();
     }
 }

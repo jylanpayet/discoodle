@@ -32,6 +32,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .antMatchers("/*/*/*/*")
                 .permitAll()
+                .antMatchers("/*/*/*/*/*")
+                .permitAll()
                 .anyRequest()
                 .authenticated().and()
                 .formLogin();
@@ -49,4 +51,5 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         provider.setUserDetailsService(userService);
         return provider;
     }
+
 }

@@ -5,13 +5,44 @@
          <div>
             <span style="font-size: 23px; font-weight: 500; color: #F4F4F4">{{ $route.query.name }}</span>
             <div class="top-right-buttons">
-               <button :style="pinAdd ? { animation: '' } : { animation: 'none' }" style="height: 100%;" @click="switchPinDisplay">
+               <button :style="pinAdd ? { animation: '' } : { animation: 'none' }" style="height: 100%;"
+                       @click="switchPinDisplay">
                   <img src="../assets/pin.png" alt="" style="height: 60%;">
                </button>
-               <button style="color: #F4F4F4; font-size: 33px; font-weight: 500; height: 100%" @click="showAddUser = true">
+               <button style="color: #F4F4F4; font-size: 33px; font-weight: 500; height: 100%"
+                       @click="showAddUser = true">
                   +
                </button>
-               <AddUserInConv v-if="showAddUser" @addUsers="addUsers" @desactivatePopUp="showAddUser = false" />
+               <button style="cursor: pointer;" @click="showUserList = true;">
+                  <img src="../assets/user.svg" alt="" style="width: 25px;">
+               </button>
+               <w-drawer
+                     v-model="showUserList"
+                     right
+                     width="350px"
+                     bg-color="grey-dark5"
+               >
+                  <div class="user-list">
+                     <span style="font-size: 18px; color: #F4F4F4; font-weight: 600; margin-bottom: 10px;">Utilisateur(s) de la room :</span>
+                     <div :key="user.id" class="user" v-for="user in users">
+                        <img src="../assets/crown.svg" style="height: 80%; margin-right: 10px;" alt=""
+                             v-if="user.id === roomAdminID">
+                        {{ user.username }}
+                        <div>
+                           <button v-if="user.id !== getUser.id && getUser.id === roomAdminID"
+                                   style="margin-right: 6px;" @click="promoteAdmin(user.id)">
+                              <img src="../assets/crown.svg" style="height: 70%" alt="">
+                           </button>
+                           <button v-if="getUser.id === roomAdminID && user.id !== getUser.id && user.id !== roomAdminID"
+                                   @click="removerUser(user.id)">
+                              X
+                           </button>
+                        </div>
+                     </div>
+                  </div>
+               </w-drawer>
+               <AddUser v-if="showAddUser" @addUsers="addUsers" @desactivatePopUp="showAddUser = false;"
+                        :show-autocomplete="true"/>
             </div>
 
             <div class="pinned-message" v-if="showPinned">
@@ -20,8 +51,7 @@
                   <div class="pinned-message-content" :key="messages" v-for="messages in pinned">
                      {{ messages.sender }} : <br>
                      {{ messages.content }} <br>
-                     {{ messages.messageDate }}
-                     <button class="unpin-message" @click="unpinMessage(messages.id)">
+                     <button class="unpin-message" @click="unpinMessage(messages.message_id)">
                         X
                      </button>
                   </div>
@@ -37,11 +67,11 @@
             }}</span>
          <Message :key="message" v-for="message in messages"
                   :content="message.content"
-                  :user-logo="message.sender.charAt(0).toUpperCase()"
-                  :belong-to-myself="message.sender === user"
-                  :message-date="message.messageDate"
-                  :message-i-d="message.id"
-                  :is-edited="message.edited"
+                  :sender="message.sender"
+                  :belong_to_myself="message.sender === getUser.username"
+                  :message_date="message.message_date"
+                  :message_id="message.message_id"
+                  :edited="message.edited"
                   @pinnedMessage="pinnedMessage"
                   @deletedMessage="deletedMessage"
                   @editedMessage="editedMessage"
@@ -55,13 +85,15 @@
             <input type="text" autocomplete="off" :placeholder="`Envoyer un message à ${ $route.query.name }`"
                    @keydown="actionInput">
             <div class="right-side-input">
-               <EmojiPicker @selected-emoji="insertEmoji" @closeEmoji="showEmoji = false" v-if="showEmoji" class="emojiPicker" />
+               <EmojiPicker @selected-emoji="insertEmoji" @closeEmoji="showEmoji = false" v-if="showEmoji"
+                            class="emojiPicker"/>
                <button style="height: 32px; width: 32px;" @click="showEmoji = !showEmoji">
                   <img src="../assets/happy.svg" alt="Smiley">
                </button>
-               <button class="submit-file">
+               <label class="submit-file" style="cursor: pointer;">
                   +
-               </button>
+                  <input type="file" ref="uploadImage" @change="uploadImage()" style="height: 0; width: 0;">
+               </label>
             </div>
          </div>
       </div>
@@ -77,38 +109,50 @@ import marked from "marked";
 import Message from "@/components/common/Message";
 import emojis from "@/assets/emojis_uncathegorized";
 import EmojiPicker from "@/components/common/EmojiPicker";
-import AddUserInConv from "@/components/AddUserInConv";
+import AddUser from "@/components/AddUser";
 
 let stompClient = null;
 
 export default {
    name: "ChatContent",
    components: {
-      AddUserInConv,
+      AddUser,
       EmojiPicker,
       Message
    },
    data() {
       return {
          messages: [],
+         users: [],
          pinned: [],
-         user: "",
          writers: [],
          showPinned: false,
          showEmoji: false,
          pinAdd: false,
-         showAddUser: false
+         showAddUser: false,
+         showUserList: false,
+         roomAdminID: Number,
       }
    },
    mounted() {
-      this.user = this.getUser.username;
       this.getMessagesFromJSON();
       this.connect();
+      this.getUserOfRoom()
+      axios.get(`http://localhost:8080/api/rooms/findAdminOfRoom?room_id=${this.getCurrentConv}`).then(response => {
+         this.roomAdminID = response.data.id;
+      })
    },
    beforeRouteUpdate() {
       this.disconnect();
       this.getMessagesFromJSON();
+      this.getUserOfRoom()
       this.connect();
+      axios.get(`http://localhost:8080/api/rooms/findUserOfRoom?room_id=${this.getCurrentConv}`).then(response => {
+         this.users = response.data;
+      });
+      axios.get(`http://localhost:8080/api/rooms/findAdminOfRoom?room_id=${this.getCurrentConv}`).then(response => {
+         this.roomAdminID = response.data.id;
+      })
    },
    unmounted() {
       this.disconnect();
@@ -130,17 +174,22 @@ export default {
       actionInput(event) {
          if (event.keyCode === 13 && document.querySelector(".conv-input > div > input").value !== "") {
             this.send();
-            this.writers.pop(this.user);
+            this.writers.pop(this.getUser.username);
          } else if (event.keyCode !== 13) {
             this.writing();
             const inputContent = document.querySelector(".conv-input > div > input");
             inputContent.value = this.displayMessage(inputContent.value, false, true, false);
          }
       },
+      getUserOfRoom() {
+         axios.get(`http://localhost:8080/api/rooms/findUserOfRoom?room_id=${this.getCurrentConv}`).then(response => {
+            this.users = response.data;
+         });
+      },
       writing() {
-         if (!this.writers.includes(this.user)) {
+         if (!this.writers.includes(this.getUser.username)) {
             stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify({
-               sender: this.user,
+               sender: this.getUser.username,
                type: "WRITING"
             }));
          }
@@ -149,7 +198,7 @@ export default {
          let ws = new SockJS("http://localhost:8080/ws");
          stompClient = Stomp.over(ws);
          // Comment the next line if you want to show websocket's logs
-         stompClient.debug = null
+         // stompClient.debug = null
 
          stompClient.connect({}, () => {
             stompClient.subscribe(`/conversations/rooms/${this.getCurrentConv}`, (sdkEvent) => {
@@ -170,21 +219,18 @@ export default {
       onMessageReceived(payload) {
          let message = JSON.parse(payload.body);
 
-         if (message.sender !== this.user) {
+         if (message.sender !== this.getUser.username) {
             if (message.type === "MESSAGE") {
 
                this.messages.unshift({
                   convUUID: message.convUUID,
-                  id: message.id,
+                  message_id: message.message_id,
                   content: message.content,
                   sender: message.sender,
-                  messageDate: message.messageDate,
+                  message_date: message.message_date,
                   pinned: message.pinned,
                   edited: false,
-                  // TODO : Add messageReactions implementation.
-                  // messageReactions: message.messageReactions
                })
-               this.writers.pop(message.sender)
             } else if (message.type === "WRITING") {
                if (!this.writers.includes(message.sender)) {
                   this.writers.push(message.sender)
@@ -194,27 +240,48 @@ export default {
                }
             } else if (message.type === "PINNED") {
                this.messages.forEach(elt => {
-                  if (elt.id === message.id && !this.pinned.includes(elt))
+                  if (elt.message_id === message.message_id && !this.pinned.includes(elt))
                      this.pinned.push(elt);
                });
             } else if (message.type === "UNPINNED") {
-               this.pinned = this.pinned.filter(elt => elt.id !== message.id);
+               this.pinned = this.pinned.filter(elt => elt.message_id !== message.message_id);
             } else if (message.type === "DELETED") {
-               this.messages = this.messages.filter(elt => elt.id !== message.id);
-               this.pinned = this.pinned.filter(elt => elt.id !== message.id);
+               this.messages = this.messages.filter(elt => elt.message_id !== message.message_id);
+               this.pinned = this.pinned.filter(elt => elt.message_id !== message.message_id);
             } else if (message.type === "EDITED") {
                this.messages.forEach(elt => {
-                  if (elt.id === message.id) {
+                  if (elt.message_id === message.message_id) {
                      elt.content = message.content;
                      elt.edited = true;
                   }
                });
                this.pinned.forEach(elt => {
-                  if (elt.id === message.id) {
+                  if (elt.message_id === message.message_id) {
                      elt.content = message.content;
                      elt.edited = true;
                   }
                });
+            } else if (message.type === "USERS_ADDED") {
+               message.users.forEach(user => {
+                  if (this.containUsername(user)) {
+                     axios.get(`http://localhost:8080/api/users/findByUserName?username=${user}`).then(response => {
+                        this.users.push(response.data)
+                     })
+                  }
+               })
+               setTimeout(() => {
+                  this.getUserOfRoom()
+               }, 500)
+               this.showAddUser = false;
+            } else if (message.type === "USER_REMOVED") {
+               this.users = this.users.filter(elt => elt.id !== message.user_id);
+               setTimeout(() => {
+                  this.getUserOfRoom()
+               }, 500)
+               if (message.user_id === this.getUser.id)
+                  location.replace("/messages")
+            } else if (message.type === "CHANGE_ADMIN") {
+               this.roomAdminID = message.user_id;
             }
          }
       },
@@ -222,57 +289,46 @@ export default {
          let messageContent = document.querySelector(".conv-input > div > input");
 
          if (messageContent && stompClient) {
-            let date = new Date();
-            date = date.toLocaleString('fr-FR', {timeZone: 'UTC'}).substr(0, 17).replace(",", " -");
-            date = date.substr(0, 13) + ((Number(date.substr(13, 2)) + 1) % 24) + date.substr(15, 3);
-
-            let chatMessage = {
-               id: this.messages.length,
+            axios.post(`http://localhost:8080/api/messages/sendMessage?room_uuid=${this.getCurrentConv}`, {
+               conv_uuid: this.getCurrentConv,
                content: messageContent.value,
-               sender: this.user,
-               messageDate: date,
-               pinned: false,
-               edited: false,
-               convUUID: this.getCurrentConv,
-               // messageReactions: []
-
-               type: "MESSAGE"
-            };
-
-            this.messages.unshift(chatMessage);
-            stompClient.send(`/conversationListener/${this.getCurrentConv}/room.send`, {}, JSON.stringify(chatMessage));
-            messageContent.value = '';
+               sender: this.getUser.username,
+               message_date: Date.now()
+            }).then(response => {
+               this.messages.unshift(response.data);
+               stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify(response.data))
+               messageContent.value = "";
+            });
          }
       },
       getMessagesFromJSON() {
-         axios.get(`http://localhost:8080/api/messages?uuid=${this.getCurrentConv}`).then(response => {
-            this.messages = response.data.messages;
+         axios.get(`http://localhost:8080/api/messages?room_uuid=${this.getCurrentConv}`).then(response => {
+            this.messages = response.data.sort((a, b) => b.message_date - a.message_date);
             this.pinned = this.messages.filter(elt => (elt.pinned === true));
          });
-
       },
       switchPinDisplay() {
          this.showPinned = !this.showPinned;
       },
       unpinMessage(messageID) {
-         axios.put(`http://localhost:8080/api/room/unpinMessage/${this.getCurrentConv}?messageID=${messageID}`).then(() => {
+         axios.put(`http://localhost:8080/api/messages/unpinMessage?message_id=${messageID}`).then(() => {
             let c = 0;
             this.pinned.forEach(elt => {
-               if (elt.id === messageID)
+               if (elt.message_id === messageID)
                   this.pinned.splice(c, 1);
                c++;
             })
             stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify({
-               id: messageID,
+               message_id: messageID,
                type: "UNPINNED"
             }));
          })
       },
       pinnedMessage(messageID) {
          this.messages.forEach(elt => {
-            if (elt.id === messageID && !this.pinned.includes(elt)) {
+            if (elt.message_id === messageID && !this.pinned.includes(elt)) {
                stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify({
-                  id: messageID,
+                  message_id: messageID,
                   type: "PINNED"
                }));
                this.pinned.push(elt);
@@ -281,23 +337,78 @@ export default {
       },
       deletedMessage(messageID) {
          stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify({
-            id: messageID,
+            message_id: messageID,
             type: "DELETED"
          }));
       },
       editedMessage(messageID, content) {
          stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify({
-            id: messageID,
+            message_id: messageID,
             content: content,
             type: "EDITED"
          }));
       },
+      async addUsers(users) {
+         for (const user of users) {
+            if (this.containUsername(user)) {
+               await axios.get(`http://localhost:8080/api/users/findByUserName?username=${user}`).then(response => {
+                  axios.post(`http://localhost:8080/api/rooms/addNewMember?room_id=${this.getCurrentConv}&user_id=${response.data.id}`)
+               })
+            }
+         }
+         stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify({
+            users: users,
+            type: "USERS_ADDED"
+         }));
+      },
+      removerUser(user_id) {
+         axios.delete(`http://localhost:8080/api/rooms/removeMember?room_id=${this.getCurrentConv}&user_id=${user_id}`)
+         stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify({
+            user_id: user_id,
+            type: "USER_REMOVED"
+         }));
+      },
+      promoteAdmin(user_id) {
+         axios.put(`http://localhost:8080/api/rooms/changeAdmin?room_id=${this.getCurrentConv}&admin=${user_id}`)
+         stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify({
+            user_id: user_id,
+            type: "CHANGE_ADMIN"
+         }));
+      },
 
-      filterEmoji(content){
+
+      uploadImage() {
+         let file = this.$refs.uploadImage.files[0];
+         let temp = new FormData();
+         temp.append("file", file);
+         axios({
+            url: `http://localhost:8080/api/uploadfile/uploadImageInChat?room_id=${this.getCurrentConv}`,
+            method: 'POST',
+            data: temp,
+            headers: {
+               Accept: 'application/json',
+               'Content-type': 'multipart/form-data'
+            }
+         }).then(response => {
+            if (response.data !== "L'extension n'est pas un fichier jpg ou png, il ne peut donc pas être upload" && response.data !== "Erreur lors du téléchargement de l'image !") {
+               axios.post(`http://localhost:8080/api/messages/sendMessage?room_uuid=${this.getCurrentConv}`, {
+                  conv_uuid: this.getCurrentConv,
+                  content: `![${"Image de " + this.getUser.username}](${response.data})`,
+                  sender: this.getUser.username,
+                  message_date: Date.now()
+               }).then(response => {
+                  this.messages.unshift(response.data);
+                  stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify(response.data))
+               });
+            }
+         })
+      },
+
+      filterEmoji(content) {
          // Regex to match with the emoji string encode ( ':xxxxx_xxx_xxx_xxx:' where '_' is optionnal )
          const regex = ":[a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*:";
          const emoji = [...content.matchAll(regex)];
-         if(emoji && emoji.length > 0) {
+         if (emoji && emoji.length > 0) {
             emoji.forEach(elt => {
                if (emojis[elt[0].replaceAll(":", "")])
                   content = content.replace(elt[0], emojis[elt[0].replaceAll(":", "")]);
@@ -305,7 +416,7 @@ export default {
          }
          return content;
       },
-      filterMarkdown(content){
+      filterMarkdown(content) {
          return marked(content);
       },
       filterPing(content) {
@@ -337,22 +448,9 @@ export default {
          })
          return bool;
       },
-
-      addUsers(users) {
-         if (users.length > 0) {
-            users.forEach(user => {
-               if (this.containUsername(user)) {
-                  axios.get(`http://localhost:8080/api/users/${user}`).then(response => {
-                     axios.post(`http://localhost:8080/api/room/${this.getCurrentConv}/room.add?user_id=${response.data.id}`)
-                  })
-               }
-            })
-         }
-
-      }
    },
    computed: {
-      ...mapGetters(['getColors', 'getTheme', 'getCurrentConv', 'getUser', 'getFriends'])
+      ...mapGetters(['getColors', 'getCurrentConv', 'getUser', 'getFriends'])
    }
 }
 </script>
@@ -404,7 +502,7 @@ button {
    justify-content: space-between;
 
    height: 40px;
-   width: 65px;
+   width: 100px;
 }
 
 .conv-input {
@@ -512,7 +610,7 @@ button {
 
    padding: 10px 10px 0 10px;
    border-radius: 12px;
-   right: 36px;
+   right: 70px;
    top: 70px;
    min-width: 350px;
    background-color: #909090;
@@ -587,6 +685,53 @@ button {
    top: -10px;
    left: 32px;
    transform: translateX(-100%) translateY(-100%);
+}
+
+.user-list {
+   padding: 20px;
+   width: 100%;
+   height: 100%;
+
+   display: flex;
+   align-items: flex-start;
+   justify-content: flex-start;
+   flex-direction: column;
+}
+
+.user {
+   position: relative;
+   width: 100%;
+   height: 40px;
+   background-color: #8F8F8F;
+   border-radius: 12px;
+
+   display: flex;
+   align-items: center;
+   justify-content: flex-start;
+   padding-left: 15px;
+
+   color: #F4F4F4;
+   font-size: 18px;
+   font-weight: 600;
+   margin-bottom: 10px;
+}
+
+.user > div {
+   position: absolute;
+   right: 20px;
+
+   display: flex;
+   flex-direction: row;
+   align-items: center;
+   justify-content: space-between;
+}
+
+.user > div > button {
+   font-size: 18px;
+   width: 22px;
+   height: 22px;
+   font-weight: 600;
+   color: #F4F4F4;
 }
 
 @keyframes appear-opacity {

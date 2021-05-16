@@ -10,7 +10,11 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public class EditGroupRequest {
+
     private final Long groups_id;
+
     private final String name;
+
     private final String description;
+
 }

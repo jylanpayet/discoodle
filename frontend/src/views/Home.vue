@@ -1,14 +1,11 @@
 <template>
    <div class="Home">
       <div @scroll="loadPosts">
-         <SearchBar/>
          <div class="home-content">
             <div>
                <div class="welcome-discoodle">
                   Bienvenue sur Discoodle !
                </div>
-
-               <!-- TODO : Intégrer les posts -->
 
                <div class="posts-content">
                   <div v-if="posts.length === 0"
@@ -31,7 +28,6 @@
 </template>
 
 <script>
-import SearchBar from "@/components/common/SearchBar";
 import axios from "axios";
 import Post from "@/components/common/Post";
 import { mapGetters } from "vuex"
@@ -39,7 +35,6 @@ import { mapGetters } from "vuex"
 export default {
    name: 'Home',
    components: {
-      SearchBar,
       Post
    },
    data() {
@@ -140,7 +135,7 @@ export default {
    overflow-y: auto;
    margin: auto;
    height: 100%;
-   width: 80%;
+   width: 94%;
 
 
 }

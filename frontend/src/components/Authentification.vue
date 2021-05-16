@@ -4,9 +4,8 @@
          <div class="login" v-if="showLogin">
             <div style="display: flex; flex-direction: column; align-items: flex-start; justify-content: center; width: 100%;">
                <span style="color: #F4F4F4; font-size: 30px; font-weight: 600">Se connecter</span>
-               <input type="text" placeholder="Pseudo" name="userlog" autocomplete="false" required spellcheck="false" @keypress="actionInputLogin">
+               <input type="text" placeholder="Pseudo" name="userlog" autocomplete="off" required spellcheck="false" @keypress="actionInputLogin">
                <input type="password" placeholder="Mot de passe" name="passwordlog" required spellcheck="false" @keypress="actionInputLogin">
-               <a href="" style="font-size: 12px; color: #909090">Mot de passe oublié ?</a>
                <label>
                   <input type="checkbox">
                   Se souvenir de moi !
@@ -19,11 +18,11 @@
          <div class="register" v-else>
             <span style="margin-bottom: 15px; color: #F4F4F4; font-size: 30px; font-weight: 600">Créer mon compte</span>
 
-            <input type="text" placeholder="Pseudo" name="username" required @keypress="actionInputRegister">
-            <input type="text" placeholder="Prénom" name="name" required @keypress="actionInputRegister">
-            <input type="text" placeholder="Nom" name="lastname" required @keypress="actionInputRegister">
-            <input type="email" placeholder="Mail" name="mailReg" required @keypress="actionInputRegister">
-            <input type="password" placeholder="Mot de passe" name="passwordReg" required @keypress="actionInputRegister">
+            <input type="text" placeholder="Pseudo" autocomplete="off" name="username" required @keypress="actionInputRegister">
+            <input type="text" placeholder="Prénom" autocomplete="off" name="name" required @keypress="actionInputRegister">
+            <input type="text" placeholder="Nom" autocomplete="off" name="lastname" required @keypress="actionInputRegister">
+            <input type="email" placeholder="Mail" autocomplete="off" name="mailReg" required @keypress="actionInputRegister">
+            <input type="password" placeholder="Mot de passe" autocomplete="off" name="passwordReg" required @keypress="actionInputRegister">
             <button @click="userRegistration" style="align-self: center; margin-top: 15px;" class="submit">C'est parti !</button>
 
 
@@ -47,7 +46,6 @@
                   Discoodle est un outil pédagogique permettant aux étudiants ou aux professeurs d'université de
                   profiter des avantages de la plateforme Discord et Moodle en une même application.
                </p>
-               <a href="" style="color: #8F8F8F; font-size: 10px; align-self: flex-end">En savoir plus...</a>
             </div>
          </div>
       </div>
@@ -94,9 +92,17 @@ export default {
                if (document.querySelector(".login > div > label > input[type=checkbox]").checked)
                   vueCookie.set("username", document.querySelector("input[name=userlog]").value, {expires: '1Y'});
 
-               axios.get(`http://localhost:8080/api/users/${document.querySelector("input[name=userlog]").value}`).then(response => {
-                  this.setUser(response.data);
-                  this.$emit("logSuccess")
+               axios.get(`http://localhost:8080/api/users/findByUserName?username=${document.querySelector("input[name=userlog]").value}`).then(response => {
+                  if (!response.data.locked) {
+                     this.setUser(response.data);
+                     this.$emit("logSuccess")
+                  } else {
+                     this.errorMessage = "Votre compte a été bloqué";
+                     this.showError = true;
+                     setTimeout(() => {
+                        this.showError = false;
+                     }, 4000);
+                  }
                }).catch(error => {
                   console.log(error);
                })

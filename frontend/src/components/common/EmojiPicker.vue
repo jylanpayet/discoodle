@@ -2,7 +2,7 @@
    <div class="EmojiPicker">
       <div class="search-emojis">
          <input type="text" spellcheck="false" placeholder="Recherchez un emoji ..." @keydown="searchEmoji"
-                autocomplete="false">
+                autocomplete="off">
          <button
                style="margin-left: 10px; outline: none; border: none; background-color: #E85C5C; color: #f4f4f4; font-weight: 500; height: 20px; width: 20px; border-radius: 50px; cursor: pointer;"
                @click="$emit('closeEmoji')">X

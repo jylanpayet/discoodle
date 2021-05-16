@@ -51,7 +51,7 @@ empêchait toutes les interactions sociales, les professeurs ne pouvaient assure
 conditions et devaient se creuser la tête afin de pouvoir réunir diverses outils pour communiquer facilement 
 avec les élèves tout en ayant une plateforme qui leur permettait de mettre à disposition de tous les éléments 
 essentiels au bon déroulement du cursus d'apprentissage... Le soucis c'est que chacun ne procédait pas de la 
-même façon et nous pouvions passer d'une plateforme à une autre entre le cours de d'AAL et celui de POO.  
+même façon et nous pouvions passer d'une plateforme à une autre entre le cours de d'AAL et celui de POO, par exemple.  
 Heureusement, une équipe de développeurs hors du commun se mit à réaliser une application révolutionnaire : Discoodle !_
 
 Pourquoi Discoodle ?
@@ -67,6 +67,7 @@ Pourquoi Discoodle ?
 * [Vue.js](https://vuejs.org/) - Le framework web utilisé
 * [Spring](https://spring.io/) - Le framework backend utilisé
 * [Maven](https://maven.apache.org/) - L'outil de gestion des dépendances utilisé
+* [JUnit](https://junit.org/junit5/) - Le framework de test unitaire pour le backend
 
 ## <div id="commencer">Pour commencer</div>
 
@@ -103,7 +104,7 @@ npm install
 npm run serve 
 ```
 
-Pour customiser la configuration : [here](https://cli.vuejs.org/config/).
+Pour customiser la configuration : [ici](https://cli.vuejs.org/config/).
 
 #### <ins>_Uniquement le backend_</ins> :
 
@@ -121,15 +122,50 @@ mvn spring-boot:run
 
 ## <div id="issues">Feuille de route des issues</div>
 
-Regardez [les issues](https://gaufre.informatique.univ-paris-diderot.fr/somon/discoodle/issues) créées afin de prendre connaissance du travail réalisé, des améliorations déjà effectuées 
+#### <ins>_DISCOO-START_</ins> :
+Nous avons lors du premier sprint...
+
+#### <ins>_DISCOO-WEBRTC_</ins> :
+Durant ce second sprint, ...
+
+#### <ins>_DISCOO-API_</ins> :
+Nous avons durant ce troisième sprint, ...
+
+#### <ins>_DISCOO-WEBRTC_</ins> :
+Lors de ce quatrième sprint, ...
+
+#### <ins>_DISCOO-BUILD_</ins> :
+Le cinquième sprint rime avec "dint" (signifiant force) car nous voyons le rendu final de notre 
+travail : ...
+
+#### <ins>_DISCOO-HAPPY-END_</ins> :
+Il s'est avéré que ce dernier sprint fut l'élément manquant car ...
+
+Regardez, de manière plus détaillée, [les issues](https://gaufre.informatique.univ-paris-diderot.fr/somon/discoodle/issues) créées afin de prendre connaissance du travail réalisé, des améliorations déjà effectuées 
 ainsi que des problèmes rencontrés.
+
+
+## <div id="issues">TODO</div>
+#### <ins>_Les différentes idées possibles à intégrer_</ins> :
+- améliorer le webrtc en faisant en sorte que le système fonctionne pour des 
+  conversations entre différents utilisateurs (au sein d'une conversation...).
+- faire en sorte que l'application soit fonctionnelle sous forme d'application bureau (et 
+  toujours web évidemment) afin de faciliter son utilisation.
+- améliorer la sécurité en instaurant un système de tokens lorsqu'une action s'effectue 
+  côté back afin de prévenir des failles CSRF.
+- intégrer un système d'authentification grâce gmail afin de rendre plus intuitive 
+  l'inscription à la plateforme.
+- améliorer l'api en rajoutant quelques fonctionnalités pour l'intégration des patterns, 
+  l'auto-sauvegarde régulière des BDDs...
+- rajouter des limitations à l'upload des fichiers avec timers prédéfinis...
+- rajouter l'option de bloquer des utilisateurs entre eux
 
 ## <div id="auteurs">Auteurs</div>
 
 * **SOMON Bastian** - [@somon](https://gaufre.informatique.univ-paris-diderot.fr/somon)
+* **ALEXANDRE Dylan** - [@alexandr](https://gaufre.informatique.univ-paris-diderot.fr/alexandr)
 * **PAYET Jylan** - [@payetj](https://gaufre.informatique.univ-paris-diderot.fr/payetj)
 * **CLIPAL Moïse** - [@clipal](https://gaufre.informatique.univ-paris-diderot.fr/clipal)
-* **ALEXANDRE Dylan** - [@alexandr](https://gaufre.informatique.univ-paris-diderot.fr/alexandr)
 
 <!-- REMERCIEMENTS -->
 ## <div id="remerciements">Remerciements</div>

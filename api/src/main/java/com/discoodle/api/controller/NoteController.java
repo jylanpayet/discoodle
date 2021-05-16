@@ -1,120 +1,81 @@
 package com.discoodle.api.controller;
-import com.discoodle.api.ApiApplication;
+
 import com.discoodle.api.model.Note;
 import com.discoodle.api.request.NoteRequest;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
+import com.discoodle.api.service.NoteService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.PrintWriter;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.LinkedList;
-import java.util.UUID;
+import java.util.List;
+import java.util.Optional;
 
 
 @AllArgsConstructor
 @RestController
 public class NoteController {
 
+    private final NoteService noteService;
 
-    @PostMapping(path = "/api/addNewNote/{group_id}")
-    public void addNewNote(@RequestBody Note note, @PathVariable Long group_id) {
-
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String link=String.format("%sstatic/common/groups/%d/%d.json", ApiApplication.RESSOURCES, group_id, group_id);
-
-        try {
-            File file = new File(link);
-            if (!file.exists()) {
-                file.createNewFile();
-                PrintWriter writer = new PrintWriter(file);
-                writer.write("[\n\n]");
-                writer.close();
-            }
-            JsonReader reader = new JsonReader(new FileReader(link));
-            LinkedList<Note> noteLinkedList = gson.fromJson(reader, new TypeToken<LinkedList<Note>>() {
-            }.getType());
-            String id = UUID.randomUUID().toString().replaceAll("-", "");
-            note.setNote_id(id);
-            noteLinkedList.add(note);
-            Path path = Paths.get(link);
-            try (Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
-                gson.toJson(gson.toJsonTree(noteLinkedList), writer);
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.err.println("Fichier Json non mis à jour.");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("addNewNote error");
-        }
+    @PostMapping("/api/note/addNewNote")
+    public Optional<Note> addNewNote(@RequestBody NoteRequest request) {
+        return noteService.createNewNote(request);
     }
 
-    @PostMapping(path = "/api/deleteNote/{group_id}/{note_id}")
-    public void deleteNote(@PathVariable(name = "group_id") Long group_id, @PathVariable(name = "note_id") String note_id) {
-
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String link=String.format("%sstatic/common/groups/%d/%d.json", ApiApplication.RESSOURCES, group_id, group_id);
-
-        try {
-            JsonReader reader = new JsonReader(new FileReader(link));
-            LinkedList<Note> noteLinkedList = gson.fromJson(reader, new TypeToken<LinkedList<Note>>() {
-            }.getType());
-
-            for (Note n : noteLinkedList) {
-                if (n.getNote_id().equals(note_id)) {
-                    noteLinkedList.remove(n);
-                    Path path = Paths.get(link);
-                    try (Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
-                        gson.toJson(gson.toJsonTree(noteLinkedList), writer);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        System.err.println("Note non supprimée.");
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("deleteNote error");
-        }
+    @DeleteMapping("/api/note/deleteNoteById")
+    public void deleteNoteById(@RequestParam("note_id") Long note_id) {
+        noteService.deleteNoteById(note_id);
     }
 
-    @PostMapping(path = "/api/editNote/{group_id}/{note_id}")
-    public void editNote(@PathVariable(name = "group_id") Long group_id,
-                         @PathVariable(name = "note_id") String note_id,
-                         @RequestBody NoteRequest note) {
+    @DeleteMapping("api/note/deleteAllNoteByGroupId")
+    public void deleteAllNoteByGroupId(@RequestParam("group_id") Long group_id) {
+        noteService.deleteAllNoteByGroupId(group_id);
+    }
 
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String link=String.format("%sstatic/common/groups/%d/%d.json", ApiApplication.RESSOURCES, group_id, group_id);
+    @DeleteMapping("api/note/deleteAllNoteByUserId")
+    public void deleteAllNoteByUserId(@RequestParam("user_id") Long user_id) {
+        noteService.deleteAllNoteByUserId(user_id);
+    }
 
-        try {
-            JsonReader reader = new JsonReader(new FileReader(link));
-            LinkedList<Note> noteLinkedList = gson.fromJson(reader, new TypeToken<LinkedList<Note>>() {}.getType());
+    @DeleteMapping("api/note/deleteAllNoteByTitre")
+    public void deleteAllNoteByTitre(@RequestParam("group_id") Long group_id,@RequestParam("titre") String titre) {
+        noteService.deleteAllNoteByTitre(group_id,titre);
+    }
 
-            for (Note n : noteLinkedList){
-                if(n.getNote_id().equals(note_id)){
-                    n.setNote(note.getNote());
-                    Path path = Paths.get(link);
-                    try (Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
-                        gson.toJson(gson.toJsonTree(noteLinkedList), writer);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        System.err.println("Note non modifiée.");
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("editNote file error");
-        }
+    @GetMapping("api/note/getAllNoteByGroupId")
+    @ResponseBody
+    public List<Note> getAllNoteByGroupId(@RequestParam("group_id") Long group_id) {
+        return noteService.getAllNoteByGroupId(group_id);
+    }
+
+    @GetMapping("api/note/getAllNoteByUserId")
+    @ResponseBody
+    public List<Note> getAllNoteByUserId(@RequestParam("user_id") Long user_id) {
+        return noteService.getAllNoteByUserId(user_id);
+    }
+
+    @GetMapping("api/note/getAllNoteByTitre")
+    @ResponseBody
+    public List<Note> getAllNoteByTitre(@RequestParam("group_id") Long group_id,@RequestParam("titre") String titre) {
+        return noteService.getAllNoteByTitre(group_id,titre);
+    }
+
+    @GetMapping("api/note/getNoteByNoteId")
+    @ResponseBody
+    public Optional<Note> getNoteByNoteId(@RequestParam("note_id") Long note_id) {
+        return noteService.getNoteByNoteId(note_id);
+    }
+
+    @GetMapping("api/note/getUserNoteByGroupId")
+    @ResponseBody
+    public List<Note> getUserNoteByGroupId(@RequestParam("group_id") Long group_id, @RequestParam("user_id") Long user_id){
+        return noteService.getUserNoteByGroupId(group_id,user_id);
+    }
+
+
+    @PostMapping("api/note/editNote")
+    public void editNote(@RequestParam(name = "group_id") Long group_id,
+                         @RequestParam(name = "note_id") Long note_id,
+                         @RequestParam (value = "note") double note) {
+        noteService.editNote(group_id,note_id,note);
     }
 }

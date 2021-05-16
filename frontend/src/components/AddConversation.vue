@@ -2,18 +2,15 @@
    <div class="AddConversation" @click="clickEvent">
       <div class="add-conv-box">
          Créer une nouvelle discussion ici :
-
          <div>
-            <input type="text" placeholder="Entrez un nom de conversation..." name="name_room" @keypress="isEnter">
-            <button>
+            <input type="text" placeholder="Entrez un nom de conversation..." autocomplete="off" name="name_room" @keypress="isEnter">
+            <button @click="isEnter">
                +
             </button>
          </div>
-
          <button class="closePopUp" @click="$emit('desactivatePopUp')">
             X
          </button>
-
       </div>
    </div>
 </template>
@@ -30,7 +27,7 @@ export default {
    methods: {
       isEnter(event) {
          let inputValue = document.querySelector("input[name=name_room]").value;
-         if (event.keyCode === 13 && inputValue.value !== "") {
+         if ((event.keyCode === 13 && inputValue.value !== "") || event.type === "click") {
             this.addRoom(name);
          }
       },
@@ -39,7 +36,7 @@ export default {
             this.$emit('desactivatePopUp');
       },
       addRoom(event, name=document.querySelector('.add-conv-box > div > input').value) {
-         axios.post(`http://localhost:8080/api/room/addNewRoom`, {
+         axios.post(`http://localhost:8080/api/rooms/addNewRoom`, {
             room_name: name,
             room_members: [this.getUser.id],
             link_picture: null

@@ -16,13 +16,16 @@
          </div>
 
          <div class="input-user">
-            <input type="text" placeholder="Entrez un nom d'utilisateur..." name="name_room" @keypress="isEnter">
+            <input type="text" placeholder="Entrez un nom d'utilisateur..." autocomplete="off" list="friends-list" name="name_room" @keypress="isEnter">
+            <datalist id="friends-list" v-if="showAutocomplete">
+               <option :key="friend.id" v-for="friend in getFriends.filter(elt => !users.map(e => e.username).includes(elt.username))" :value="friend.username"></option>
+            </datalist>
             <button @click="addUser">
                +
             </button>
          </div>
 
-         <button class="submit" @click="$emit('addUsers', usersToAdd); $emit('desactivatePopUp')">
+         <button class="submit" @click="$emit('addUsers', usersToAdd);">
             Ajouter les utilisateurs séléctionnés !
          </button>
 
@@ -34,8 +37,17 @@
 </template>
 
 <script>
+import {mapGetters} from "vuex";
+import axios from "axios";
+
 export default {
    name: "AddUserInConv",
+   props: {
+      showAutocomplete: {
+         required: true,
+         type: Boolean
+      },
+   },
    methods: {
       clickEvent(event) {
          if (event.target.className === "AddUserInConv")
@@ -45,7 +57,6 @@ export default {
          const inputValue = document.querySelector(".input-user > input").value;
          if (inputValue !== "" && !this.usersToAdd.includes(inputValue))
             this.usersToAdd.push(inputValue);
-         // TODO : Push seulement si ami. sinon alert d'erreur.
          document.querySelector(".input-user > input").value = "";
       },
       removeUser(username) {
@@ -58,8 +69,18 @@ export default {
    },
    data() {
       return {
-         usersToAdd: []
+         usersToAdd: [],
+         users: []
       }
+   },
+   computed: {
+      ...mapGetters(['getFriends', 'getCurrentConv'])
+   },
+   mounted() {
+      if (this.getCurrentConv !== "")
+         axios.get(`http://localhost:8080/api/rooms/findUserOfRoom?room_id=${this.getCurrentConv}`).then(response => {
+            this.users = response.data;
+         })
    }
 }
 </script>
@@ -154,6 +175,7 @@ export default {
    background-color: #454150;
    color: #f4f4f4;
    padding-left: 13px;
+   padding-right: 7px;
    border-radius: 9099px;
 }
 .input-user > input::placeholder {
