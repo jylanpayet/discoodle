@@ -132,13 +132,16 @@ public class UserService implements UserDetailsService {
     }
 
     public String login(String username, String password) {
+        Optional<User> test = userRepository.getUserByUserName(username);
         // Check if user exists.
         if (userRepository.getUserByUserName(username).isPresent()) {
             // Check if password refered in the input during the login process matches with the password saved in database during the registration of the user.
             if (!bCryptPasswordEncoder.matches(password, userRepository.getUserByUserName(username).get().getPassword()))
                 return "Mot de passe ou nom d'utilisateur incorrect";
-            else
+            if(test.get().isEnabled())
                 return "";
+            else
+                return "Vous n'avez pas encore activé votre compte";
         }
         return "Mot de passe ou nom d'utilisateur incorrect";
     }
