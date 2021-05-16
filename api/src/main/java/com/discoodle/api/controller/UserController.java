@@ -92,6 +92,16 @@ public class UserController {
         return userService.changeName(user_id, request.getName());
     }
 
+    @PutMapping("/changeRole")
+    public String changeRole(@RequestParam("user_id") Long user_id, @RequestParam("role") User.Role role) {
+        return userService.changeRole(user_id, role);
+    }
+
+    @PutMapping("/lockOrUnlock")
+    public Optional<User> lockOrUnlockUser(@RequestParam("user_id") Long user_id, @RequestParam("lock") Boolean lock) {
+        return userService.lockOrUnlockUser(user_id, lock);
+    }
+
     @PostMapping("/changeLastName")
     public Optional<User> changeLastName(@RequestParam("user_id") Long user_id, @RequestBody RegistrationRequest request) {
         return userService.changeLastName(user_id, request.getLast_name());

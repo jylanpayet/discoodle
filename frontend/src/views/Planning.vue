@@ -1,46 +1,19 @@
 <template>
-   <div class="Planning">
-      <div class="webcams">
-         <video src="" id="webcamVideo" autoplay playsinline>
+   <w-switch class="mr6" v-model="view"></w-switch>
 
-         </video>
-
-         <video src="" id="remoteVideo" autoplay playsinline>
-
-         </video>
-      </div>
-
-      <button class="webcamButton" @click="startWebcam">
-         Webcam
-      </button>
-      <button class="screenshareButton" @click="startScreenshare">
-         Partage d'écran
-      </button>
-
-      <br><br>
-
-      <button class="callButton" @click="createCall" disabled>
-         Démarrer le stream
-      </button>
-
-      <br><br>
-
-      <input type="text" id="callInput" v-model="model.callInput">
-      <button class="answerButton" disabled @click="answerCall">
-         Rejoindre le stream
-      </button>
-
-      <br><br>
-
-      <button @click="logInfo">
-         Afficher les informations
-      </button>
+   <div class="Planning" >
+      <TeacherView v-if="view" />
+      <StudentView v-else />
    </div>
+
+
 </template>
 
 <script>
 import firebase from 'firebase/app';
 import 'firebase/firestore';
+import TeacherView from "@/components/rtc/TeacherView";
+import StudentView from "@/components/rtc/StudentView";
 
 const firebaseConfig = {
    apiKey: "AIzaSyB1nMvRom2_rglfpi02kcZ6TIgGDkmKgBU",
@@ -61,7 +34,7 @@ const firestore = firebase.firestore();
 
 export default {
    name: "Planning",
-   components: {},
+   components: {StudentView, TeacherView},
    methods: {
       async startWebcam() {
          this.localStream = await navigator.mediaDevices.getUserMedia({
@@ -96,10 +69,12 @@ export default {
 
          this.remoteStream = new MediaStream();
 
+         // On ajoute les tracks (audio/vidéo etc d'une source) au peer connexion
          this.localStream.getTracks().forEach((track) => {
             this.pc.addTrack(track, this.localStream);
          });
 
+         // A chaque connexion ajoutée, on le met dans remoteStream
          this.pc.ontrack = event => {
             event.streams[0].getTracks().forEach(track => {
                this.remoteStream.addTrack(track);
@@ -117,8 +92,6 @@ export default {
          const callDoc = firestore.collection('calls').doc();
          const offerCandidates = callDoc.collection('offerCandidates');
          const answerCandidates = callDoc.collection('answerCandidates');
-
-         this.model.callInput = callDoc.id;
 
          this.pc.onicecandidate = (event) => {
             event.candidate && offerCandidates.add(event.candidate.toJSON());
@@ -190,16 +163,12 @@ export default {
          });
       },
 
-      logInfo() {
-         navigator.mediaDevices.enumerateDevices().then(response => {
-            console.log(response);
-         });
-         console.log(this.localStream, this.localStream.getTracks());
-         console.log(this.remoteStream, this.remoteStream.getTracks());
-      }
+
    },
    data() {
       return {
+         view: true,
+
          pc: null,
          localStream: null,
          remoteStream: null,
@@ -237,46 +206,14 @@ export default {
 </script>
 
 <style scoped>
-.webcams {
-   display: flex;
-   align-items: center;
-   justify-content: space-between;
+.Planning {
    width: 100%;
-   height: 400px;
-   background-color: #4f4b5a;
-}
+   height: 600px;
+   padding: 30px;
 
-button {
-   height: 30px;
-   width: 100px;
-   background-color: #F4F4F4;
-   color: #2d2d2d;
-}
-
-video {
-   max-height: 100%;
-   max-width: 50%;
-}
-
-button {
-   background-color: #F4F4F4;
-   color: #4f4b5a;
-   border: none;
-   outline: none;
-
-   cursor: pointer;
-
-   height: 30px;
-}
-
-button:hover {
-   background-color: #E85C5C;
-   color: #F4F4F4;
-}
-
-button[disabled] {
-   background-color: #454545;
-   color: #999999;
-   cursor: not-allowed;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
 }
 </style>

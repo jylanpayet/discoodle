@@ -6,7 +6,6 @@
                <span style="color: #F4F4F4; font-size: 30px; font-weight: 600">Se connecter</span>
                <input type="text" placeholder="Pseudo" name="userlog" autocomplete="off" required spellcheck="false" @keypress="actionInputLogin">
                <input type="password" placeholder="Mot de passe" name="passwordlog" required spellcheck="false" @keypress="actionInputLogin">
-               <a href="" style="font-size: 12px; color: #909090">Mot de passe oublié ?</a>
                <label>
                   <input type="checkbox">
                   Se souvenir de moi !
@@ -47,7 +46,6 @@
                   Discoodle est un outil pédagogique permettant aux étudiants ou aux professeurs d'université de
                   profiter des avantages de la plateforme Discord et Moodle en une même application.
                </p>
-               <a href="" style="color: #8F8F8F; font-size: 10px; align-self: flex-end">En savoir plus...</a>
             </div>
          </div>
       </div>
@@ -95,8 +93,16 @@ export default {
                   vueCookie.set("username", document.querySelector("input[name=userlog]").value, {expires: '1Y'});
 
                axios.get(`http://localhost:8080/api/users/findByUserName?username=${document.querySelector("input[name=userlog]").value}`).then(response => {
-                  this.setUser(response.data);
-                  this.$emit("logSuccess")
+                  if (!response.data.locked) {
+                     this.setUser(response.data);
+                     this.$emit("logSuccess")
+                  } else {
+                     this.errorMessage = "Votre compte a été bloqué";
+                     this.showError = true;
+                     setTimeout(() => {
+                        this.showError = false;
+                     }, 4000);
+                  }
                }).catch(error => {
                   console.log(error);
                })

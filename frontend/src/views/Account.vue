@@ -92,6 +92,115 @@
                />
             </div>
          </div>
+
+         <div class="container requests">
+            <span>Mes demandes :</span>
+            <div class="container-content" style="margin-bottom: 15px;">
+               <span style="font-size: 18px; font-weight: 600; text-decoration: underline">Demande de rôle Enseignant :</span>
+               <div style="width: 100%">
+                  <w-button
+                        @click="requestTeacher"
+                        bg-color="error"
+                        :disabled="requests.teacher.requestState || getUser.role === 'TEACHER'"
+                  >
+                     Demander le rôle Enseignant
+                  </w-button>
+               </div>
+
+               <span>Etat de ma demande :</span>
+
+               <div class="request">
+                  <span v-if="JSON.stringify(requests.teacher.request) === JSON.stringify({})">Aucune demande en cours.</span>
+                  <w-card
+                        v-else
+                        success
+                        :bg-color="{
+                              'ACCEPTEE': 'success',
+                              'COURS': 'warning',
+                              'REFUSEE': 'error'
+                           }[requests.teacher.request.status]"
+                        style="width: 70%; height: 70px; display: flex; align-items: center; justify-content: center"
+                  >
+                     Votre demande {{
+                        {
+                           "ACCEPTEE": "a été accpetée",
+                           "COURS": "est toujours en cours",
+                           "REFUSEE": "a été refusée"
+                        }[requests.teacher.request.status]
+                     }}
+                  </w-card>
+               </div>
+            </div>
+
+            <div class="container-content" v-if="getUser.role === 'TEACHER'">
+               <span style="font-size: 18px; font-weight: 600; text-decoration: underline">Demande de création d'établissements :</span>
+               <w-button
+                     bg-color="error"
+                     plain
+                     @click="requests.establishments.dialog.show = true;"
+               >
+                  Faire une demande
+               </w-button>
+
+               <div class="pending-requests">
+                  <span v-if="requests.establishments.list.length === 0">Aucune requête en cours</span>
+                  <div :key="req" v-for="req in requests.establishments.list" :class="req.status === 'ACCEPTEE' ? 'req green' : 'req'">
+                     {{ req.name }} | {{ {
+                              "ESTABLISHMENT": "Etablissement",
+                              "FACULTY": "Université"
+                           }[req.type] }}
+                  </div>
+               </div>
+
+               <w-dialog
+                     v-model="requests.establishments.dialog.show"
+                     :width="500"
+                     title="Demander un établissement"
+                     color="grey-dark4"
+               >
+                  <div
+                        style="width: 100%; min-height: 150px;"
+                  >
+                     <w-form
+                           class="establishment-form"
+                           @success="askEstablishment"
+                     >
+                        <w-input
+                              :validators="[requests.establishments.dialog.form.required]"
+                              v-model="requests.establishments.dialog.form.value.name"
+                        >
+                           Nom de l'établissement
+                        </w-input>
+                        <w-input
+                              v-model="requests.establishments.dialog.form.value.init"
+                              maxlength="4"
+                        >
+                           Initiales de l'établissement
+                        </w-input>
+
+                        <w-select
+                         :items="[
+                               { label: 'Etablissement', value: 'ESTABLISHMENT' },
+                               { label: 'Université', value: 'FACULTY' }
+                         ]"
+                         v-model="requests.establishments.dialog.form.value.type"
+
+                        >
+                           Type d'établissement
+                        </w-select>
+
+                        <w-button
+                              type="submit"
+                              @click="requests.establishments.dialog.show = false;"
+                              :disabled="!requests.establishments.dialog.form.value.name || requests.establishments.dialog.form.value.name === '' || !requests.establishments.dialog.form.value.type"
+                        >
+                           Demander
+                        </w-button>
+                     </w-form>
+                  </div>
+               </w-dialog>
+            </div>
+         </div>
       </div>
    </div>
    <div style="width: 100%; height: 100%;" v-else>
@@ -324,7 +433,40 @@ export default {
          }
       },
 
-      ...mapActions(['setLinkToAvatar'])
+      requestTeacher() {
+         axios.post(`http://localhost:8080/api/TeacherRequest/addTeacherRequest?user_id=${this.getUser.id}`).then(response => {
+            if (response.data !== null) {
+               this.requests.teacher.request = response.data;
+               this.requests.teacher.requestState = true;
+            } else {
+               this.requests.teacher.request = {};
+               this.requests.teacher.requestState = false;
+            }
+         });
+      },
+
+      async askEstablishment() {
+         await axios.get("http://localhost:8080/api/groups/findIDOfDiscoodle").then(response => {
+            axios.post(`http://localhost:8080/api/establishmentRequest/addEstablishmentRequest`, {
+               parent_id: response.data,
+               user_id: this.getUser.id,
+               depth: 2,
+               name: this.requests.establishments.dialog.form.value.name,
+               description: this.requests.establishments.dialog.form.value.init ? this.requests.establishments.dialog.form.value.init : this.requests.establishments.dialog.form.value.name.substring(0, 4).toUpperCase(),
+               type: this.requests.establishments.dialog.form.value.type,
+               text: ""
+            }).then(rep => {
+               this.requests.establishments.list.push(rep.data);
+            });
+         });
+         this.requests.establishments.dialog.form.value = {
+            name: null,
+            init: null,
+            type: null
+         }
+      },
+
+      ...mapActions(['setLinkToAvatar', 'setUser'])
    },
    data() {
       return {
@@ -360,12 +502,36 @@ export default {
             show: false,
          },
          alreadyRegistered: false,
-         fullRegister: true
+         fullRegister: true,
+
+         requests: {
+            teacher: {
+               requestState: false,
+               request: {}
+            },
+            establishments: {
+               dialog: {
+                  show: false,
+                  form: {
+                     required: value => !!value || "Vous devez remplir ce champ",
+                     value: {
+                        name: null,
+                        init: null,
+                        type: null
+                     }
+                  }
+               },
+               list: [],
+            }
+         }
       }
    },
    mounted() {
       this.isAuthentificated = (JSON.stringify(this.getUser) !== JSON.stringify({}));
       if (this.isAuthentificated) {
+         axios.get(`http://localhost:8080/api/users/findByUserName?username=${this.getUser.username}`).then(response => {
+            this.setUser(response.data);
+         });
          this.updateEstablishment();
 
          axios.get(`http://localhost:8080/api/users/seeAllGroups?user_id=${this.getUser.id}`).then(response => {
@@ -411,6 +577,24 @@ export default {
                   }
                });
             }, 500)
+         });
+
+         axios.get(`http://localhost:8080/api/TeacherRequest/getTeacherRequestOfUser?user_id=${this.getUser.id}`).then(response => {
+            if (response.data?.status === 'ACCEPTEE')
+               this.getUser.role = "TEACHER";
+            if (response.data) {
+               this.requests.teacher.request = response.data;
+               this.requests.teacher.requestState = response.data.status === "COURS" || response.data.status === "ACCEPTEE";
+            } else {
+               this.requests.teacher.request = {};
+               this.requests.teacher.requestState = false;
+            }
+         });
+
+         axios.get(`http://localhost:8080/api/establishmentRequest/getEstablishmentRequestOfUser?user_id=${this.getUser.id}`).then(response => {
+            this.requests.establishments.list = response.data.filter(e => {
+               return e.status === 'ACCEPTEE' || e.status === 'COURS'
+            });
          });
       }
    }
@@ -496,6 +680,8 @@ export default {
 
    margin-bottom: 10px;
    width: 100%;
+   height: 85%;
+   min-height: 280px;
 }
 
 .logo-and-text {
@@ -630,5 +816,58 @@ export default {
    font-weight: 500;
    border-bottom: #8F8F8F solid 1px;
    cursor: not-allowed;
+}
+
+.requests > div {
+   color: white;
+
+   justify-content: space-between;
+   align-items: flex-start;
+}
+
+.request {
+   width: 100%;
+   height: 120px;
+
+   display: flex;
+   align-items: center;
+   justify-content: center;
+}
+
+.pending-requests {
+   width: 100%;
+   min-height: 150px;
+   max-height: 150px;
+   overflow-y: auto;
+}
+
+.establishment-form {
+   width: 100%;
+   min-height: 150px;
+   display: flex;
+   align-items: flex-start;
+   justify-content: space-between;
+   flex-direction: column
+}
+
+.establishment-form > * {
+   width: 100%;
+}
+
+.req {
+   margin-bottom: 10px;
+   width: 100%;
+   padding: 10px;
+   height: 40px;
+   background-color: #2d2d2d;
+   border-radius: 3px;
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+}
+
+.green {
+   background-color: #5CE8AD !important;
+   color: #F4F4F4 !important;
 }
 </style>

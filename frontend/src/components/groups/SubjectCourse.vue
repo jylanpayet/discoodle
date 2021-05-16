@@ -1,9 +1,8 @@
 <template>
    <div class="SubjectCourse">
-      <div class="teacher-view">
-         <div class="stream-start-stop">
-
-         </div>
+      <div v-if="fullLoad">
+         <TeacherView ref="teacher-view" v-if="rights.canStream" :rights="rights" />
+         <StudentView ref="student-view" v-else :rights="rights" />
       </div>
    </div>
 </template>
@@ -11,11 +10,22 @@
 <script>
 import axios from "axios";
 import {mapGetters} from "vuex";
+import TeacherView from "@/components/rtc/TeacherView";
+import StudentView from "@/components/rtc/StudentView";
 
 export default {
    name: "SubjectCourse",
+   components: {StudentView, TeacherView},
    computed: {
       ...mapGetters(['getGroup', 'getUser'])
+   },
+   data() {
+      return {
+         rights: {
+
+         },
+         fullLoad: false,
+      }
    },
    beforeRouteUpdate() {
       // Get rights of user in this group.
@@ -50,7 +60,9 @@ export default {
                canStream: temp.includes("l"),
             }
          }
-      })
+
+         this.fullLoad = true;
+      });
    },
    mounted() {
       // Get rights of user in this group.
@@ -85,6 +97,8 @@ export default {
                canStream: temp.includes("l"),
             }
          }
+
+         this.fullLoad = true;
       })
    }
 }

@@ -4,6 +4,7 @@ import com.discoodle.api.model.Friendships;
 import com.discoodle.api.model.Room;
 import com.discoodle.api.model.User;
 import com.discoodle.api.repository.FriendshipsRepository;
+import com.discoodle.api.repository.TeacherRequestRepository;
 import com.discoodle.api.repository.UserRepository;
 import com.discoodle.api.security.token.ConfirmationToken;
 import com.discoodle.api.security.token.ConfirmationTokenService;
@@ -14,6 +15,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +31,7 @@ public class UserService implements UserDetailsService {
     private final RoomService roomService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final ConfirmationTokenService confirmationTokenService;
+    private final TeacherRequestRepository teacherRequestRepository;
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -210,6 +213,28 @@ public class UserService implements UserDetailsService {
         if (changeLinkToAvatar.isPresent()) {
             userRepository.changeLinkToAvatar(user_id, link_to_avatar);
             return changeLinkToAvatar;
+        }
+        return Optional.empty();
+    }
+
+    public String changeRole(Long user_id, User.Role role) {
+        if (userRepository.findById(user_id).isPresent()) {
+            if (role.equals(User.Role.STUDENT) || role.equals(User.Role.TEACHER) || role.equals(User.Role.ADMIN )) {
+                if (role.equals(User.Role.STUDENT) && teacherRequestRepository.getTeacherRequestByUser(user_id).isPresent())
+                    teacherRequestRepository.deleteById(teacherRequestRepository.getTeacherRequestByUser(user_id).get().getTr_id());
+                userRepository.changeRole(user_id, role);
+                return "Rôle modifié";
+            }
+            return "ERR|Rôle introuvable";
+        }
+        return "ERR|Utilisateur introuvable";
+    }
+
+    public Optional<User> lockOrUnlockUser(Long user_id, Boolean lock) {
+        Optional<User> temp = userRepository.findById(user_id);
+        if (temp.isPresent()) {
+            userRepository.lockOrUnlockUser(user_id, lock);
+            return temp;
         }
         return Optional.empty();
     }

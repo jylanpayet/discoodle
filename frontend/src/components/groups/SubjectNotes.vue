@@ -8,7 +8,7 @@
             class="notes"
       >
          <template #no-data>
-            Vous n'avez aucune note(s) pour l'instant.
+            Vous n'avez aucune note pour l'instant.
          </template>
       </w-table>
 
