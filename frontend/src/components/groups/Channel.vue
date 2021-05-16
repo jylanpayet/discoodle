@@ -254,7 +254,6 @@ export default {
                sender: this.getUser.username,
                message_date: Date.now()
             }).then(response => {
-               console.log(response);
                this.messages.unshift(response.data);
                stompClient.send(`/conversations/rooms/${this.getCurrentConv}`, {}, JSON.stringify(response.data))
                messageContent.value = "";
@@ -491,7 +490,6 @@ export default {
       axios.get(`http://localhost:8080/api/rooms/findRoomByID?room_uuid=${this.getCurrentConv}`).then(response => {
          this.room = response.data;
          this.getMessagesFromJSON();
-         console.log(this.room);
       })
       this.connect();
 

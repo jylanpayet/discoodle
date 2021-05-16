@@ -50,9 +50,7 @@ export default {
           Accept: 'application/json',
           'Content-type': 'multipart/form-data'
         }
-      }).then(response =>{
-        console.log(JSON.stringify(response.data))
-      })
+      });
     },
     startImageUpload() {
       axios({
@@ -63,9 +61,7 @@ export default {
           Accept: 'application/json',
           'Content-type': 'multipart/form-data'
         }
-      }).then(response =>{
-        console.log(JSON.stringify(response.data))
-      })
+      });
     },
     startSubjectUpload() {
       axios({
@@ -76,8 +72,6 @@ export default {
           Accept: 'application/json',
           'Content-type': 'multipart/form-data'
         }
-      }).then(response =>{
-        console.log(JSON.stringify(response.data))
       });
     }
   }

@@ -349,7 +349,6 @@ export default {
 
       async startStream(isActive) {
          if (isActive) {
-            // TODO : stopper le stream
             this.send({
                type: "STREAM_STOPPED",
                callID: this.stream_id
@@ -461,7 +460,6 @@ export default {
       onMessageReceived(payload) {
          const obj = JSON.parse(payload.body);
          if (obj.info === "IS_STREAMING") {
-            console.log(obj);
             if (this.sources.stream.active) {
                this.send({
                   type: "STREAM_STARTED",
@@ -545,7 +543,6 @@ export default {
       }
    },
    unmounted() {
-      console.log("UNMOUNTED");
       this.stream?.getTracks().forEach(function (track) {
          if (track.readyState === 'live') {
             track.stop();

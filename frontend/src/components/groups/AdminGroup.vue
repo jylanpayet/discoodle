@@ -69,8 +69,6 @@ export default {
             }
          }
       })
-
-      console.log(this.getGroup);
    },
    beforeRouteUpdate() {
       // Get rights of user in this group.

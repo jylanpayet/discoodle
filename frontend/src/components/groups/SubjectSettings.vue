@@ -340,8 +340,10 @@ export default {
             {label: "ESTABLISHMENT", order: 1},
             {label: "FACULTY", order: 1},
             {label: "ADMINISTRATION", order: 2},
-            {label: "SUBJECTS", order: 3},
-            {label: "OTHER", order: 4},
+            {label: "COURSE", order: 3},
+            {label: "GRADE", order: 4},
+            {label: "SUBJECTS", order: 5},
+            {label: "OTHER", order: 6},
          ],
          groupTypes: [],
          uploaded: false,
@@ -526,8 +528,7 @@ export default {
          this.createRole.show = false;
       },
       deleteRole() {
-         axios.delete(`http://localhost:8080/api/groups/deleteRole?role_id=${this.roleToEdit.role.role_id}`).then(response => {
-            console.log(response);
+         axios.delete(`http://localhost:8080/api/groups/deleteRole?role_id=${this.roleToEdit.role.role_id}`).then(() => {
             this.getGroup.roles = this.getGroup.roles.filter(e => {
                return e.role_id !== this.roleToEdit.role.role_id;
             })

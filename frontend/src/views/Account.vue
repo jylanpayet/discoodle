@@ -676,7 +676,7 @@ export default {
    display: flex;
    flex-direction: column;
    align-items: center;
-   justify-content: space-between;
+   justify-content: flex-start;
 
    margin-bottom: 10px;
    width: 100%;

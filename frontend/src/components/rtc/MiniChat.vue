@@ -128,7 +128,6 @@ export default {
                color: message.color
             });
          } else {
-            console.log(message);
             this.question.show = true;
             this.question.form = message.form;
             setTimeout(() => {
@@ -188,7 +187,6 @@ export default {
       this.connect();
    },
    unmounted() {
-      console.log("CHAT UNMOUTNED");
       this.disconnect();
    }
 }
