@@ -110,7 +110,8 @@
                <span>Etat de ma demande :</span>
 
                <div class="request">
-                  <span v-if="JSON.stringify(requests.teacher.request) === JSON.stringify({})">Aucune demande en cours.</span>
+                  <span v-if="getUser.role === 'TEACHER'">Vous êtes déjà professeur</span>
+                  <span v-else-if="JSON.stringify(requests.teacher.request) === JSON.stringify({})">Aucune demande en cours.</span>
                   <w-card
                         v-else
                         success
