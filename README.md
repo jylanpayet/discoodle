@@ -62,6 +62,19 @@ Pourquoi Discoodle ?
   fonction de ses propres besoins : création de salons personnalisables, emploie du temps modifiable 
   selon nos tâches quotidiennes...
 
+Quelques fonctionnalités abordées :
+
+* Avoir des amis et interagir avec eux dans des salons privés.
+* Chat complet en temps réel incluant de nombreuses fonctionnalités : l'upload d'image, messages épinglés, pin, émoji...
+* Modélisation permettant de créer toute une infrastructure éducative (université, lycée) avec la possibilité d'apporter des modifications à celle-ci.
+* Rejoindre un établissement, s'inscrire à des matières et communiquée avec l'ensemble des personnes se trouvant dans votre groupe grâce à la mise en place de serveurs dédiés.
+* Système de rôles à travers chaque groupe permettant d'octroyer des droits à chaque utilisateur.
+* Avoir accès au cours d'un prof directement depuis une matière dans la section "accueil".
+* Ajouter des notes aux élèves inscrits à une matière.
+* Possibilité de lancer un live ou un partage d'écran afin d'effectuer son cours à distance.
+* Interagir avec la room grâce à un tchat et des QCM lors d'un cours qui pourrait être programmé en distanciel.
+* Demander à créer son établissement en tant que professeur.
+
 ### <div id="langages-et-outils"><ins>Langages et outils utilisés</ins></div>
 
 * [Vue.js](https://vuejs.org/) - Le framework web utilisé
