@@ -20,21 +20,21 @@ public class EstablishmentRequestController {
         return establishmentRequestService.addNewEstablishmentRequest(groupsRequest);
     }
 
-    @PostMapping("/acceptEstablishmentRequest")
+    @PutMapping("/acceptEstablishmentRequest")
     public Optional<EstablishmentRequest> acceptEstablishmentRequest(@RequestParam("er_id") Long er_id) {
         return establishmentRequestService.acceptEstablishmentRequest(er_id);
     }
 
-    @PostMapping("/refuseEstablishmentRequest")
+    @PutMapping("/refuseEstablishmentRequest")
     public Optional<EstablishmentRequest> refuseEstablishmentRequest(@RequestParam("er_id") Long er_id) {
         return establishmentRequestService.refuseEstablishmentRequest(er_id);
     }
-    @PostMapping("/getEstablishmentRequestOfUser")
+    @GetMapping("/getEstablishmentRequestOfUser")
     public List<EstablishmentRequest> getEstablishmentRequestOfUser(@RequestParam("user_id") Long user_id){
         return establishmentRequestService.getEstablishmentRequestOfUser(user_id);
     }
 
-    @PostMapping("/getEstablishmentRequestBeingProcessed")
+    @GetMapping("/getEstablishmentRequestBeingProcessed")
     public List<EstablishmentRequest> getEstablishmentRequestBeingProcessed(){
         return establishmentRequestService.getEstablishmentRequestBeingProcessed();
     }
