@@ -145,6 +145,35 @@
          </div>
       </div>
 
+      <div class="establishment-request">
+         <div class="card-title" style="width: 100%;">
+            Demandes de création d'établissement :
+         </div>
+
+         <div class="content">
+            <span v-if="requests.establishments.list.length === 0">Aucune requête en cours</span>
+            <div :key="req" v-for="req in requests.establishments.list" class="req">
+               {{ req.name }} | {{ req.type }}
+               <div style="width: 20%; min-width: 170px; display: flex; align-items: center; justify-content: space-between">
+                  <w-button
+                        bg-color="error"
+                        plain
+                        @click="refuseEstablishment(req.er_id)"
+                  >
+                     Refuser
+                  </w-button>
+                  <w-button
+                        bg-color="success"
+                        plain
+                        @click="acceptEstablishment(req.er_id)"
+                  >
+                     Accepter
+                  </w-button>
+               </div>
+            </div>
+         </div>
+      </div>
+
    </div>
 </template>
 
@@ -187,6 +216,9 @@ export default {
 
          requests: {
             teacher: {
+               list: [],
+            },
+            establishments: {
                list: [],
             }
          }
@@ -252,7 +284,24 @@ export default {
                return elt.user.id !== user_id;
             });
          });
-      }
+      },
+
+      acceptEstablishment(er_id) {
+         axios.put(`http://localhost:8080/api/establishmentRequest/acceptEstablishmentRequest?er_id=${er_id}`).then(response => {
+            console.log(response.data);
+            this.requests.establishments.list = this.requests.establishments.list.filter(e => {
+               return e.er_id !== er_id;
+            });
+         });
+      },
+      refuseEstablishment(er_id) {
+         axios.put(`http://localhost:8080/api/establishmentRequest/refuseEstablishmentRequest?er_id=${er_id}`).then(response => {
+            console.log(response.data);
+            this.requests.establishments.list = this.requests.establishments.list.filter(e => {
+               return e.er_id !== er_id;
+            });
+         });
+      },
    },
 
    async mounted() {
@@ -275,7 +324,10 @@ export default {
          })
       })
 
-      console.log(this.requests.teacher.list);
+      await axios.get("http://localhost:8080/api/establishmentRequest/getEstablishmentRequestBeingProcessed").then(response => {
+         console.log(response.data);
+         this.requests.establishments.list = response.data;
+      });
    },
 
 }
@@ -284,7 +336,6 @@ export default {
 <style scoped>
 .Discoodle {
    width: 100%;
-   height: 100%;
    display: flex;
    flex-direction: column;
    align-content: flex-start;
@@ -418,4 +469,37 @@ export default {
    margin-bottom: 5px;
 }
 
+.establishment-request {
+   padding: 15px;
+   margin-top: 20px;
+   width: 100%;
+   height: 400px;
+   background-color: #4f4b5a;
+   color: #F4F4F4;
+   border-radius: 5px;
+
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: flex-start;
+}
+
+.req {
+   margin-bottom: 10px;
+   width: 100%;
+   padding: 10px;
+   height: 40px;
+   background-color: #2d2d2d;
+   border-radius: 3px;
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+}
+
+.content {
+   width: 100%;
+   margin-top: 10px;
+   max-height: 340px;
+   overflow-y: auto;
+}
 </style>
