@@ -455,7 +455,7 @@ export default {
          if (stompClient !== null) {
             stompClient.disconnect();
          }
-         this.$refs["mini-chat"].disconnect();
+         this.$refs["mini-chat"]?.disconnect();
       },
       onMessageReceived(payload) {
          const obj = JSON.parse(payload.body);
